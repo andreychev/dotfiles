@@ -1,4 +1,15 @@
 # Install Homebrew
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
-sh brew.sh && sh cask.sh && sh npm.sh
+# Install all software
+./brew.sh
+./cask.sh
+./npm.sh
+
+# Install antigen
+curl -L https://raw.githubusercontent.com/zsh-users/antigen/master/antigen.zsh > antigen.zsh
+source antigen.zsh
+
+# Install Scm Breeze
+git clone git://github.com/ndbroadbent/scm_breeze.git ~/.scm_breeze
+~/.scm_breeze/install.sh

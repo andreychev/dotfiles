@@ -42,5 +42,5 @@ alias dos2unix="perl -pi -e 's/\r\n?/\n/g'"
 # List all git conflicts
 alias git-conflicts="git ls-files -u | awk '{print $4}' | sort -u"
 
-# Get OS X Software Updates and update homebrew
-alias update='sudo softwareupdate -i -a; brew update; brew upgrade --all; brew cleanup'
+# Get OS X Software Updates and update homebrew, scm_breeze
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade --all; brew cleanup; update_scm_breeze'

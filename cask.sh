@@ -33,7 +33,7 @@ apps=(
 	sopcast
 
 	dockertoolbox
-
+	vagrant
 	parallels-desktop
 
 	intellij-idea-ce

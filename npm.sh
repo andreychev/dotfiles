@@ -8,16 +8,10 @@ npmscripts=(
 	which
 	caniuse-cmd
 
-	osx-wifi-cli
 	pure-prompt
-
-	jshint
-	jscs
 
 	gulp
 	browser-sync
-
-	docpad
 
 	karma
 

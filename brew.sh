@@ -1,15 +1,32 @@
-# Ask for the administrator password upfront
+#!/usr/bin/env bash
+
+# Install command-line tools using Homebrew.
+
+# Ask for the administrator password upfront.
 sudo -v
 
-# Make sure we’re using the latest Homebrew
+# Keep-alive: update existing `sudo` time stamp until the script has finished.
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# Make sure we’re using the latest Homebrew.
 brew update
 
-# Upgrade any already-installed formulae
-brew upgrade
+# Upgrade any already-installed formulae.
+brew upgrade --all
 
 # More recent versions of some OS X tools
 brew tap homebrew/dupes
 brew install homebrew/dupes/grep
+brew install homebrew/dupes/screen
+
+utils=(
+	coreutils
+	moreutils
+	findutils
+)
+
+brew install ${utils[@]}
+sudo ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
 
 # Subversions
 subversions=(
@@ -30,11 +47,10 @@ echo -e "setenv PATH $HOME/dotfiles/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/
 
 # OS X crutches
 crutches=(
-	coreutils
-	findutils
-	vim
+	vim --override-system-vi
 
 	ack
+
 	bash
 	ntfs-3g
 
@@ -42,10 +58,10 @@ crutches=(
 	ctags
 
 	htop-osx
-	wget
+	wget --with-iri
 	unrar
 
-	gnu-sed
+	gnu-sed --with-default-names
 
 	httpie
 
@@ -83,9 +99,8 @@ languages=(
 
 brew install ${languages[@]}
 
-# Terminal multiplexers
+# Terminal multiplexer
 brew install tmux
-brew install screen
 brew install reattach-to-user-namespace
 
 # Frontend libs

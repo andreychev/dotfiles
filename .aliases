@@ -1,0 +1,46 @@
+# Easier navigation:
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
+# Shortcuts
+alias dropbox="cd ~/Dropbox"
+alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs"
+alias o="open"
+alias oo="open ."
+alias e="subl"
+alias h="history"
+
+# All stupidity
+alias :q="exit"
+alias claer="clear"
+
+alias myip="ifconfig | grep 'inet ' | grep -v 127.0.0.1 | awk '{print \$2}'"
+
+# IP addresses
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias localip="ipconfig getifaddr en0"
+alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+
+# Flush Directory Service cache
+alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
+
+# Clean up LaunchServices to remove duplicates in the “Open With” menu
+alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
+
+# Recursively delete `.DS_Store` files
+alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
+
+# Lock the screen (when going AFK)
+alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+
+# Convert line endings to UNIX
+# tr -d '\015'
+alias dos2unix="perl -pi -e 's/\r\n?/\n/g'"
+
+# List all git conflicts
+alias git-conflicts="git ls-files -u | awk '{print $4}' | sort -u"
+
+# Get OS X Software Updates and update homebrew
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade --all; brew cleanup'

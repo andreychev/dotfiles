@@ -13,6 +13,8 @@ npmscripts=(
 	gulp
 	browser-sync
 
+	guppy-cli
+
 	karma
 
 	csscomb

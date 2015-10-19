@@ -31,6 +31,8 @@ apps=(
 	utorrent
 	xld
 	sopcast
+	
+	microsoft-office365
 
 	dockertoolbox
 	vagrant

@@ -7,6 +7,7 @@ npmscripts=(
 	npm-check-updates
 	which
 	caniuse-cmd
+	tldr
 
 	pure-prompt
 

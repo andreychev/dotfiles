@@ -5,6 +5,8 @@ brew install caskroom/cask/brew-cask
 brew tap caskroom/versions
 
 apps=(
+	slack
+
 	java
 
 	tunnelblic
@@ -33,6 +35,8 @@ apps=(
 	sopcast
 	
 	microsoft-office365
+
+	teamviewer
 
 	dockertoolbox
 	vagrant

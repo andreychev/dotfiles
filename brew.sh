@@ -77,6 +77,7 @@ everythingelse=(
 	dark-mode
 	youtube-dl
 	mackup
+	ranger
 )
 
 brew install ${everythingelse[@]}

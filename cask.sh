@@ -19,6 +19,9 @@ apps=(
 	opera
 	torbrowser-ru
 
+	sketch
+	sketch-toolbox
+
 	iterm2
 	rescuetime
 	anybar
@@ -33,7 +36,7 @@ apps=(
 	utorrent
 	xld
 	sopcast
-	
+
 	microsoft-office365
 
 	teamviewer

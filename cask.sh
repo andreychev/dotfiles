@@ -21,6 +21,8 @@ apps=(
 
 	sketch
 	sketch-toolbox
+	iconjar
+	skyfonts
 
 	iterm2
 	rescuetime

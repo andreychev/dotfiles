@@ -57,6 +57,7 @@ fonts=(
 	font-hack
 	font-ubuntu
 	font-ubuntu-mono-powerline
+	font-roboto
 )
 
 brew cask install ${apps[@]}

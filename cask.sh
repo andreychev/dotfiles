@@ -4,6 +4,8 @@ brew install caskroom/cask/brew-cask
 
 brew tap caskroom/versions
 
+brew tap caskroom/fonts
+
 apps=(
 	slack
 
@@ -51,6 +53,13 @@ apps=(
 	webstorm
 )
 
+fonts=(
+	font-hack
+	font-ubuntu
+	font-ubuntu-mono-powerline
+)
+
 brew cask install ${apps[@]}
+brew cask install ${fonts[@]}
 
 brew cask cleanup

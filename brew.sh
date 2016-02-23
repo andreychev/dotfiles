@@ -62,6 +62,7 @@ crutches=(
 	unrar
 
 	gnu-sed --with-default-names
+	openssl
 
 	httpie
 
@@ -96,6 +97,8 @@ languages=(
 	racket
 
 	postgresql
+
+	rbenv
 )
 
 brew install ${languages[@]}
@@ -119,6 +122,7 @@ nvm use stable
 nvm alias default stable
 
 brew install ttfautohint fontforge --with-python
+brew link --force openssl
 
 # Remove outdated versions from the cellar
 brew cleanup

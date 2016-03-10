@@ -36,7 +36,7 @@ subversions=(
 	gist
 	tig
 
-	subversions
+	subversion
 	mercurial
 )
 

@@ -23,8 +23,7 @@ apps=(
 
 	sketch
 	sketch-toolbox
-	iconjar
-	skyfonts
+	zeplin
 
 	iterm2
 	rescuetime

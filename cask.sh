@@ -21,10 +21,6 @@ apps=(
 	opera
 	torbrowser-ru
 
-	sketch
-	sketch-toolbox
-	zeplin
-
 	iterm2
 	rescuetime
 	anybar

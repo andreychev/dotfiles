@@ -7,6 +7,7 @@ plugins=(
   language-babel
   highlight-selected
   gist
+  jumpy
 )
 
 apm install ${plugins[@]}

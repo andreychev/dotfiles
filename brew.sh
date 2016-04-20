@@ -79,6 +79,7 @@ everythingelse=(
 	youtube-dl
 	mackup
 	ranger
+	ansiweather
 )
 
 brew install ${everythingelse[@]}

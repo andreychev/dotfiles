@@ -36,7 +36,7 @@ apps=(
 	xld
 	sopcast
 
-	microsoft-office365
+	microsoft-office
 
 	teamviewer
 

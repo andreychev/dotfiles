@@ -25,6 +25,7 @@ apps=(
 	rescuetime
 	anybar
 	quicklook-json
+	postman
 
 	flux
 
@@ -35,12 +36,14 @@ apps=(
 	utorrent
 	xld
 	sopcast
+	mailbutler
+	fantastical
 
 	microsoft-office
 
 	teamviewer
 
-	dockertoolbox
+	docker
 	vagrant
 	parallels-desktop
 

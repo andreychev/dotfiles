@@ -4,10 +4,12 @@ sudo -v
 npmscripts=(
 	node-gyp
 
-	npm-check-updates
 	which
 	caniuse-cmd
 	tldr
+
+	# LOL
+	gify
 
 	pure-prompt
 
@@ -17,8 +19,6 @@ npmscripts=(
 	guppy-cli
 
 	karma
-
-	csscomb
 )
 
 npm install -g ${npmscripts[@]}

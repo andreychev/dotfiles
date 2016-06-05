@@ -26,6 +26,7 @@ apps=(
 	anybar
 	quicklook-json
 	postman
+    choosy
 
 	flux
 

@@ -20,9 +20,9 @@ brew install homebrew/dupes/grep
 brew install homebrew/dupes/screen
 
 utils=(
-	coreutils
-	moreutils
-	findutils
+  coreutils
+  moreutils
+  findutils
 )
 
 brew install ${utils[@]}
@@ -30,14 +30,14 @@ sudo ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
 
 # Subversions
 subversions=(
-	git
-	git-extras
-	hub
-	gist
-	tig
+  git
+  git-extras
+  hub
+  gist
+  tig
 
-	subversion
-	mercurial
+  subversion
+  mercurial
 )
 
 brew install ${subversions[@]}
@@ -47,59 +47,59 @@ echo -e "setenv PATH $HOME/dotfiles/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/
 
 # OS X crutches
 crutches=(
-	vim --override-system-vi
+  vim --override-system-vi
 
-	ack
+  ack
 
-	bash
-	ntfs-3g
+  bash
+  ntfs-3g
 
-	tree
-	ctags
+  tree
+  ctags
 
-	htop-osx
-	wget --with-iri
-	unrar
+  htop-osx
+  wget --with-iri
+  unrar
 
-	gnu-sed --with-default-names
-	openssl
+  gnu-sed --with-default-names
+  openssl
 
-	httpie
+  httpie
 
-	msmtp --with-macosx-keyring
+  msmtp --with-macosx-keyring
 )
 
 brew install ${crutches[@]}
 
 # Everything else
 everythingelse=(
-	archey
-	thefuck
-	dark-mode
-	youtube-dl
-	mackup
-	ranger
-	ansiweather
+  archey
+  thefuck
+  dark-mode
+  youtube-dl
+  mackup
+  ranger
+  ansiweather
 )
 
 brew install ${everythingelse[@]}
 
 languages=(
-	python
-	ansible
+  python
+  ansible
 
-	scala
-	sbt
+  scala
+  sbt
 
-	erlang
+  erlang
 
-	go
+  go
 
-	racket
+  racket
 
-	postgresql
+  postgresql
 
-	rbenv
+  rbenv
 )
 
 brew install ${languages[@]}

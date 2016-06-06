@@ -2,23 +2,23 @@
 sudo -v
 
 npmscripts=(
-	node-gyp
+  node-gyp
 
-	which
-	caniuse-cmd
-	tldr
+  which
+  caniuse-cmd
+  tldr
 
-	# LOL
-	gify
+  # LOL
+  gify
 
-	pure-prompt
+  pure-prompt
 
-	gulp
-	browser-sync
+  gulp
+  browser-sync
 
-	guppy-cli
+  guppy-cli
 
-	karma
+  karma
 )
 
 npm install -g ${npmscripts[@]}

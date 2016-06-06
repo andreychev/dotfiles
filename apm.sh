@@ -10,6 +10,8 @@ plugins=(
   gist
   jumpy
   project-manager
+  spacegray-dark-neue-syntax
+  spacegray-dark-ui
 )
 
 apm install ${plugins[@]}

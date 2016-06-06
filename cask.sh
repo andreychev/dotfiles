@@ -7,56 +7,56 @@ brew tap caskroom/versions
 brew tap caskroom/fonts
 
 apps=(
-	slack
+  slack
 
-	java
+  java
 
-	tunnelblic
+  tunnelblic
 
-	sequel-pro
+  sequel-pro
 
-	google-chrome
-	google-chrome-canary
-	firefox
-	opera
-	torbrowser-ru
+  google-chrome
+  google-chrome-canary
+  firefox
+  opera
+  torbrowser-ru
 
-	iterm2
-	rescuetime
-	anybar
-	quicklook-json
-	postman
+  iterm2
+  rescuetime
+  anybar
+  quicklook-json
+  postman
     choosy
 
-	flux
+  flux
 
-	appcleaner
-	raindrop
-	calibre
-	vlc
-	utorrent
-	xld
-	sopcast
-	mailbutler
-	fantastical
+  appcleaner
+  raindrop
+  calibre
+  vlc
+  utorrent
+  xld
+  sopcast
+  mailbutler
+  fantastical
 
-	microsoft-office
+  microsoft-office
 
-	teamviewer
+  teamviewer
 
-	docker
-	vagrant
-	parallels-desktop
+  docker
+  vagrant
+  parallels-desktop
 
-	intellij-idea-ce
-	webstorm
+  intellij-idea-ce
+  webstorm
 )
 
 fonts=(
-	font-hack
-	font-ubuntu
-	font-ubuntu-mono-powerline
-	font-roboto
+  font-hack
+  font-ubuntu
+  font-ubuntu-mono-powerline
+  font-roboto
 )
 
 brew cask install ${apps[@]}

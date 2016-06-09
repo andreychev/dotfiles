@@ -26,7 +26,7 @@ apps=(
   anybar
   quicklook-json
   postman
-    choosy
+  choosy
 
   flux
 
@@ -43,6 +43,7 @@ apps=(
   microsoft-office
 
   teamviewer
+  ngrok
 
   docker
   vagrant

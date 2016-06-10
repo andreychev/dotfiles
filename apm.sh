@@ -4,6 +4,7 @@ plugins=(
   clipboard-plus
   file-types
   highlight-selected
+  atom-keyboard-macros
 
   editorconfig
 

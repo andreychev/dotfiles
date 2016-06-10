@@ -7,6 +7,7 @@ npmscripts=(
   which
   caniuse-cmd
   tldr
+  nativefier
 
   # LOL
   gify

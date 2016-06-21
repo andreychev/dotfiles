@@ -7,6 +7,7 @@ plugins=(
   atom-keyboard-macros
 
   editorconfig
+  linter-eslint
 
   gist
   jumpy

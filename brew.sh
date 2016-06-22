@@ -52,6 +52,7 @@ crutches=(
   ack
 
   bash
+  shellcheck
   ntfs-3g
 
   tree

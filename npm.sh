@@ -8,6 +8,7 @@ npmscripts=(
   caniuse-cmd
   tldr
   nativefier
+  jscodeshift
 
   # LOL
   gify

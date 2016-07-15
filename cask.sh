@@ -58,6 +58,7 @@ fonts=(
   font-ubuntu
   font-ubuntu-mono-powerline
   font-roboto
+  font-fira-code
 )
 
 brew cask install ${apps[@]}

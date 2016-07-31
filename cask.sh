@@ -27,6 +27,7 @@ apps=(
   quicklook-json
   postman
   choosy
+  quitter
 
   flux
 

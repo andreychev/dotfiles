@@ -15,6 +15,7 @@ plugins=(
 
   spacegray-dark-neue-syntax
   spacegray-dark-ui
+  file-icons
 
   language-babel
   language-postcss

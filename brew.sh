@@ -23,6 +23,7 @@ utils=(
   coreutils
   moreutils
   findutils
+  m-cli
 )
 
 brew install ${utils[@]}

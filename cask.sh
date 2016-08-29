@@ -11,6 +11,8 @@ apps=(
 
   java
 
+  haskell-platform
+
   tunnelblic
 
   sequel-pro

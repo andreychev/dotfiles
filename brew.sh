@@ -62,6 +62,7 @@ crutches=(
   htop-osx
   wget --with-iri
   unrar
+  ssh-copy-id
 
   gnu-sed --with-default-names
   openssl

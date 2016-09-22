@@ -78,7 +78,6 @@ brew install ${crutches[@]}
 everythingelse=(
   archey
   thefuck
-  dark-mode
   youtube-dl
   mackup
   ranger

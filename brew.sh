@@ -20,6 +20,9 @@ brew install homebrew/dupes/grep
 brew install homebrew/dupes/screen
 
 utils=(
+  gnutls
+  gawk
+  binutils
   coreutils
   moreutils
   findutils
@@ -52,6 +55,9 @@ crutches=(
 
   ack
 
+  gzip
+  unzip
+
   bash
   shellcheck
   ntfs-3g
@@ -64,7 +70,10 @@ crutches=(
   unrar
   ssh-copy-id
 
+  gnu-which --with-default-names
+  gnu-tar --with-default-names
   gnu-sed --with-default-names
+
   openssl
 
   httpie

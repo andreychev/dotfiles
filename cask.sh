@@ -34,7 +34,7 @@ apps=(
   flux
 
   appcleaner
-  raindrop
+  raindropio
   calibre
   vlc
   utorrent

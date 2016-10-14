@@ -40,6 +40,7 @@ apps=(
   utorrent
   xld
   sopcast
+  spotify
   mailbutler
   fantastical
 

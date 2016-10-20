@@ -23,10 +23,14 @@ apps=(
   opera
   torbrowser-ru
 
+  quicklook-json
+  qlmarkdown
+  quicklook-csv
+  qlimagesize
+
   iterm2
   rescuetime
   anybar
-  quicklook-json
   postman
   choosy
   quitter

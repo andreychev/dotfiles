@@ -8,6 +8,7 @@ plugins=(
 
   editorconfig
   linter-eslint
+  stylefmt
 
   gist
   jumpy

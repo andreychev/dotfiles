@@ -13,6 +13,3 @@ source antigen.zsh
 # Install Scm Breeze
 git clone git://github.com/ndbroadbent/scm_breeze.git ~/.scm_breeze
 ~/.scm_breeze/install.sh
-
-# Install Git Standup
-curl -L https://raw.githubusercontent.com/kamranahmedse/git-standup/master/installer.sh | sudo sh

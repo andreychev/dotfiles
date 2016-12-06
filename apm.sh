@@ -1,4 +1,5 @@
 plugins=(
+  atom-ternjs
   autocomplete-modules
   autocomplete-paths
   clipboard-plus

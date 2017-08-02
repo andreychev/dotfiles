@@ -36,6 +36,7 @@ sudo ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
 subversions=(
   git
   git-extras
+  git-lfs
   hub
   gist
   tig

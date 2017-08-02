@@ -2,25 +2,17 @@
 sudo -v
 
 npmscripts=(
-  node-gyp
-
   which
   caniuse-cmd
   tldr
   nativefier
   jscodeshift
 
-  # LOL
-  gify
-
   pure-prompt
 
-  gulp
   browser-sync
-
-  guppy-cli
-
-  karma
+  
+  create-react-app
 )
 
 npm install -g ${npmscripts[@]}

@@ -52,7 +52,7 @@ echo -e "setenv PATH $HOME/dotfiles/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/
 
 # OS X crutches
 crutches=(
-  vim --override-system-vi
+  vim --with-override-system-vi
 
   ack
 
@@ -71,9 +71,9 @@ crutches=(
   unrar
   ssh-copy-id
 
-  gnu-which --with-default-names
-  gnu-tar --with-default-names
-  gnu-sed --with-default-names
+  gnu-which
+  gnu-tar
+  gnu-sed
 
   openssl
 

@@ -8,6 +8,7 @@ brew tap caskroom/fonts
 
 apps=(
   slack
+  skype
 
   java
 
@@ -22,6 +23,14 @@ apps=(
   firefox
   opera
   torbrowser-ru
+  
+  alfred
+  hazel
+  bartender
+  
+  atom
+  visual-studio-code
+  tunnelblick
 
   quicklook-json
   qlmarkdown
@@ -36,7 +45,8 @@ apps=(
   quitter
 
   flux
-
+  
+  functionflip
   appcleaner
   raindropio
   calibre
@@ -67,6 +77,8 @@ fonts=(
   font-ubuntu-mono-powerline
   font-roboto
   font-fira-code
+  font-lato
+  font-hasklig
 )
 
 brew cask install ${apps[@]}

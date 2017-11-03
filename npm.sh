@@ -12,6 +12,7 @@ npmscripts=(
 
   browser-sync
   
+  yarn
   create-react-app
 )
 

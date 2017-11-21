@@ -20,6 +20,7 @@ brew install homebrew/dupes/grep
 brew install homebrew/dupes/screen
 
 utils=(
+  gnu-tar
   gnutls
   gawk
   binutils

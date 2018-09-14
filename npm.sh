@@ -2,18 +2,12 @@
 sudo -v
 
 npmscripts=(
-  which
   caniuse-cmd
   tldr
   nativefier
   jscodeshift
-
-  pure-prompt
-
-  browser-sync
-  
+  pure-prompt  
   yarn
-  create-react-app
 )
 
 npm install -g ${npmscripts[@]}

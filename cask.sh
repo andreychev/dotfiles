@@ -11,24 +11,16 @@ apps=(
   skype
 
   java
-
-  haskell-platform
-
-  tunnelblic
-
-  sequel-pro
-
+  
   google-chrome
   google-chrome-canary
   firefox
   opera
-  torbrowser-ru
   
   alfred
   hazel
   bartender
   
-  atom
   visual-studio-code
   tunnelblick
 
@@ -43,42 +35,26 @@ apps=(
   postman
   choosy
   quitter
-
-  flux
   
-  functionflip
   appcleaner
   raindropio
   calibre
   vlc
-  utorrent
+  transmission
   xld
-  sopcast
-  spotify
   mailbutler
   fantastical
 
   microsoft-office
 
-  teamviewer
-  ngrok
-
   docker
-  vagrant
-  parallels-desktop
-
-  intellij-idea-ce
-  webstorm
 )
 
 fonts=(
   font-hack
-  font-ubuntu
-  font-ubuntu-mono-powerline
   font-roboto
+  font-roboto-mono
   font-fira-code
-  font-lato
-  font-hasklig
 )
 
 brew cask install ${apps[@]}

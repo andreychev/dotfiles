@@ -38,12 +38,12 @@ subversions=(
   git
   git-extras
   git-lfs
-  hub
+  # hub
   gist
   tig
 
-  subversion
-  mercurial
+  # subversion
+  # mercurial
 )
 
 brew install ${subversions[@]}
@@ -64,8 +64,8 @@ crutches=(
   shellcheck
   ntfs-3g
 
-  tree
-  ctags
+  # tree
+  # ctags
 
   htop-osx
   wget --with-iri
@@ -78,9 +78,9 @@ crutches=(
 
   openssl
 
-  httpie
+  # httpie
 
-  msmtp --with-macosx-keyring
+  # msmtp --with-macosx-keyring
 )
 
 brew install ${crutches[@]}
@@ -88,11 +88,11 @@ brew install ${crutches[@]}
 # Everything else
 everythingelse=(
   archey
-  thefuck
-  youtube-dl
+  # thefuck
+  # youtube-dl
   mackup
-  ranger
-  ansiweather
+  # ranger
+  # ansiweather
 )
 
 brew install ${everythingelse[@]}
@@ -101,14 +101,14 @@ languages=(
   python
   ansible
 
-  scala
-  sbt
+  # scala
+  # sbt
 
-  erlang
+  # erlang
 
   go
 
-  racket
+  # racket
 
   postgresql
 
@@ -122,9 +122,9 @@ brew install tmux
 brew install reattach-to-user-namespace
 
 # Frontend libs
-brew install imagemagick
-brew install watchman
-brew install jq
+# brew install imagemagick
+# brew install watchman
+# brew install jq
 
 # Node.js && npm
 brew install nvm
@@ -135,7 +135,7 @@ nvm install stable
 nvm use stable
 nvm alias default stable
 
-brew install ttfautohint fontforge --with-python
+# brew install ttfautohint fontforge --with-python
 brew link --force openssl
 
 # Remove outdated versions from the cellar

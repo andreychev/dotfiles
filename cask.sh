@@ -21,7 +21,10 @@ apps=(
   hazel
   bartender
   
+  powershell
+    
   visual-studio-code
+  
   tunnelblick
 
   quicklook-json
@@ -36,6 +39,7 @@ apps=(
   choosy
   quitter
   
+  day-o
   appcleaner
   raindropio
   calibre
@@ -44,6 +48,7 @@ apps=(
   xld
   mailbutler
   fantastical
+  telegram
 
   microsoft-office
 

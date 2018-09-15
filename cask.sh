@@ -4,12 +4,12 @@ brew tap caskroom/versions
 brew tap caskroom/fonts
 
 apps=(
-  slack
+  # slack
   skype
 
   java
   
-  google-chrome
+  # google-chrome
   google-chrome-canary
   firefox
   opera
@@ -29,7 +29,7 @@ apps=(
   quicklook-csv
   qlimagesize
 
-  iterm2
+  # iterm2
   rescuetime
   anybar
   postman
@@ -62,4 +62,4 @@ fonts=(
 brew cask install ${apps[@]}
 brew cask install ${fonts[@]}
 
-brew cask cleanup
+brew cleanup

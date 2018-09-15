@@ -50,7 +50,7 @@ echo -e "setenv PATH $HOME/dotfiles/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/
 
 # OS X crutches
 crutches=(
-  vim --with-override-system-vi
+  vim
 
   ack
 

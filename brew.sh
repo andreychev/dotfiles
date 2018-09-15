@@ -14,11 +14,6 @@ brew update
 # Upgrade any already-installed formulae.
 brew upgrade --all
 
-# More recent versions of some OS X tools
-brew tap homebrew/dupes
-brew install homebrew/dupes/grep
-brew install homebrew/dupes/screen
-
 utils=(
   gnu-tar
   gnutls

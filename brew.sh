@@ -16,6 +16,8 @@ brew upgrade --all
 
 utils=(
   gnu-tar
+  gnu-which
+  gnu-sed
   gnutls
   gawk
   binutils
@@ -66,13 +68,7 @@ crutches=(
   wget --with-iri
   unrar
   ssh-copy-id
-
-  gnu-which
-  gnu-tar
-  gnu-sed
-
-  openssl
-
+  
   # httpie
 
   # msmtp --with-macosx-keyring

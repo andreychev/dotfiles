@@ -1,0 +1,107 @@
+---
+downloads: ~/.ansible-downloads/
+
+configure_macos: true
+
+homebrew_use_brewfile: false
+
+homebrew_taps:
+  - homebrew/core
+  - homebrew/cask
+  - homebrew/cask-fonts
+  - homebrew/cask-versions
+
+homebrew_installed_packages:
+  # essential
+  - bash
+  - zsh
+  - coreutils
+  - moreutils
+  - findutils
+  - gnutls
+  - gnupg
+  - antibody
+  - wget
+  - openssh
+  - openssl
+  - readline 
+  - sqlite3 
+  - xz 
+  - zlib
+  # development
+  - git
+  - git-extras
+  - tig
+  - awscli
+  - nvm
+  - go
+  - rust
+  # others
+  - vim
+  - tmux
+  - scmpuff
+  - reattach-to-user-namespace
+  - m-cli
+  - mackup
+  - speedtest-cli
+
+homebrew_cask_appdir: /Applications
+homebrew_cask_apps:
+  # fonts
+  - font-fira-code
+  - font-jetbrains-mono
+  # browsers
+  - brave-browser
+  - google-chrome-canary
+  - firefox-developer-edition
+  - opera
+  - microsoft-edge
+  - choosy
+  # essential
+  - appcleaner
+  - 1password
+  - dropbox
+  - protonvpn
+  # tools
+  - kap
+  - grammarly
+  - cleanshot
+  - fantastical
+  - quitter
+  - rescuetime
+  - transmission
+  - alfred
+  - hazel
+  - bartender
+  - raindropio
+  - paragon-ntfs
+  # development
+  - iterm2
+  - visual-studio-code
+  - quicklook-json
+  - qlmarkdown
+  - quicklook-csv
+  - qlimagesize
+  - docker
+  - figma
+  - proxyman
+  # communication
+  - zoom
+  - discord
+  - microsoft-teams
+  # media
+  - spotify
+  - vlc
+  - xld
+  - twitch
+
+macos_script: "bash .macos --no-restart"
+
+# Install packages from other package managers.
+npm_packages: []
+pip_packages: []
+# - name: mkdocs
+#   state: present # present/absent/latest, default: present
+#   version: "0.16.3" # default: N/A
+
+touch_id_sudo_line: "auth       sufficient     pam_tid.so"

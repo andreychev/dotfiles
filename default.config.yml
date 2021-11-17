@@ -37,6 +37,7 @@ homebrew_installed_packages:
   - go
   - rust
   # others
+  - teleport
   - vim
   - tmux
   - scmpuff
@@ -75,6 +76,7 @@ homebrew_cask_apps:
   - bartender
   - raindropio
   - paragon-ntfs
+  - microsoft-office
   # development
   - iterm2
   - visual-studio-code

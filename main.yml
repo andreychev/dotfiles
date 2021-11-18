@@ -7,6 +7,8 @@
   roles:
     - role: geerlingguy.mac.homebrew
       tags: ['homebrew']
+    - role: geerlingguy.mac.mas
+      tags: ['mas']
 
   tasks:
     - import_tasks: tasks/macos.yml

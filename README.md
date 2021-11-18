@@ -35,6 +35,7 @@ Finally, there are a few other preferences and settings added on for various app
 1. Install [Pure prompt](https://github.com/xcambar/purs).
 1. Authorize Dropbox and wait for sync.
 1. Run `export PATH="opt/mackup/bin/mackup:$PATH" && mackup restore`.
+1. Run `/opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app`.
 1. Configure extra Mail, Calendar.
 
 ## Thanks to…

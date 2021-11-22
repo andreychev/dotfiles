@@ -52,7 +52,7 @@ homebrew_cask_apps:
   # browsers
   - brave-browser
   - google-chrome-canary
-  - firefox-developer-edition
+  - firefox
   - opera
   - microsoft-edge
   - choosy

@@ -39,6 +39,7 @@ homebrew_installed_packages:
   - vim
   - tmux
   - scmpuff
+  - tealdeer
   - reattach-to-user-namespace
   - mackup
   - mas

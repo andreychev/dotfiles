@@ -112,6 +112,8 @@ mas_installed_apps:
   - { id: 897118787, name: "Shazam" }
   - { id: 500154009, name: "Bitdefender Virus Scanner" }
   - { id: 1294126402, name: "HEIC Converter" }
+  - { id: 1470584107, name: "Dato" }
+  - { id: 1206020918, name: "Battery Indicator" }
 mas_uninstalled_apps:
   - { id: 408981434, name: "iMovie" }
   - { id: 682658836, name: "GarageBand" }

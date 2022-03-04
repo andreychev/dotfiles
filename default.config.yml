@@ -61,6 +61,7 @@ homebrew_cask_apps:
   - appcleaner
   - 1password
   - dropbox
+  - yandex-disk
   - protonvpn
   # tools
   - kap

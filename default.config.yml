@@ -60,7 +60,6 @@ homebrew_cask_apps:
   # essential
   - appcleaner
   - 1password
-  - dropbox
   - yandex-disk
   - protonvpn
   # tools

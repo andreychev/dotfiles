@@ -29,11 +29,12 @@ Finally, there are a few other preferences and settings added on for various app
 
 1. Install [vimi](https://github.com/miripiruni/vimi).
 1. Set Solarized Dark as default iTerm2 theme.
-1. Install [Ilya Birman Typography Layout](https://ilyabirman.net/projects/typography-layout/).
+1. Install [Ilya Birman Typography Layout](https://ilyabirman.net/projects/typography-layout).
 1. Remap Caps Lock to Ctrl.
 1. Install [Obinskit](https://www.hexcore.xyz/obinskit).
 1. Install [Pure prompt](https://github.com/xcambar/purs).
 1. Authorize Yandex.Disk and wait for sync.
+1. Run `cp .mackup.cfg ~/.mackup.cfg`.
 1. Run `export PATH="opt/mackup/bin/mackup:$PATH" && mackup restore`.
 1. Run `/opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app`.
 1. Configure extra Mail, Calendar.

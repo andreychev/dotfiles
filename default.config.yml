@@ -61,6 +61,7 @@ homebrew_cask_apps:
   - appcleaner
   - 1password
   - yandex-disk
+  - cloudflare-warp
   # tools
   - kap
   - grammarly
@@ -101,6 +102,7 @@ mas_installed_apps:
   - { id: 425424353, name: "The Unarchiver" }
   - { id: 967805235, name: "Paste" }
   - { id: 1365531024, name: "1Blocker" }
+  - { id: 1208561404, name: "Kaspersky VPN" }
   - { id: 409183694, name: "Keynote" }
   - { id: 409203825, name: "Numbers" }
   - { id: 409201541, name: "Pages" }

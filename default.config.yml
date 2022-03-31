@@ -93,7 +93,6 @@ homebrew_cask_apps:
   - spotify
   - vlc
   - xld
-  - twitch
 
 mas_signin_dialog: false
 mas_upgrade_all_apps: true

@@ -63,6 +63,7 @@ homebrew_cask_apps:
   - yandex-disk
   # tools
   - kap
+  - airbuddy
   - grammarly
   - cleanshot
   - fantastical

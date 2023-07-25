@@ -122,6 +122,21 @@ mas_uninstalled_apps:
 configure_macos: true
 macos_script: "bash .macos --no-restart"
 
+configure_dock: true
+dockitems_remove:
+  - TV
+  - Music
+  - Messages
+  - Facetime
+  - Numbers
+  - Pages
+  - Keynote
+  - Books
+  - App Store
+  - Maps
+  - Contacts
+  - Notes
+
 # Install packages from other package managers.
 npm_packages: []
 pip_packages: []

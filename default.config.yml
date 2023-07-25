@@ -4,8 +4,6 @@ downloads: ~/.ansible-downloads/
 homebrew_use_brewfile: false
 
 homebrew_taps:
-  - homebrew/core
-  - homebrew/cask
   - homebrew/cask-fonts
   - homebrew/cask-versions
 
@@ -34,14 +32,15 @@ homebrew_installed_packages:
   - nvm
   - go
   - rust
-  # others
   - teleport
+  # others
   - vim
   - tmux
   - scmpuff
   - tealdeer
   - reattach-to-user-namespace
   - mackup
+  - m-cli
   - mas
   - speedtest-cli
 
@@ -64,17 +63,19 @@ homebrew_cask_apps:
   # tools
   - kap
   - airbuddy
-  - grammarly
   - cleanshot
-  - fantastical
   - quitter
   - rescuetime
-  - transmission
   - raycast
   - hazel
   - bartender
   - raindropio
   - paragon-ntfs
+  # misc
+  - transmission
+  - qflipper
+  - logitech-g-hub
+  - calibre
   - microsoft-office
   # development
   - iterm2
@@ -86,6 +87,7 @@ homebrew_cask_apps:
   - docker
   - figma
   - proxyman
+  - outline-manager
   # communication
   - zoom
   - discord
@@ -101,17 +103,18 @@ mas_installed_apps:
   - { id: 425424353, name: "The Unarchiver" }
   - { id: 967805235, name: "Paste" }
   - { id: 1365531024, name: "1Blocker" }
-  - { id: 1208561404, name: "Kaspersky VPN" }
   - { id: 409183694, name: "Keynote" }
   - { id: 409203825, name: "Numbers" }
   - { id: 409201541, name: "Pages" }
   - { id: 1569600264, name: "Pandan" }
-  - { id: 1384080005, name: "Tweetbot" }
   - { id: 1529448980, name: "Reeder" }
   - { id: 803453959, name: "Slack" }
   - { id: 897118787, name: "Shazam" }
   - { id: 500154009, name: "Bitdefender Virus Scanner" }
   - { id: 1470584107, name: "Dato" }
+  - { id: 639968404, name: "Parcel" }
+  - { id: 1263070803, name: "Lungo" }
+  - { id: 1356178125, name: "Outline" }
 mas_uninstalled_apps:
   - { id: 408981434, name: "iMovie" }
   - { id: 682658836, name: "GarageBand" }

@@ -100,6 +100,7 @@ homebrew_cask_apps:
 mas_signin_dialog: false
 mas_upgrade_all_apps: true
 mas_installed_apps:
+  - { id: 1607635845, name: "Velja" }
   - { id: 425424353, name: "The Unarchiver" }
   - { id: 967805235, name: "Paste" }
   - { id: 1365531024, name: "1Blocker" }

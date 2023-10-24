@@ -84,7 +84,7 @@ homebrew_cask_apps:
   - qlmarkdown
   - quicklook-csv
   - qlimagesize
-  - docker
+  - podman
   - figma
   - proxyman
   - outline-manager

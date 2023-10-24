@@ -31,6 +31,7 @@ Finally, there are a few other preferences and settings added on for various app
 1. Set Solarized Dark as default iTerm2 theme.
 1. Install [Ilya Birman Typography Layout](https://ilyabirman.net/projects/typography-layout).
 1. Remap Caps Lock to Ctrl.
+1. Install [QuickGPT](https://sindresorhus.gumroad.com/l/quickgpt).
 1. Install [Obinskit](https://www.hexcore.xyz/obinskit).
 1. Install [Pure prompt](https://github.com/xcambar/purs).
 1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp).

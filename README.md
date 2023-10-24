@@ -48,4 +48,4 @@ Finally, there are a few other preferences and settings added on for various app
 
 - [Jeff Geerling](https://www.jeffgeerling.com/) and [his Mac Development Ansible Playbook](https://github.com/geerlingguy/mac-dev-playbook)
 - [Mathias Bynens](https://mathiasbynens.be/) and [his dotfiles repo](https://github.com/mathiasbynens/dotfiles)
-- Nikita Barskov and [his dotfiles repo](https://github.com/nikitabarskov/dotfiles)
+- [Nikita Barskov](https://dev-tau-seven.vercel.app/) and [his dotfiles repo](https://github.com/nikitabarskov/dotfiles)

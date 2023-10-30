@@ -58,7 +58,8 @@ homebrew_cask_apps:
   - choosy
   # essential
   - appcleaner
-  - 1password
+  # Keep old 1password
+  - 1password7
   - yandex-disk
   # tools
   - kap

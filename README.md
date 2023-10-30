@@ -35,7 +35,7 @@ Finally, there are a few other preferences and settings added on for various app
 1. Install [QMK Toolbox](https://github.com/qmk/qmk_toolbox/releases) and [latest Neo65 firmware](https://www.qwertykeys.com/pages/fw), [map Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
 1. Install [Pure prompt](https://github.com/xcambar/purs).
 1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp).
-1. Install [Amnezia VPN](https://ru.amnezia.org/).
+1. Install [Amnezia VPN](https://amnezia.org/en).
 1. Install Microsoft Office and Microsoft Teams.
 1. Authorize Yandex.Disk and wait for sync.
 1. Run `cp .mackup.cfg ~/.mackup.cfg`.

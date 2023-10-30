@@ -96,6 +96,8 @@ homebrew_cask_apps:
   # media
   - spotify
   - vlc
+  # current job
+  - pritunl
 
 mas_signin_dialog: false
 mas_upgrade_all_apps: true

@@ -27,12 +27,11 @@ Finally, there are a few other preferences and settings added on for various app
 
 ### Things that need to be done manually
 
-1. Install [vimi](https://github.com/miripiruni/vimi).
-1. Set Solarized Dark as default iTerm2 theme.
-1. Install [Ilya Birman Typography Layout](https://ilyabirman.net/projects/typography-layout).
 1. Remap Caps Lock to Ctrl.
-1. Install [QuickGPT](https://sindresorhus.gumroad.com/l/quickgpt).
+1. Install [vimi](https://github.com/miripiruni/vimi).
+1. Install [Ilya Birman Typography Layout](https://ilyabirman.net/projects/typography-layout).
 1. Install [QMK Toolbox](https://github.com/qmk/qmk_toolbox/releases) and [latest Neo65 firmware](https://www.qwertykeys.com/pages/fw), [map Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
+1. Install [QuickGPT](https://sindresorhus.gumroad.com/l/quickgpt).
 1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp) and [Chromium ГОСТ](https://github.com/deemru/Chromium-Gost/releases).
 1. Install [Amnezia VPN](https://amnezia.org/en).
 1. Install Microsoft Office and Microsoft Teams.

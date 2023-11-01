@@ -113,7 +113,7 @@ mas_uninstalled_apps:
   - { id: 682658836, name: "GarageBand" }
 
 configure_macos: true
-macos_script: "bash .macos --no-restart"
+macos_script: "bash .macos --no-restart && bash .apps --no-restart"
 
 configure_dock: true
 dockitems_remove:

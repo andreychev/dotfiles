@@ -9,95 +9,85 @@ homebrew_taps:
 
 homebrew_installed_packages:
   # essential
-  - bash
+  - vim
   - zsh
+  - mackup
+  - wget
+  - openssh
+  - openssl
+  - xz
+  - zlib
+  # https://github.com/ibraheemdev/modern-unix
+  - bat
+  - tealdeer
+  # old fashioned
   - coreutils
   - moreutils
   - findutils
   - gnutls
   - gnupg
-  - antibody
-  - wget
-  - openssh
-  - openssl
-  - readline
-  - sqlite3
-  - xz
-  - zlib
   # development
   - git
   - git-extras
   - tig
-  - awscli
-  - nvm
-  - go
-  - rust
-  - teleport
-  # others
-  - vim
-  - tmux
   - scmpuff
-  - tealdeer
-  - reattach-to-user-namespace
-  - mackup
-  - m-cli
+  - nvm
+  - rust
+  # misc
+  - youtube-dl
   - mas
-  - speedtest-cli
+  # current job
+  - zopfli
+  - teleport
+  - awscli
 
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
   # fonts
   - font-fira-code
   - font-jetbrains-mono
-  # browsers
-  - brave-browser
-  - google-chrome-canary
-  - firefox
-  - opera
-  - microsoft-edge
-  - choosy
-  # essential
-  - appcleaner
-  # Keep old 1password
-  - 1password7
-  - yandex-disk
-  # tools
-  - kap
-  - airbuddy
-  - cleanshot
-  - quitter
-  - rescuetime
-  - raycast
-  - hazel
-  - bartender
-  - raindropio
-  - paragon-ntfs
-  # misc
-  - transmission
-  - qflipper
-  - logitech-g-hub
-  - calibre
-  - microsoft-office
-  # development
-  - iterm2
-  - visual-studio-code
+  # quicklook addons
   - quicklook-json
   - qlmarkdown
   - quicklook-csv
   - qlimagesize
+  # browsers
+  - brave-browser
+  - google-chrome
+  - firefox
+  - microsoft-edge
+  # essential
+  - appcleaner
+  - 1password7
+  - yandex-disk
+  # tools
+  - raycast
+  - quitter
+  - rescuetime
+  - bartender
+  - cleanshot
+  - raindropio
+  - paragon-ntfs
+  # misc
+  - airbuddy
+  - transmission
+  - qflipper
+  - logitech-g-hub
+  - calibre
+  # development
+  - iterm2
+  - visual-studio-code
   - podman
-  - figma
   - proxyman
-  - outline-manager
   # communication
   - zoom
   - discord
-  - microsoft-teams
   # media
   - spotify
   - vlc
   # current job
   - pritunl
+  - figma
 
 mas_signin_dialog: false
 mas_upgrade_all_apps: true

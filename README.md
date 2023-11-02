@@ -23,9 +23,10 @@ sudo vi sudo_local
 # Install Homebrew.
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install mas, yadm.
+# Install mas, yadm, mackup.
 /opt/homebrew/bin/brew install mas
 /opt/homebrew/bin/brew install yadm
+/opt/homebrew/bin/brew install mackup
 
 # Install vimi.
 git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vimi" && make
@@ -43,6 +44,9 @@ brew bundle
 # Apply all defaults.
 /bin/bash -c ".macos --no-restart && .apps --no-restart"
 
+# Restore all mackup settings.
+/opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
+
 # Download old-fashioned sources.
 /bin/bash tasks/download.sh
 ```
@@ -52,12 +56,10 @@ brew bundle
 1. Remap Caps Lock to Ctrl, [Launchpad to F13](<(https://github.com/the-via/releases/issues/92#issuecomment-826337718)>).
 1. Install [QuickGPT](https://sindresorhus.gumroad.com/l/quickgpt).
 1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp).
+1. Run `/opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app`.
 1. Authorize Yandex.Disk and wait for sync.
 1. Authorize iCloud Drive and Photos.
 1. Configure extra Mail, Calendar.
-1. Run `cp .mackup.cfg ~/.mackup.cfg`.
-1. Run **after Yandex.Disk sync completes** `export PATH="opt/mackup/bin/mackup:$PATH" && mackup restore`.
-1. Run `/opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app`.
 1. Apply all licenses.
 1. Install Microsoft Office and Microsoft Teams.
 

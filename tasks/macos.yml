@@ -1,6 +1,6 @@
 ---
 - name: Run .macos dotfiles.
-  command: "{{ macos_script }}"
+  command: bash .macos --no-restart && bash .apps --no-restart
   changed_when: false
 
 - name: Ensure TouchId is available.
@@ -13,7 +13,7 @@
   register: touch_id_enabled_for_root
   changed_when: false
   when: touch_id_status.stdout == "1"
-  
+
 - name: Install TouchId as authentication method for sudo.
   lineinfile:
     path: /etc/pam.d/sudo

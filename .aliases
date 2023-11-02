@@ -12,9 +12,9 @@ alias egrep='egrep --color=auto'
 
 # Shortcuts
 alias ll="ls -la"
-alias dropbox="cd ~/Dropbox"
+alias dropbox="cd $HOME/Dropbox"
 alias disk="cd $HOME/Yandex.Disk-andreychev.ru.localized"
-alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs"
+alias icloud="cd $HOME/Library/Mobile\ Documents/com~apple~CloudDocs"
 
 alias o="open"
 alias oo="open ."

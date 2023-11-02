@@ -1,23 +1,23 @@
----
-- hosts: all
+- import_playbook: brew.yml
+- import_playbook: macos.yml
 
-  vars_files:
-    - default.config.yml
+  # vars_files:
+  #   - default.config.yml
 
-  roles:
-    - role: geerlingguy.mac.homebrew
-      tags: ["homebrew"]
-    - role: geerlingguy.mac.mas
-      when: mas_installed_apps or mas_installed_app_ids
-      tags: ["mas"]
-    - role: geerlingguy.mac.dock
-      when: configure_dock
-      tags: ["dock"]
+  # roles:
+  #   - role: geerlingguy.mac.homebrew
+  #     tags: ["homebrew"]
+  #   - role: geerlingguy.mac.mas
+  #     when: mas_installed_apps or mas_installed_app_ids
+  #     tags: ["mas"]
+  #   - role: geerlingguy.mac.dock
+  #     when: configure_dock
+  #     tags: ["dock"]
 
-  tasks:
-    - import_tasks: tasks/macos.yml
-      when: configure_macos
-      tags: ["macos"]
+  # tasks:
+  #   - import_tasks: tasks/macos.yml
+  #     when: configure_macos
+  #     tags: ["macos"]
 
-    - import_tasks: tasks/extra-packages.yml
-      tags: ["extra-packages"]
+  #   - import_tasks: tasks/extra-packages.yml
+  #     tags: ["extra-packages"]

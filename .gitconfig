@@ -1,26 +1,26 @@
 [user]
-  name = Philipp Andreychev
-  email = andreychev@me.com
+name = Philipp Andreychev
+email = andreychev@me.com
 [core]
-  editor = vim
-  excludesfile = ~/.gitignore
+editor = vim
+excludesfile = ~/.gitignore
 [commit]
-  verbose = true
+verbose = true
 [color]
-  branch = auto
-  diff = auto
-  interactive = auto
-  status = auto
+branch = auto
+diff = auto
+interactive = auto
+status = auto
 [init]
-  defaultBranch = master
+defaultBranch = master
 [web]
-  browser = google-chrome
+browser = google-chrome
 [credential]
-  helper = osxkeychain
+helper = osxkeychain
 [filter "lfs"]
-  process = git-lfs filter-process
-  required = true
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
+process = git-lfs filter-process
+required = true
+clean = git-lfs clean -- %f
+smudge = git-lfs smudge -- %f
 [pull]
-  rebase = true
+rebase = true

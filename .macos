@@ -16,10 +16,14 @@ osascript -e 'tell application "System Preferences" to quit'
 sudo -v
 
 # Keep-alive: update existing `sudo` time stamp until `.macos` has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+while true; do
+  sudo -n true
+  sleep 60
+  kill -0 "$$" || exit
+done 2>/dev/null &
 
 ###############################################################################
-# General UI/UX                                                               #
+# General UI/UX
 ###############################################################################
 
 # Set sidebar icon size to medium
@@ -104,7 +108,7 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bo
 defaults write com.apple.universalaccess reduceTransparency -bool true
 
 ###############################################################################
-# Screen                                                                      #
+# Screen
 ###############################################################################
 
 # Require password immediately after sleep or screen saver begins
@@ -195,7 +199,7 @@ sudo chflags nohidden /Volumes
 sudo chflags nohidden ~/Library
 
 ###############################################################################
-# Dock, Dashboard, and hot corners                                            #
+# Dock, Dashboard, and hot corners
 ###############################################################################
 
 # Enable highlight hover effect for the grid view of a stack (Dock)
@@ -220,7 +224,7 @@ defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock show-recents -bool false
 
 ###############################################################################
-# Safari & WebKit                                                             #
+# Safari & WebKit
 ###############################################################################
 
 # Privacy: don’t send search queries to Apple
@@ -247,11 +251,11 @@ defaults write com.apple.Safari ShowSidebarInTopSites -bool false
 defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
 
 # Enable the Develop menu and the Web Inspector in Safari
-defaults write com.apple.Safari IncludeInternalDebugMenu -bool true && \
-defaults write com.apple.Safari IncludeDevelopMenu -bool true && \
-defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true && \
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true && \
-defaults write -g WebKitDeveloperExtras -bool true
+defaults write com.apple.Safari IncludeInternalDebugMenu -bool true &&
+  defaults write com.apple.Safari IncludeDevelopMenu -bool true &&
+  defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true &&
+  defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true &&
+  defaults write -g WebKitDeveloperExtras -bool true
 
 # Enable continuous spellchecking
 defaults write com.apple.Safari WebContinuousSpellCheckingEnabled -bool true
@@ -283,7 +287,7 @@ defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
 defaults write com.apple.Safari InstallExtensionUpdatesAutomatically -bool true
 
 ###############################################################################
-# Mail                                                                        #
+# Mail
 ###############################################################################
 
 # Copy email addresses as `foo@example.com` instead of `Foo Bar <foo@example.com>` in Mail.app
@@ -297,7 +301,7 @@ defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnab
 defaults write -g NSAllowContinuousSpellChecking -bool true
 
 ###############################################################################
-# Terminal.app                                                                #
+# Terminal.app
 ###############################################################################
 
 # Only use UTF-8 in Terminal.app
@@ -311,17 +315,17 @@ defaults write com.apple.terminal SecureKeyboardEntry -bool true
 defaults write com.apple.Terminal ShowLineMarks -int 0
 
 ###############################################################################
-# Time Machine                                                                #
+# Time Machine
 ###############################################################################
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 # Disable local Time Machine backups
-hash tmutil &> /dev/null && sudo tmutil disablelocal
+hash tmutil &>/dev/null && sudo tmutil disablelocal
 
 ###############################################################################
-# Activity Monitor                                                            #
+# Activity Monitor
 ###############################################################################
 
 # Show the main window when launching Activity Monitor
@@ -335,7 +339,7 @@ defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
 defaults write com.apple.ActivityMonitor SortDirection -int 0
 
 ###############################################################################
-# Address Book, Dashboard, iCal, TextEdit, and Disk Utility                   #
+# Address Book, Dashboard, iCal, TextEdit, and Disk Utility
 ###############################################################################
 
 # Use plain text mode for new TextEdit documents
@@ -349,7 +353,7 @@ defaults write com.apple.DiskUtility DUDebugMenuEnabled -bool true
 defaults write com.apple.DiskUtility advanced-image-options -bool true
 
 ###############################################################################
-# Mac App Store                                                               #
+# Mac App Store
 ###############################################################################
 
 # Enable the automatic update check
@@ -368,14 +372,14 @@ defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
 defaults write com.apple.commerce AutoUpdate -bool true
 
 ###############################################################################
-# Photos                                                                      #
+# Photos
 ###############################################################################
 
 # Prevent Photos from opening automatically when devices are plugged in
 defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 
 ###############################################################################
-# Messages                                                                    #
+# Messages
 ###############################################################################
 
 # Disable automatic emoji substitution (i.e. use plain text smileys)

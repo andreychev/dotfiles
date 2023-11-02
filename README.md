@@ -52,6 +52,9 @@ yadm clone git@github.com:andreychev/dotfiles.git
 
 # Install FS.
 /opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app
+
+# Install nvm.
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 ```
 
 ### Things that need to be done manually

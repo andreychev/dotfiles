@@ -1,49 +1,71 @@
-This playbook installs and configures most of the software I use on my Mac for web and software development. Some things in macOS are slightly difficult to automate, so I still have a few manual installation steps, but at least it's all documented here.
+This scripts installs and configures most of the software I use on my Mac for web and software development. Some things in macOS are slightly difficult to automate, so I still have a few manual installation steps, but at least it's all documented here.
 
 ## Installation
 
-1. Ensure macOS is updated (`sudo softwareupdate -i -a`).
-1. Ensure Apple's command line tools are installed (`xcode-select --install` to launch the installer).
-1. Ensure you were authorized in the Mac App Store.
-1. [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/index.html):
+```bash
+# Take Me Home, Country Roads.
+cd $HOME
 
-   1. [Install Python3](https://www.python.org/downloads/macos/)
-   2. Upgrade Pip: `sudo pip3 install --upgrade pip`
-   3. Install Ansible: `pip3 install ansible`
+# Ensure macOS is updated.
+sudo softwareupdate -i -a
 
-1. Clone or download this repository to your local drive.
-1. Run `ansible-galaxy install -r requirements.yml` inside this directory to install required Ansible roles.
-1. Run `ansible-playbook main.yml --ask-become-pass` inside this directory. Enter your macOS account password when prompted for the 'BECOME' password.
+# Ensure Apple's command line tools are installed.
+xcode-select --install
+sudo xcodebuild -license
 
-### Running a specific set of tagged tasks
+# **Ensure you were authorized in the Mac App Store**.
 
-You can filter which part of the provisioning process to run by specifying a set of tags using `ansible-playbook`'s `--tags` flag. The tags available are `homebrew`, `extra-packages` and `macos`.
+# Enable TouchID for sudo (uncomment corresponding line).
+# Note: at least in the US, you cannot be compelled to give up a password by a court (it's considered a violation of the 5th amendment), but your biometrics are not secret, so you can absolutely be forced by a court to biometric auth.
+sudo cp sudo_local.template sudo_local
+sudo vi sudo_local
 
-    ansible-playbook main.yml -K --tags "homebrew"
+# Install Homebrew.
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-My other dotfiles are also available into the current user's home directory, including the `.macos` dotfile for configuring many aspects of macOS for better performance and ease of use.
+# Install mas, yadm, mackup.
+/opt/homebrew/bin/brew install mas
+/opt/homebrew/bin/brew install yadm
+/opt/homebrew/bin/brew install mackup
 
-Finally, there are a few other preferences and settings added on for various apps and services.
+# Install vimi.
+git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vimi" && make
+
+# Create basic directories.
+mkdir work
+mkdir personal
+
+# Clone this repository to your local drive using yadm.
+yadm clone git@github.com:andreychev/dotfiles.git
+
+# Install all dependencies.
+/opt/homebrew/bin/brew bundle
+
+# Apply all defaults.
+/bin/bash -c ".macos --no-restart && .apps --no-restart"
+
+# Restore all mackup settings.
+/opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
+
+# Download old-fashioned sources.
+/bin/bash tasks/download.sh
+
+# Install FS.
+/opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app
+```
 
 ### Things that need to be done manually
 
-1. Remap Caps Lock to Ctrl.
-1. Install [vimi](https://github.com/miripiruni/vimi).
-1. Install [Ilya Birman Typography Layout](https://ilyabirman.net/projects/typography-layout).
-1. Install [QMK Toolbox](https://github.com/qmk/qmk_toolbox/releases) and [latest Neo65 firmware](https://www.qwertykeys.com/pages/fw), [map Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
+1. [Remap Caps Lock to Ctrl](https://support.apple.com/zh-sg/guide/mac-help/mchlp1011/mac), [Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
 1. Install [QuickGPT](https://sindresorhus.gumroad.com/l/quickgpt).
-1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp) and [Chromium ГОСТ](https://github.com/deemru/Chromium-Gost/releases).
-1. Install [Amnezia VPN](https://amnezia.org/en).
-1. Install Microsoft Office and Microsoft Teams.
+1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp).
 1. Authorize Yandex.Disk and wait for sync.
-1. Run `cp .mackup.cfg ~/.mackup.cfg`.
-1. Run `export PATH="opt/mackup/bin/mackup:$PATH" && mackup restore`.
-1. Run `/opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app`.
+1. Authorize iCloud Drive and Photos.
 1. Configure extra Mail, Calendar.
 1. Apply all licenses.
+1. Install Microsoft Office and Microsoft Teams.
 
 ## Thanks to…
 
-- [Jeff Geerling](https://www.jeffgeerling.com/) and [his Mac Development Ansible Playbook](https://github.com/geerlingguy/mac-dev-playbook)
 - [Mathias Bynens](https://mathiasbynens.be/) and [his dotfiles repo](https://github.com/mathiasbynens/dotfiles)
 - [Nikita Barskov](https://dev-tau-seven.vercel.app/) and [his dotfiles repo](https://github.com/nikitabarskov/dotfiles)

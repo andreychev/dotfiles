@@ -5,6 +5,7 @@ tap "homebrew/cask-versions"
 # Keep here just to make `brew bundle cleanup` work
 brew "mas"
 brew "yadm"
+brew "mackup"
 
 ##
 # GNU command line tools
@@ -44,7 +45,6 @@ brew "bash"
 brew "vim"
 brew "zsh"
 brew "antigen"
-brew "mackup"
 brew "wget"
 brew "openssh"
 brew "openssl"

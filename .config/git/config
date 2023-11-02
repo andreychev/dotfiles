@@ -3,7 +3,7 @@ name = Philipp Andreychev
 email = andreychev@me.com
 [core]
 editor = vim
-excludesfile = ~/.gitignore
+excludesfile = $XDG_CONFIG_HOME/git/ignore
 [commit]
 verbose = true
 [color]

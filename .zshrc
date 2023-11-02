@@ -1,4 +1,5 @@
 source "$HOME/.aliases"
+source "$HOME/.xdg.dirs"
 
 # Make some path, must be done before antigen
 export PATH="/opt/homebrew/bin:$PATH"

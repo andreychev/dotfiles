@@ -1,4 +1,4 @@
-This playbook installs and configures most of the software I use on my Mac for web and software development. Some things in macOS are slightly difficult to automate, so I still have a few manual installation steps, but at least it's all documented here.
+This scripts installs and configures most of the software I use on my Mac for web and software development. Some things in macOS are slightly difficult to automate, so I still have a few manual installation steps, but at least it's all documented here.
 
 ## Installation
 
@@ -34,10 +34,8 @@ git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vim
 mkdir work
 mkdir personal
 
-# Clone or download this repository to your local drive.
-cd personal
-git clone git@github.com:andreychev/dotfiles.git
-cd $HOME
+# Clone this repository to your local drive using yadm.
+yadm clone git@github.com:andreychev/dotfiles.git
 
 # Install all dependencies.
 brew bundle

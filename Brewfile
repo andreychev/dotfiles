@@ -106,9 +106,6 @@ cask "rescuetime"
 cask "bartender"
 cask "cleanshot"
 
-# Drivers.
-cask "paragon-ntfs"
-
 # Misc applications.
 cask "airbuddy"
 cask "transmission"

@@ -3,7 +3,6 @@ name = Philipp Andreychev
 email = andreychev@me.com
 [core]
 editor = vim
-excludesfile = ~/.gitignore
 [commit]
 verbose = true
 [color]
@@ -12,9 +11,9 @@ diff = auto
 interactive = auto
 status = auto
 [init]
-defaultBranch = master
+defaultBranch = main
 [web]
-browser = google-chrome
+browser = brawe
 [credential]
 helper = osxkeychain
 [filter "lfs"]

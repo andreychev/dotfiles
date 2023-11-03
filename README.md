@@ -2,7 +2,7 @@ This scripts installs and configures most of the software I use on my Mac for we
 
 ## Installation
 
-```bash
+```sh
 # Take Me Home, Country Roads.
 cd $HOME
 
@@ -21,37 +21,17 @@ sudo cp sudo_local.template sudo_local
 sudo vi sudo_local
 
 # Install Homebrew.
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+if [[ $(command -v brew) == "" ]]; then
+  /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
 # Install mas, yadm, mackup.
 /opt/homebrew/bin/brew install mas
 /opt/homebrew/bin/brew install yadm
 /opt/homebrew/bin/brew install mackup
 
-# Install vimi.
-git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vimi" && make
-
-# Create basic directories.
-mkdir work
-mkdir personal
-
 # Clone this repository to your local drive using yadm.
-yadm clone git@github.com:andreychev/dotfiles.git
-
-# Install all dependencies.
-/opt/homebrew/bin/brew bundle
-
-# Apply all defaults.
-/bin/bash -c ".macos --no-restart && .apps --no-restart"
-
-# Restore all mackup settings.
-/opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
-
-# Download old-fashioned sources.
-/bin/bash tasks/download.sh
-
-# Install FS.
-/opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app
+yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
 ```
 
 ### Things that need to be done manually
@@ -59,6 +39,7 @@ yadm clone git@github.com:andreychev/dotfiles.git
 1. [Remap Caps Lock to Ctrl](https://support.apple.com/zh-sg/guide/mac-help/mchlp1011/mac), [Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
 1. Install [QuickGPT](https://sindresorhus.gumroad.com/l/quickgpt).
 1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp).
+1. Install [Paragon NTFS](https://uc.paragon-software.com/cabinet).
 1. Authorize Yandex.Disk and wait for sync.
 1. Authorize iCloud Drive and Photos.
 1. Configure extra Mail, Calendar.

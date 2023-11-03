@@ -1,0 +1,42 @@
+#!/bin/sh
+
+set -eu
+
+cd $HOME
+
+source "$HOME/.xdg.dirs"
+source "$XDG_CONFIG_HOME/shell/xdg"
+
+# Install vimi.
+[ ! -d "$HOME/.vimi" ] && git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vimi" && make
+echo "vimi installing is complete."
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # Run brew bundle.
+  /opt/homebrew/bin/brew bundle
+  echo "brew dependencies installing is complete."
+
+  # Apply all defaults.
+  /bin/sh -c ".config/iterm2/defaults && .config/transmission/defaults && .config/macos/defaults --no-restart"
+  echo "defaults applying is complete."
+
+  # Restore all mackup settings.
+  /opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
+  echo "mackup settings restoring is complete."
+
+  # Install old-fashioned apps.
+  TYPOGRAPHY="3.8"
+  CHROMIUM_GOST="119.0.6045.105"
+  AMNEZIA="4.0.8.6"
+
+  cd $XDG_DOWNLOAD_DIR
+  [ ! -f "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" ] && curl -fLo "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg"
+  [ ! -f "$CHROMIUM_GOST-macos-arm64.tar.bz2" ] && curl -fLo "$CHROMIUM_GOST-macos-arm64.tar.bz2" "https://github.com/deemru/Chromium-Gost/releases/download/$CHROMIUM_GOST/chromium-gost-$CHROMIUM_GOST-macos-arm64.tar.bz2"
+  [ ! -f "AmneziaVPN_$AMNEZIA.dmg" ] && curl -fLo "AmneziaVPN_$AMNEZIA.dmg" "https://github.com/amnezia-vpn/amnezia-client/releases/download/${AMNEZIA%.*}/AmneziaVPN_$AMNEZIA.dmg"
+  cd $HOME
+  echo "Downloading is complete."
+fi
+
+# Install nvm.
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | sh
+echo "nvm installing is complete."

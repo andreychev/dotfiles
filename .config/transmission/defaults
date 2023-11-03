@@ -2,9 +2,9 @@
 # Transmission.app
 ###############################################################################
 
-# Use `~/Documents/Torrents` to store incomplete downloads
+# Use `${XDG_DOCUMENTS_DIR}/Torrents` to store incomplete downloads
 defaults write org.m0k.transmission UseIncompleteDownloadFolder -bool true
-defaults write org.m0k.transmission IncompleteDownloadFolder -string "${HOME}/Documents/Torrents"
+defaults write org.m0k.transmission IncompleteDownloadFolder -string "${XDG_DOCUMENTS_DIR}/Torrents"
 
 # Use `~/Downloads` to store completed downloads
 defaults write org.m0k.transmission DownloadLocationConstant -bool true
@@ -27,13 +27,3 @@ defaults write org.m0k.transmission WarningLegal -bool false
 
 # Randomize port on launch
 defaults write org.m0k.transmission RandomPort -bool true
-
-###############################################################################
-# iTerm.app
-###############################################################################
-
-# Specify the preferences directory
-defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "${HOME}"
-
-# Tell iTerm2 to use the custom preferences in the directory
-defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true

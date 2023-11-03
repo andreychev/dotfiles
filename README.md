@@ -21,7 +21,9 @@ sudo cp sudo_local.template sudo_local
 sudo vi sudo_local
 
 # Install Homebrew.
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+case $(which brew) in "brew not found")
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+esac
 
 # Install mas, yadm, mackup.
 /opt/homebrew/bin/brew install mas
@@ -42,7 +44,7 @@ yadm clone git@github.com:andreychev/dotfiles.git
 /opt/homebrew/bin/brew bundle
 
 # Apply all defaults.
-/bin/bash -c ".macos --no-restart && .apps --no-restart"
+/bin/bash -c ".config/iterm2/defaults && .config/transmission/defaults && .config/macos/defaults --no-restart"
 
 # Restore all mackup settings.
 /opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall

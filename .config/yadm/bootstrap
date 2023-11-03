@@ -16,7 +16,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   echo "brew dependencies installing is complete."
 
   # Apply all defaults.
-  /bin/bash -c ".config/iterm2/defaults && .config/transmission/defaults && .config/macos/defaults --no-restart"
+  /bin/sh -c ".config/iterm2/defaults && .config/transmission/defaults && .config/macos/defaults --no-restart"
 
   # Restore all mackup settings.
   /opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall

@@ -1,0 +1,8 @@
+export CARGO_HOME="$XDG_DATA_HOME"/cargo
+export GNUPGHOME="$XDG_DATA_HOME"/gnupg
+export LESSHISTFILE="$XDG_CACHE_HOME"/less/history
+export WGETRC="$XDG_CONFIG_HOME/wgetrc"
+export HISTFILE="$XDG_STATE_HOME"/zsh/history
+export TERMINFO="$XDG_DATA_HOME"/terminfo
+export TERMINFO_DIRS="$XDG_DATA_HOME"/terminfo:/usr/share/terminfo
+export ADOTDIR="$XDG_CONFIG_HOME/antigen"

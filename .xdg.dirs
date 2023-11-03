@@ -1,15 +1,23 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_LOGS_HOME="$HOME/.cache/logs"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
-# https://gist.github.com/sharadhr/39b804236c1941e9c30d90af828ad41e#214xdg-user-dirs
-export XDG_DESKTOP_DIR="$HOME/Desktop"
-export XDG_DOCUMENTS_DIR="$HOME/Documents"
-export XDG_DOWNLOAD_DIR="$HOME/Downloads"
-export XDG_MUSIC_DIR="$HOME/Music"
-export XDG_PICTURES_DIR="$HOME/Pictures"
-export XDG_PUBLICSHARE_DIR="$HOME/Public"
-export XDG_VIDEOS_DIR="$HOME/Videos"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export XDG_CACHE_HOME="$HOME/Library/Caches"
+  export XDG_LOGS_HOME="$HOME/Library/Caches/logs"
+else
+  export XDG_CACHE_HOME="$HOME/.cache"
+  export XDG_LOGS_HOME="$HOME/.cache/logs"
+fi
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # https://gist.github.com/sharadhr/39b804236c1941e9c30d90af828ad41e#214xdg-user-dirs
+  export XDG_DESKTOP_DIR="$HOME/Desktop"
+  export XDG_DOCUMENTS_DIR="$HOME/Documents"
+  export XDG_DOWNLOAD_DIR="$HOME/Downloads"
+  export XDG_MUSIC_DIR="$HOME/Music"
+  export XDG_PICTURES_DIR="$HOME/Pictures"
+  export XDG_PUBLICSHARE_DIR="$HOME/Public"
+  export XDG_VIDEOS_DIR="$HOME/Videos"
+fi

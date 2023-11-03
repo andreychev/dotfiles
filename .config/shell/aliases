@@ -12,7 +12,6 @@ alias egrep='egrep --color=auto'
 
 # Shortcuts
 alias ll="ls -la"
-alias dropbox="cd $HOME/Dropbox"
 alias disk="cd $HOME/Yandex.Disk-andreychev.ru.localized"
 alias icloud="cd $HOME/Library/Mobile\ Documents/com~apple~CloudDocs"
 
@@ -66,7 +65,7 @@ alias update='sudo softwareupdate -i -a'
 
 # Default application aliases
 alias vscode="code"
-alias chrome="open -na 'Google Chrome' --args '--user-data-dir=$HOME/.temp-chrome-profile' --ignore-certificate-errors"
+alias chrome="open -na 'Google Chrome' --args '--user-data-dir=$XDG_STATE_HOME/.temp-chrome-profile' --ignore-certificate-errors"
 alias firefox="open -na 'Firefox'"
 
 # Kill all the tabs in Chrome to free up memory

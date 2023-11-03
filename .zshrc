@@ -1,12 +1,14 @@
 source "$HOME/.xdg.dirs"
 source "$XDG_CONFIG_HOME/shell/config"
 
+export HOMEBREW_PREFIX="/opt/homebrew"
+
 # Make some path, must be done before antigen
-export PATH="/opt/homebrew/bin:$PATH"
-export PATH="/opt/homebrew/sbin:$PATH"
+export PATH="$HOMEBREW_PREFIX/bin:$PATH"
+export PATH="$HOMEBREW_PREFIX/sbin:$PATH"
 
 # Install all zsh-related stuff using antigen
-source $(brew --prefix)/share/antigen/antigen.zsh
+source "$HOMEBREW_PREFIX/share/antigen/antigen.zsh"
 antigen init "$ADOTDIR/config"
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -17,7 +19,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 if type brew &>/dev/null; then
-  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+  FPATH="$HOMEBREW_PREFIX/share/zsh-completions:$FPATH"
 
   autoload -Uz compinit
   compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"

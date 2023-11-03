@@ -3,7 +3,6 @@ name = Philipp Andreychev
 email = andreychev@me.com
 [core]
 editor = vim
-excludesfile = $XDG_CONFIG_HOME/git/ignore
 [commit]
 verbose = true
 [color]
@@ -12,9 +11,9 @@ diff = auto
 interactive = auto
 status = auto
 [init]
-defaultBranch = master
+defaultBranch = main
 [web]
-browser = google-chrome
+browser = brawe
 [credential]
 helper = osxkeychain
 [filter "lfs"]

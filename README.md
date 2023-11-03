@@ -2,7 +2,7 @@ This scripts installs and configures most of the software I use on my Mac for we
 
 ## Installation
 
-```bash
+```sh
 # Take Me Home, Country Roads.
 cd $HOME
 
@@ -21,42 +21,17 @@ sudo cp sudo_local.template sudo_local
 sudo vi sudo_local
 
 # Install Homebrew.
-case $(which brew) in "brew not found")
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-esac
+if [[ $(command -v brew) == "" ]]; then
+  /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
 # Install mas, yadm, mackup.
 /opt/homebrew/bin/brew install mas
 /opt/homebrew/bin/brew install yadm
 /opt/homebrew/bin/brew install mackup
 
-# Install vimi.
-git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vimi" && make
-
-# Create basic directories.
-mkdir work
-mkdir personal
-
 # Clone this repository to your local drive using yadm.
-yadm clone git@github.com:andreychev/dotfiles.git
-
-# Install all dependencies.
-/opt/homebrew/bin/brew bundle
-
-# Apply all defaults.
-/bin/bash -c ".config/iterm2/defaults && .config/transmission/defaults && .config/macos/defaults --no-restart"
-
-# Restore all mackup settings.
-/opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
-
-# Download old-fashioned sources.
-/bin/bash tasks/download.sh
-
-# Install FS.
-/opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app
-
-# Install nvm.
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
 ```
 
 ### Things that need to be done manually

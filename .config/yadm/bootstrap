@@ -24,10 +24,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   /opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
   echo "mackup settings restoring is complete."
 
-  # Install FS.
-  open /opt/homebrew/Caskroom/paragon-ntfs/15/FSInstaller.app --args -AppCommandLineArg
-  echo "FS installing is complete."
-
   # Install old-fashioned apps.
   TYPOGRAPHY="3.8"
   CHROMIUM_GOST="119.0.6045.105"

@@ -1,3 +1,5 @@
 .vscode
 
+Brewfile.lock.json
+
 .DS_Store

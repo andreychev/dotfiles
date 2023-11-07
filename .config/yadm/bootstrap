@@ -4,8 +4,8 @@ set -eu
 
 cd $HOME
 
-source "$HOME/.xdg.dirs"
-source "$XDG_CONFIG_HOME/shell/xdg"
+source "$HOME"/.xdg.dirs
+source "$XDG_CONFIG_HOME"/shell/xdg
 
 # Install vimi.
 [ ! -d "$HOME/.vimi" ] && git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vimi" && make
@@ -17,7 +17,13 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   echo "brew dependencies installing is complete."
 
   # Apply all defaults.
-  /bin/sh -c ".config/iterm2/defaults && .config/transmission/defaults && .config/macos/defaults --no-restart"
+  find .config -type f -name "defaults" | while read -r file; do
+    # Check if the file is executable and execute it
+    if [ -x "$file" ]; then
+      # Execute the file
+      /bin/sh -c "$file --no-restart"
+    fi
+  done
   echo "defaults applying is complete."
 
   # Restore all mackup settings.
@@ -38,5 +44,5 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # Install nvm.
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | sh
+PROFILE=/dev/null /bin/sh -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | sh'
 echo "nvm installing is complete."

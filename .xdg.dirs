@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # https://wiki.archlinux.org/title/XDG_Base_Directory
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
@@ -11,6 +13,13 @@ else
   export XDG_CACHE_HOME="$HOME/.cache"
   export XDG_LOGS_HOME="$HOME/.cache/logs"
 fi
+
+# Ensure XDG dirs exist.
+for xdgdir in XDG_{CONFIG,CACHE,DATA,STATE}_HOME XDG_LOGS_HOME XDG_RUNTIME_DIR; do
+  [[ -e ${(P)xdgdir} ]] || mkdir -p ${(P)xdgdir}
+done
+
+unset xdgdir
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # https://gist.github.com/sharadhr/39b804236c1941e9c30d90af828ad41e#214xdg-user-dirs

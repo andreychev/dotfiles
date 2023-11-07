@@ -1,13 +1,13 @@
+#!/bin/sh
+
 supercrabtree/k
 
 ###
 # Syntax highlighting
-#zsh-users/zsh-syntax-highlighting kind:defer
 zdharma-continuum/fast-syntax-highlighting kind:defer
 
 ## Oh-my-zsh plugins
 ohmyzsh/ohmyzsh path:lib/clipboard.zsh
-ohmyzsh/ohmyzsh path:plugins/dotenv
 
 # zsh-users/zsh-completions is a popular plugin for adding supplemental completions.
 # We combine the `path:` and `kind:fpath` annotations here:
@@ -19,6 +19,8 @@ romkatv/powerlevel10k kind:fpath
 # Compinit plugins should be near the end of .zsh_plugins.txt so that $fpath has been
 # fully populated. Use zsh-utils for its completion plugin.
 belak/zsh-utils path:completion
+ohmyzsh/ohmyzsh path:plugins/dotenv
+ohmyzsh/ohmyzsh path:plugins/nvm
 
 # These core plugins should be loaded at the end
 zsh-users/zsh-autosuggestions kind:defer

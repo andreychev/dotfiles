@@ -12,6 +12,13 @@ else
   export XDG_LOGS_HOME="$HOME/.cache/logs"
 fi
 
+# Ensure XDG dirs exist.
+for xdgdir in XDG_{CONFIG,CACHE,DATA,STATE}_HOME XDG_RUNTIME_DIR; do
+  [[ -e ${(P)xdgdir} ]] || mkdir -p ${(P)xdgdir}
+done
+
+unset xdgdir
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # https://gist.github.com/sharadhr/39b804236c1941e9c30d90af828ad41e#214xdg-user-dirs
   export XDG_DESKTOP_DIR="$HOME/Desktop"

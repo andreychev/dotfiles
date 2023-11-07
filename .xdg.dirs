@@ -15,7 +15,7 @@ else
 fi
 
 # Ensure XDG dirs exist.
-for xdgdir in XDG_{CONFIG,CACHE,DATA,STATE}_HOME XDG_RUNTIME_DIR; do
+for xdgdir in XDG_{CONFIG,CACHE,DATA,STATE}_HOME XDG_LOGS_HOME XDG_RUNTIME_DIR; do
   [[ -e ${(P)xdgdir} ]] || mkdir -p ${(P)xdgdir}
 done
 

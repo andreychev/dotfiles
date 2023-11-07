@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Easier navigation:
 alias ..="cd .."
 alias ...="cd ../.."
@@ -55,6 +57,9 @@ alias reload="exec ${SHELL} -l"
 
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
+
+# Open all the dotfiles in VSCode
+alias dotfiles='for _path in $(yadm list); do code - "$_path"; done; unset _path'
 
 # Show/hide hidden files in Finder
 alias show="defaults write com.apple.Finder AppleShowAllFiles -bool true && killall Finder"

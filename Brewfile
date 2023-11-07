@@ -44,7 +44,6 @@ brew "bash"
 # Essential CLI.
 brew "vim"
 brew "zsh"
-brew "antidote"
 brew "wget"
 brew "openssh"
 brew "openssl"

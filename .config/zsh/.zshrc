@@ -27,6 +27,7 @@ zsh_plugins="${ZDOTDIR}"/.zsh_plugins
 if [[ ! "${zsh_plugins}".zsh -nt "${zsh_plugins}".txt ]]; then
   (
     source $ANTIDOTE_HOME/mattmc3/antidote/antidote.zsh
+
     antidote bundle <"${zsh_plugins}".txt >"${zsh_plugins}".zsh
   )
 fi
@@ -37,6 +38,8 @@ autoload -Uz "$XDG_CONFIG_HOME"/shell/functions/*(.:t)
 
 autoload -Uz promptinit && promptinit && prompt powerlevel10k
 
+# This loads rtx
+eval "$(rtx activate zsh)"
 # This loads scmpuff
 eval "$(scmpuff init -s)"
 

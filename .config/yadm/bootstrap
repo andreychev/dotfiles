@@ -42,7 +42,3 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   cd $HOME
   echo "Downloading is complete."
 fi
-
-# Install nvm.
-PROFILE=/dev/null /bin/sh -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | sh'
-echo "nvm installing is complete."

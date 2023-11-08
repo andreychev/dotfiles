@@ -13,7 +13,9 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # Shortcuts
-alias ll="ls -laG"
+alias exa='eza'
+alias k='exa --color -l --git'
+
 alias disk="cd $HOME/Yandex.Disk-andreychev.ru.localized"
 alias icloud="cd $HOME/Library/Mobile\ Documents/com~apple~CloudDocs"
 
@@ -53,4 +55,3 @@ alias firefox="open -na 'Firefox'"
 # Kill all the tabs in Chrome to free up memory
 # [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
 alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
-

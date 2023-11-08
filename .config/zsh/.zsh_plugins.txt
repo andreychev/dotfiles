@@ -1,21 +1,18 @@
 #!/bin/sh
 
-supercrabtree/k
-
-###
 # Syntax highlighting
 zdharma-continuum/fast-syntax-highlighting kind:defer
 
-## Oh-my-zsh plugins
+# Oh-my-zsh plugins
 ohmyzsh/ohmyzsh path:lib/clipboard.zsh
 
 # zsh-users/zsh-completions is a popular plugin for adding supplemental completions.
-# We combine the `path:` and `kind:fpath` annotations here:
 zsh-users/zsh-completions path:src kind:fpath
 
 # Install custom prompt
 romkatv/powerlevel10k kind:fpath
 
+# Best util to use completions
 belak/zsh-utils path:completion
 
 # These core plugins should be loaded at the end

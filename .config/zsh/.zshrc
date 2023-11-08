@@ -32,12 +32,8 @@ if [[ ! "${zsh_plugins}".zsh -nt "${zsh_plugins}".txt ]]; then
 fi
 source ${zsh_plugins}.zsh
 
-if type brew &>/dev/null; then
-  FPATH="$HOMEBREW_PREFIX/share/zsh-completions:$FPATH"
-
-  autoload -Uz compinit
-  compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
-fi
+fpath=("$XDG_CONFIG_HOME"/shell/functions $fpath)
+autoload -Uz "$XDG_CONFIG_HOME"/shell/functions/*(.:t)
 
 autoload -Uz promptinit && promptinit && prompt powerlevel10k
 

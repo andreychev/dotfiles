@@ -16,11 +16,7 @@ zsh-users/zsh-completions path:src kind:fpath
 # Install custom prompt
 romkatv/powerlevel10k kind:fpath
 
-# Compinit plugins should be near the end of .zsh_plugins.txt so that $fpath has been
-# fully populated. Use zsh-utils for its completion plugin.
 belak/zsh-utils path:completion
-ohmyzsh/ohmyzsh path:plugins/dotenv
-ohmyzsh/ohmyzsh path:plugins/nvm
 
 # These core plugins should be loaded at the end
 zsh-users/zsh-autosuggestions kind:defer

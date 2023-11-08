@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# New ls
-supercrabtree/k
-
 # Syntax highlighting
 zdharma-continuum/fast-syntax-highlighting kind:defer
 

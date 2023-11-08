@@ -50,6 +50,7 @@ brew "openssl"
 brew "xz"
 brew "zlib"
 # https://github.com/ibraheemdev/modern-unix
+brew "eza"
 brew "bat"
 brew "tealdeer"
 

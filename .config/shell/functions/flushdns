@@ -1,0 +1,4 @@
+#!/bin/sh
+
+##? flushdns - Flush the DNS cache.
+dscacheutil -flushcache && sudo killall -HUP mDNSResponder

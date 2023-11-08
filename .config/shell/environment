@@ -1,0 +1,67 @@
+#!/bin/sh
+
+#
+# Language
+#
+
+if [[ -z "$LANG" ]]; then
+  export LANG='en_US.UTF-8'
+fi
+
+export LC_ALL="en_US.UTF-8"
+# Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
+export PYTHONIOENCODING="UTF-8"
+
+#
+# Browser
+#
+
+if [[ -z "$BROWSER" && "$OSTYPE" == darwin* ]]; then
+  export BROWSER='open'
+fi
+
+#
+# Editors
+#
+
+if [[ -z "$EDITOR" ]]; then
+  export EDITOR='vim'
+fi
+if [[ -z "$VISUAL" ]]; then
+  export VISUAL='code'
+fi
+if [[ -z "$PAGER" ]]; then
+  export PAGER='less'
+fi
+
+# Set the default Less options.
+# Mouse-wheel scrolling can be disabled with -X (disable screen clearing).
+# Add -X to disable it.
+if [[ -z "$LESS" ]]; then
+  export LESS='-g -i -M -R -S -w -z-4'
+fi
+
+# LS colors: https://the.exa.website/docs/colour-themes
+# Used by: exa, fd
+export LS_COLORS=${LS_COLORS:-'di=34:ln=35:so=32:pi=33:ex=31:bd=36;01:cd=33;01:su=31;40;07:sg=36;40;07:tw=32;40;07:ow=33;40;07:'}
+
+# Colorize man pages.
+# start/end - md/me:bold; us/ue:underline; so/se:standout;
+# colors    - 0-black; 1-red; 2-green; 3-yellow; 4-blue; 5-magenta; 6-cyan; 7-white;
+export LESS_TERMCAP_mb=$'\e[01;36m'
+export LESS_TERMCAP_md=$'\e[01;36m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[00;47;30m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[04;35m'
+
+# Deactivate Homebrew analytics, see https://docs.brew.sh/Analytics
+export HOMEBREW_NO_ANALYTICS=1
+
+# Avoid issues with `gpg` as installed via Homebrew.
+# https://stackoverflow.com/a/42265848/96656
+export GPG_TTY=$(tty)
+
+# Hide the “default interactive shell is now zsh” warning on macOS.
+export BASH_SILENCE_DEPRECATION_WARNING=1

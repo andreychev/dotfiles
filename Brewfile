@@ -56,7 +56,6 @@ brew "tealdeer"
 
 # Basic things for development.
 brew "git"
-brew "git-extras"
 brew "git-lfs"
 brew "tig"
 brew "scmpuff"

@@ -1,4 +1,11 @@
-This scripts installs and configures most of the software I use on my Mac for web and software development. Some things in macOS are slightly difficult to automate, so I still have a few manual installation steps, but at least it's all documented here.
+This scripts installs and configures most of the software I use on my Mac for web and software development.
+
+## Intro
+
+1. Setup uses [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) and heavily inspired by [this blogpost](https://gist.github.com/sharadhr/39b804236c1941e9c30d90af828ad41e).
+2. [`yadm`](https://yadm.io/) is used for managing dotfiles, [`mackup`](https://github.com/lra/mackup) is used for managing some desktop application preferences.
+3. [`zsh`](https://en.wikipedia.org/wiki/Z_shell), [`powerline10k`](https://github.com/romkatv/powerlevel10k) and [`antidote`](https://github.com/mattmc3/antidote) are working together with [`iterm2`](https://iterm2.com/) to provide high-perfomant, beaufiful and handy terminal defaults.
+4. Some things in macOS are slightly difficult to automate, so there are a few manual installation steps, but at least it's all documented here.
 
 ## Installation
 
@@ -48,5 +55,4 @@ yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
 
 ## Thanks to…
 
-- [Mathias Bynens](https://mathiasbynens.be/) and [his dotfiles repo](https://github.com/mathiasbynens/dotfiles)
-- [Nikita Barskov](https://dev-tau-seven.vercel.app/) and [his dotfiles repo](https://github.com/nikitabarskov/dotfiles)
+- [Github dotfiles repos](https://dotfiles.github.io/)

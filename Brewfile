@@ -59,7 +59,7 @@ brew "git-extras"
 brew "git-lfs"
 brew "tig"
 brew "scmpuff"
-brew "nvm"
+brew "rtx"
 brew "rust"
 brew "podman"
 

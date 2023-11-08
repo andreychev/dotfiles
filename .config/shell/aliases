@@ -42,6 +42,9 @@ command -v sha1sum >/dev/null || alias sha1sum="shasum"
 # Open all the dotfiles in VSCode
 alias dotfiles='for _path in $(yadm list); do code - "$_path"; done; unset _path'
 
+alias macosup="sudo softwareupdate -i -a"
+alias brewup="brew update && brew upgrade && brew cleanup"
+
 # Default application aliases
 alias vscode="code"
 alias chrome="open -na 'Google Chrome' --args '--user-data-dir=$XDG_STATE_HOME/.temp-chrome-profile' --ignore-certificate-errors"

@@ -59,6 +59,7 @@ brew "git"
 brew "git-lfs"
 brew "tig"
 brew "rtx"
+brew "fzf"
 brew "rust"
 brew "podman"
 

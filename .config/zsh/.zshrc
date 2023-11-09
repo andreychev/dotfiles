@@ -1,5 +1,4 @@
-
-#!/bin/sh
+#!/bin/zsh
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.config/zsh/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -40,9 +39,6 @@ autoload -Uz promptinit && promptinit && prompt powerlevel10k
 
 # This loads rtx
 eval "$(rtx activate zsh)"
-# This loads scmpuff
-eval "$(scmpuff init -s)"
 
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f "$ZDOTDIR"/.p10k.zsh ]] || source "$ZDOTDIR"/.p10k.zsh
-

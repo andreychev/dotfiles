@@ -35,10 +35,8 @@ if [[ -z "$PAGER" ]]; then
 fi
 
 # Set the default Less options.
-# Mouse-wheel scrolling can be disabled with -X (disable screen clearing).
-# Add -X to disable it.
 if [[ -z "$LESS" ]]; then
-  export LESS='-g -i -M -R -S -w -z-4'
+  export LESS='-g -i -M -R -S -X -w -z-4'
 fi
 
 # LS colors: https://the.exa.website/docs/colour-themes

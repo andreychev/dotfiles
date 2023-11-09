@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 set -eu
 
-cd $HOME
+cd "$HOME"
 
 source "$HOME"/.xdg.dirs
 source "$XDG_CONFIG_HOME"/shell/xdg
@@ -21,7 +21,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # Check if the file is executable and execute it
     if [ -x "$file" ]; then
       # Execute the file
-      /bin/sh -c "$file --no-restart"
+      /bin/bash -c "$file --no-restart"
     fi
   done
   echo "defaults applying is complete."
@@ -35,10 +35,10 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   CHROMIUM_GOST="119.0.6045.105"
   AMNEZIA="4.0.8.6"
 
-  cd $XDG_DOWNLOAD_DIR
+  cd "$XDG_DOWNLOAD_DIR"
   [ ! -f "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" ] && curl -fLo "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg"
   [ ! -f "$CHROMIUM_GOST-macos-arm64.tar.bz2" ] && curl -fLo "$CHROMIUM_GOST-macos-arm64.tar.bz2" "https://github.com/deemru/Chromium-Gost/releases/download/$CHROMIUM_GOST/chromium-gost-$CHROMIUM_GOST-macos-arm64.tar.bz2"
   [ ! -f "AmneziaVPN_$AMNEZIA.dmg" ] && curl -fLo "AmneziaVPN_$AMNEZIA.dmg" "https://github.com/amnezia-vpn/amnezia-client/releases/download/${AMNEZIA%.*}/AmneziaVPN_$AMNEZIA.dmg"
-  cd $HOME
+  cd "$HOME"
   echo "Downloading is complete."
 fi

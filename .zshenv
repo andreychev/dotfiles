@@ -1,5 +1,5 @@
-#!/bin/sh
+#!/bin/zsh
 
-source "$HOME/.xdg.dirs"
+source "$HOME"/.xdg.dirs
 
-export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+export ZDOTDIR="$XDG_CONFIG_HOME"/zsh

@@ -83,7 +83,6 @@ cask "quicklook-csv"
 cask "qlimagesize"
 
 # Browsers.
-cask "brave-browser"
 cask "google-chrome"
 cask "firefox"
 cask "microsoft-edge"
@@ -99,6 +98,7 @@ cask "visual-studio-code"
 cask "proxyman"
 
 # Improvements.
+cask "sensiblesidebuttons"
 cask "raycast"
 cask "quitter"
 cask "rescuetime"

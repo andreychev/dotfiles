@@ -7,6 +7,9 @@ cd "$HOME"
 source "$HOME"/.xdg.dirs
 source "$XDG_CONFIG_HOME"/shell/xdg
 
+# Specify permissions.
+chmod 700 "$XDG_CONFIG_HOME"
+
 # Install vimi.
 [ ! -d "$HOME/.vimi" ] && git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vimi" && make
 echo "vimi installing is complete."
@@ -17,7 +20,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   echo "brew dependencies installing is complete."
 
   # Apply all defaults.
-  find .config -type f -name "defaults" | while read -r file; do
+  find "$XDG_CONFIG_HOME" -type f -name "defaults" | while read -r file; do
     # Check if the file is executable and execute it
     if [ -x "$file" ]; then
       # Execute the file
@@ -41,4 +44,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   [ ! -f "AmneziaVPN_$AMNEZIA.dmg" ] && curl -fLo "AmneziaVPN_$AMNEZIA.dmg" "https://github.com/amnezia-vpn/amnezia-client/releases/download/${AMNEZIA%.*}/AmneziaVPN_$AMNEZIA.dmg"
   cd "$HOME"
   echo "Downloading is complete."
+
+  # Specify sparse-checkout.
+  /opt/homebrew/bin/yadm sparse-checkout init
+  /opt/homebrew/bin/yadm sparse-checkout set --no-cone '/*' '!README.md' '!LICENSE' '!.editoconfig'
 fi

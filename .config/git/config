@@ -13,7 +13,7 @@ status = auto
 [init]
 defaultBranch = main
 [web]
-browser = open
+browser = google-chrome
 [credential]
 helper = osxkeychain
 [filter "lfs"]

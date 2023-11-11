@@ -8,6 +8,7 @@ ohmyzsh/ohmyzsh path:lib/clipboard.zsh
 
 # zsh-users/zsh-completions is a popular plugin for adding supplemental completions.
 zsh-users/zsh-completions path:src kind:fpath
+lukechilds/zsh-better-npm-completion kind:fpath
 
 # Install custom prompt
 romkatv/powerlevel10k kind:fpath

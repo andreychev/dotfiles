@@ -77,7 +77,7 @@ brew "awscli"
 cask "font-fira-code"
 cask "font-jetbrains-mono"
 
-# Qquicklook addons.
+# Quicklook addons.
 cask "quicklook-json"
 cask "qlmarkdown"
 cask "quicklook-csv"

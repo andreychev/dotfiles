@@ -8,6 +8,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 source "$XDG_CONFIG_HOME"/shell/config
+source "$XDG_CONFIG_HOME"/zsh/environment.zsh
 
 export HOMEBREW_PREFIX="/opt/homebrew"
 export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
@@ -36,6 +37,9 @@ fpath=("$XDG_CONFIG_HOME"/shell/functions $fpath)
 autoload -Uz "$XDG_CONFIG_HOME"/shell/functions/*(.:t)
 
 autoload -Uz promptinit && promptinit && prompt powerlevel10k
+
+# This loads scmpuff
+eval "$(scmpuff init -s --aliases=false)"
 
 # This loads rtx
 eval "$(rtx activate zsh)"

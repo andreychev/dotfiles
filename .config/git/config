@@ -3,6 +3,8 @@ name = Philipp Andreychev
 email = andreychev@me.com
 [core]
 editor = vim
+[advice]
+detachedHead = false
 [commit]
 verbose = true
 [color]
@@ -22,22 +24,26 @@ required = true
 clean = git-lfs clean -- %f
 smudge = git-lfs smudge -- %f
 [pull]
-rebase = true
+ff = only
+[push]
+default = current
+[fetch]
 prune = true
+writeCommitGraph = true
 [alias]
 # Basic aliases
-k = !git ls-files
-b = !git branch
-t = !git tag
-s = !git status
+a = add
+k = ls-files
+ls = ls-files
+b = branch
+t = tag
+s = status
+co = checkout
+ci = commit
+sw = switch
 d = !git diff --stat -p -C
 ds = !git diff --staged --stat -p -C
-undo = !git reset HEAD~1 --mixed
-pushf = !git push --force-with-lease
-# Smart aliases using fzf
-a = !git ls-files --deleted --modified --other --exclude-standard | fzf -0 -m --preview 'git diff --color=always {-1}' | xargs -r git add
-co = !git branch --all | grep -v '^[*+]' | awk '{print $1}' | fzf -0 --preview 'git show --color=always {-1}' | sed 's/remotes\\/origin\\///g' | xargs -r git checkout
-delete-branch = !git branch | grep -v '^[*+]' | awk '{print $1}' | fzf -0 --multi --preview 'git show --color=always {-1}' | xargs -r git branch --delete
-r = !git diff --name-only --cached | fzf -0 -m --preview 'git diff --color=always {-1}' | xargs -r git reset
+undo = reset HEAD~1 --mixed
+pushf = push --force-with-lease
 # Show the aliases list
 aliases = !git config -l | grep alias | cut -c 7-

@@ -24,8 +24,8 @@ alias oo="open ."
 alias e="code"
 
 # Aliases for git aliases :smart:
-alias gs="git s"
-alias ga="git s"
+alias gs="scmpuff_status"
+alias ga="git add"
 
 alias disk='cd "$HOME"/Yandex.Disk-andreychev.ru.localized'
 alias icloud='cd "$HOME"/Library/Mobile\ Documents/com~apple~CloudDocs'

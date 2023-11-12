@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 ##? path - Print each PATH entry on a separate line.
 echo -e ${PATH//:/\\n}

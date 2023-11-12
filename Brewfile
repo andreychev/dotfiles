@@ -60,7 +60,8 @@ brew "git-lfs"
 brew "tig"
 brew "rtx"
 brew "fzf"
-brew "rust"
+brew "scmpuff"
+
 brew "podman"
 
 # Misc CLI.

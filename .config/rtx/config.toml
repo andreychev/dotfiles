@@ -1,0 +1,8 @@
+[env]
+NODE_OPTIONS="--max_old_space_size=1536"
+[tools]
+node = "20"
+go = "1.21"
+rust = "1.73"
+[plugins]
+rust = 'https://github.com/code-lever/asdf-rust'

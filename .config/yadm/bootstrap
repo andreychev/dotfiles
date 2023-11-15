@@ -34,8 +34,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   echo "mackup settings restoring is complete."
 
   # Install old-fashioned apps.
-  TYPOGRAPHY="3.8"
-  CHROMIUM_GOST="119.0.6045.105"
+  TYPOGRAPHY="3.9"
+  CHROMIUM_GOST="119.0.6045.159"
   AMNEZIA="4.0.8.6"
 
   cd "$XDG_DOWNLOAD_DIR"

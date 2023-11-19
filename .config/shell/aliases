@@ -55,7 +55,7 @@ alias macosup="sudo softwareupdate -i -a"
 alias brewup="brew update && brew upgrade && brew cleanup"
 
 # Default application aliases
-alias chrome="open -na 'Google Chrome' --args '--user-data-dir=$XDG_STATE_HOME/.temp-chrome-profile' --ignore-certificate-errors"
+alias chrome="open -na 'Google Chrome' --args --ignore-certificate-errors"
 alias firefox="open -na 'Firefox'"
 
 # Kill all the tabs in Chrome to free up memory

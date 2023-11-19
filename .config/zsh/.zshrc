@@ -36,6 +36,8 @@ source ${zsh_plugins}.zsh
 fpath=("$XDG_CONFIG_HOME"/shell/functions $fpath)
 autoload -Uz "$XDG_CONFIG_HOME"/shell/functions/*(.:t)
 
+fast-theme -q XDG:catppuccin-mocha
+
 autoload -Uz promptinit && promptinit && prompt powerlevel10k
 
 # This loads scmpuff

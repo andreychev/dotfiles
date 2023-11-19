@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Syntax highlighting
-zdharma-continuum/fast-syntax-highlighting kind:defer
+zdharma-continuum/fast-syntax-highlighting
 
 # Oh-my-zsh plugins
 ohmyzsh/ohmyzsh path:lib/clipboard.zsh

@@ -10,10 +10,6 @@ source "$XDG_CONFIG_HOME"/shell/xdg
 # Specify permissions.
 chmod 700 "$XDG_CONFIG_HOME"
 
-# Install vimi.
-[ ! -d "$HOME/.vimi" ] && git clone https://github.com/miripiruni/vimi.git "$HOME/.vimi" && cd "$HOME/.vimi" && make
-echo "vimi installing is complete."
-
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # Run brew bundle.
   /opt/homebrew/bin/brew bundle

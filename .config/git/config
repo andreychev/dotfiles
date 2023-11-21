@@ -2,7 +2,7 @@
 name = Philipp Andreychev
 email = andreychev@me.com
 [core]
-editor = vim
+editor = nvim
 [advice]
 detachedHead = false
 [commit]

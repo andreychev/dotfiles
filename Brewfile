@@ -42,7 +42,7 @@ brew "gzip"
 brew "bash"
 
 # Essential CLI.
-brew "vim"
+brew "nvim"
 brew "zsh"
 brew "wget"
 brew "openssh"
@@ -74,8 +74,7 @@ brew "teleport"
 brew "awscli"
 
 # Perfect fonts.
-cask "font-fira-code"
-cask "font-jetbrains-mono"
+cask "font-fira-code-nerd-font"
 
 # Quicklook addons.
 cask "quicklook-json"

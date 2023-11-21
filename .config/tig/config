@@ -1,5 +1,3 @@
-set git-colors = no
-
 # Override the default terminal colors to white on black.
 # color default         white   black
 color cursor black blue

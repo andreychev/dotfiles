@@ -53,6 +53,8 @@ brew "zlib"
 brew "eza"
 brew "bat"
 brew "tealdeer"
+brew "ripgrep"
+brew "fd"
 
 # Basic things for development.
 brew "git"

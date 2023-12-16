@@ -145,6 +145,7 @@ mas "Dato", id: 1470584107
 mas "Parcel", id: 639968404
 mas "Lungo", id: 1263070803
 mas "Outline", id: 1356178125
+mas "Twitter", id: 1482454543
 
 mas "Slack", id: 803453959
 

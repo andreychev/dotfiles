@@ -17,6 +17,9 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
 export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 
+# To make CryptoPro wort
+export PKG_CONFIG_PATH="/opt/homebrew/opt/pcsc-lite/lib/pkgconfig"
+
 # use antidote for plugin management
 export ANTIDOTE_HOME=${XDG_CACHE_HOME:=~/.cache}/repos
 [[ -d $ANTIDOTE_HOME/mattmc3/antidote ]] ||
@@ -43,8 +46,8 @@ autoload -Uz promptinit && promptinit && prompt powerlevel10k
 # This loads scmpuff
 eval "$(scmpuff init -s --aliases=false)"
 
-# This loads rtx
-eval "$(rtx activate zsh)"
+# This loads mise
+eval "$(mise activate zsh)"
 
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f "$ZDOTDIR"/.p10k.zsh ]] || source "$ZDOTDIR"/.p10k.zsh

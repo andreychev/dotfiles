@@ -384,4 +384,10 @@ defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 # Disable automatic emoji substitution (i.e. use plain text smileys)
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
 
+# Make CryptoPro work
+defaults write /Library/Preferences/com.apple.security.smartcard useIFDCCID -bool yes
+
+# Disable language indicator
+defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled 0
+
 echo "Done. Note that some of these changes require a logout/restart to take effect."

@@ -60,7 +60,7 @@ brew "fd"
 brew "git"
 brew "git-lfs"
 brew "tig"
-brew "rtx"
+brew "mise"
 brew "fzf"
 brew "scmpuff"
 

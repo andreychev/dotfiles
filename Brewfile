@@ -41,6 +41,9 @@ brew "gnupg"
 brew "gzip"
 brew "bash"
 
+# To make CryptoPro work
+brew "pcsc-lite"
+
 # Essential CLI.
 brew "nvim"
 brew "zsh"
@@ -91,7 +94,7 @@ cask "microsoft-edge"
 
 # Essential applications.
 cask "appcleaner"
-cask "1password7"
+cask "1password@7"
 cask "yandex-disk"
 
 # Basic applications for development.
@@ -145,7 +148,6 @@ mas "Dato", id: 1470584107
 mas "Parcel", id: 639968404
 mas "Lungo", id: 1263070803
 mas "Outline", id: 1356178125
-mas "Twitter", id: 1482454543
 
 mas "Slack", id: 803453959
 

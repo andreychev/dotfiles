@@ -95,7 +95,6 @@ cask "microsoft-edge"
 # Essential applications.
 cask "appcleaner"
 cask "1password@7"
-cask "yandex-disk"
 
 # Basic applications for development.
 cask "iterm2"

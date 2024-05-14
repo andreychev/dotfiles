@@ -38,6 +38,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   [ ! -f "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" ] && curl -fLo "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg"
   [ ! -f "$CHROMIUM_GOST-macos-arm64.tar.bz2" ] && curl -fLo "$CHROMIUM_GOST-macos-arm64.tar.bz2" "https://github.com/deemru/Chromium-Gost/releases/download/$CHROMIUM_GOST/chromium-gost-$CHROMIUM_GOST-macos-arm64.tar.bz2"
   [ ! -f "AmneziaVPN_$AMNEZIA.dmg" ] && curl -fLo "AmneziaVPN_$AMNEZIA.dmg" "https://github.com/amnezia-vpn/amnezia-client/releases/download/${AMNEZIA%.*}/AmneziaVPN_$AMNEZIA.dmg"
+  [ ! -f "Yandex.Disk.dmg" ] && curl -fLo "Yandex.Disk.dmg" "https://disk.yandex.ru/download/Yandex.Disk.dmg/?instant=1"
   cd "$HOME"
   echo "Downloading is complete."
 

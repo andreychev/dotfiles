@@ -27,7 +27,7 @@ alias e="code"
 alias gs="scmpuff_status"
 alias ga="git add"
 
-alias disk='cd "$HOME"/Yandex.Disk-andreychev.ru.localized'
+alias disk='cd "$HOME"/Yandex.Disk.localized'
 alias icloud='cd "$HOME"/Library/Mobile\ Documents/com~apple~CloudDocs'
 
 # All stupidity

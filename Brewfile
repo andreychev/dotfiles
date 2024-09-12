@@ -1,6 +1,3 @@
-# Taps
-tap "homebrew/cask-fonts"
-
 # Keep here just to make `brew bundle cleanup` work
 brew "mas"
 brew "yadm"
@@ -68,9 +65,6 @@ brew "scmpuff"
 brew "jq"
 
 brew "podman"
-
-# Misc CLI.
-brew "youtube-dl"
 
 # Only used at my current job.
 brew "sshuttle"

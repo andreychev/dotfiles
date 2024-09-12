@@ -1,6 +1,5 @@
 # Taps
 tap "homebrew/cask-fonts"
-tap "homebrew/cask-versions"
 
 # Keep here just to make `brew bundle cleanup` work
 brew "mas"
@@ -66,6 +65,7 @@ brew "tig"
 brew "mise"
 brew "fzf"
 brew "scmpuff"
+brew "jq"
 
 brew "podman"
 
@@ -77,6 +77,9 @@ brew "sshuttle"
 brew "zopfli"
 brew "teleport"
 brew "awscli"
+
+# Keep $HOME clean.
+brew "xdg-ninja"
 
 # Perfect fonts.
 cask "font-fira-code-nerd-font"
@@ -121,6 +124,7 @@ cask "outline-manager"
 # Communication.
 cask "zoom"
 cask "discord"
+cask "skype"
 
 # Media.
 cask "spotify"

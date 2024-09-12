@@ -11,5 +11,11 @@ export TERMINFO_DIRS="$XDG_DATA_HOME"/terminfo:/usr/share/terminfo
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/config
 export ZSH_CACHE_DIR="$XDG_CACHE_HOME"/zsh
 
+export GOPATH="$XDG_DATA_HOME"/go
+export NODE_REPL_HISTORY="$XDG_DATA_HOME"/node_repl_history
+
+export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
+export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
+
 export WGETRC="$XDG_CONFIG_HOME"/wget/wgetrc
 alias wget="wget --hsts-file=\$XDG_CACHE_HOME/wget/wget-hsts"

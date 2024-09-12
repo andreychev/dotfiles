@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist xmlns="http://xspf.org/ns/0/" xmlns:vlc="http://www.videolan.org/vlc/playlist/ns/0/" version="1">
+	<title>Media Library</title>
+	<trackList>
+		<track>
+			<location>file:///Users/andreychev/Downloads/Fleabag.s01e06.hd.subs.m4v</location>
+			<title>Episode 6</title>
+			<creator>Fleabag</creator>
+			<album>Fleabag, Season 1</album>
+			<trackNum>6</trackNum>
+			<image>file:///Users/andreychev/Library/Caches/org.videolan.vlc/art/artistalbum/Fleabag/Fleabag%2C%20Season%201/art.jpg</image>
+			<duration>1513344</duration>
+			<extension application="http://www.videolan.org/vlc/playlist/0">
+				<vlc:id>0</vlc:id>
+			</extension>
+		</track>
+		<track>
+			<location>file:///Users/andreychev/Downloads/Nymphomaniac.Vol1%2C2.Directors.Cut.2013.bdrip_%5B2.18%5D_%5Bteko%5D/Nymphomaniac.Vol2.Directors.Cut.2013.bdrip_%5B2.18%5D.avi</location>
+			<duration>10692000</duration>
+			<extension application="http://www.videolan.org/vlc/playlist/0">
+				<vlc:id>1</vlc:id>
+			</extension>
+		</track>
+	</trackList>
+	<extension application="http://www.videolan.org/vlc/playlist/0">
+		<vlc:item tid="0"/>
+		<vlc:item tid="1"/>
+	</extension>
+</playlist>

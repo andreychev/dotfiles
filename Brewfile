@@ -65,6 +65,7 @@ brew "scmpuff"
 brew "jq"
 
 brew "docker"
+brew "docker-buildx"
 brew "colima"
 
 # Only used at my current job.

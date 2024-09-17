@@ -17,5 +17,7 @@ export NODE_REPL_HISTORY="$XDG_DATA_HOME"/node_repl_history
 export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
 
+export DOCKER_CONFIG="$XDG_CONFIG_HOME"/docker
+
 export WGETRC="$XDG_CONFIG_HOME"/wget/wgetrc
 alias wget="wget --hsts-file=\$XDG_CACHE_HOME/wget/wget-hsts"

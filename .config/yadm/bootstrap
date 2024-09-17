@@ -29,6 +29,11 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   /opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
   echo "mackup settings restoring is complete."
 
+  # Specify docker-buildx dir
+  mkdir -p $DOCKER_CONFIG/cli-plugins
+  ln -sfn $HOMEBREW_PREFIX/opt/docker-buildx/bin/docker-buildx $DOCKER_CONFIG/cli-plugins/docker-buildx
+  echo "docker-buildx specified."
+
   # Install old-fashioned apps.
   TYPOGRAPHY="3.9"
   CHROMIUM_GOST="124.0.6367.78"

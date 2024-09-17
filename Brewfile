@@ -64,7 +64,8 @@ brew "fzf"
 brew "scmpuff"
 brew "jq"
 
-brew "podman"
+brew "docker"
+brew "colima"
 
 # Only used at my current job.
 brew "sshuttle"

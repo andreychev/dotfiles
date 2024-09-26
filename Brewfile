@@ -127,6 +127,8 @@ cask "skype"
 cask "spotify"
 cask "vlc"
 
+cask "avast-security"
+
 # Only used at my current job.
 cask "pritunl"
 cask "figma"
@@ -151,4 +153,3 @@ mas "Outline", id: 1356178125
 
 mas "Slack", id: 803453959
 
-mas "Bitdefender Virus Scanner", id: 500154009

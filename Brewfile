@@ -116,6 +116,7 @@ cask "logitech-g-hub"
 cask "calibre"
 cask "raindropio"
 cask "outline-manager"
+cask "latest"
 
 # Communication.
 cask "zoom"

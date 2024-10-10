@@ -117,6 +117,7 @@ cask "calibre"
 cask "raindropio"
 cask "outline-manager"
 cask "latest"
+cask "imaging-edge"
 
 # Communication.
 cask "zoom"

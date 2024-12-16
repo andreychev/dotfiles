@@ -25,7 +25,7 @@ brew "mackup"
 # https://www.topbug.net/blog/2013/04/14/install-and-use-gnu-command-line-tools-in-mac-os-x/
 ##
 
-# Basic file, shell and text manipulation utilities of the GNU operating system.
+# GNU core utilities
 brew "coreutils"
 brew "binutils"
 brew "findutils"
@@ -37,10 +37,7 @@ brew "gnupg"
 brew "gzip"
 brew "bash"
 
-# To make CryptoPro work
-brew "pcsc-lite"
-
-# Essential CLI.
+# Essential CLI tools
 brew "nvim"
 brew "zsh"
 brew "wget"
@@ -48,59 +45,60 @@ brew "openssh"
 brew "openssl"
 brew "xz"
 brew "zlib"
-# https://github.com/ibraheemdev/modern-unix
+brew "git"
+brew "git-lfs"
+brew "tig"
+brew "jq"
+brew "fzf"
+
+# Modern Unix tools
 brew "eza"
 brew "bat"
 brew "tealdeer"
 brew "ripgrep"
 brew "fd"
 
-# Basic things for development.
-brew "git"
-brew "git-lfs"
-brew "tig"
+# Development tools
 brew "mise"
-brew "fzf"
 brew "scmpuff"
-brew "jq"
-
 brew "docker"
 brew "docker-buildx"
 brew "colima"
 
-# Only used at my current job.
+# Job-specific tools
 brew "sshuttle"
 brew "zopfli"
 brew "teleport"
 brew "awscli"
 
-# Keep $HOME clean.
+# System utilities
 brew "xdg-ninja"
+brew "pcsc-lite"
 
-# Perfect fonts.
+# Fonts
 cask "font-fira-code-nerd-font"
 
-# Quicklook addons.
+# QuickLook plugins
 cask "quicklook-json"
 cask "qlmarkdown"
 cask "quicklook-csv"
 cask "qlimagesize"
 
-# Browsers.
+# Browsers
 cask "google-chrome"
 cask "firefox"
 cask "microsoft-edge"
 
-# Essential applications.
+# Essential applications
 cask "appcleaner"
 cask "1password@7"
 
-# Basic applications for development.
+# Development applications
 cask "iterm2"
 cask "visual-studio-code"
 cask "proxyman"
 
-# Improvements.
+# Productivity and UI enhancements
 cask "sensiblesidebuttons"
 cask "raycast"
 cask "quitter"
@@ -108,7 +106,23 @@ cask "rescuetime"
 cask "bartender"
 cask "cleanshot"
 
-# Misc applications.
+# Communication tools
+cask "zoom"
+cask "discord"
+cask "skype"
+
+# Media applications
+cask "spotify"
+cask "vlc"
+
+# Security
+cask "avast-security"
+
+# Job-specific applications
+cask "pritunl"
+cask "figma"
+
+# Miscellaneous applications
 cask "adobe-creative-cloud"
 cask "airbuddy"
 cask "imazing"
@@ -121,22 +135,7 @@ cask "outline-manager"
 cask "latest"
 cask "imaging-edge"
 
-# Communication.
-cask "zoom"
-cask "discord"
-cask "skype"
-
-# Media.
-cask "spotify"
-cask "vlc"
-
-cask "avast-security"
-
-# Only used at my current job.
-cask "pritunl"
-cask "figma"
-
-# Utility Apps.
+# Utility Apps from Mac App Store
 mas "The Unarchiver", id: 425424353
 mas "Paste", id: 967805235
 mas "1Blocker", id: 1365531024
@@ -148,24 +147,24 @@ mas "Parcel", id: 639968404
 mas "Lungo", id: 1263070803
 mas "Shareful", id: 1522267256
 
-# Productivity Suite.
+# Productivity Suite from Mac App Store
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 
-# Communication and Social Media.
+# Communication and Social Media from Mac App Store
 mas "Telegram", id: 747648890
 mas "Slack", id: 803453959
 
-# Information and News.
+# Information and News from Mac App Store
 mas "Perplexity", id: 6714467650
 mas "Reeder", id: 1529448980
 
-# Entertainment.
+# Entertainment from Mac App Store
 mas "Shazam", id: 897118787
 
-# Security and Privacy.
+# Security and Privacy from Mac App Store
 mas "Outline", id: 1356178125
 
-# Task Management.
+# Task Management from Mac App Store
 mas "Flow", id: 1423210932

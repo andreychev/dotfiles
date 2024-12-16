@@ -109,7 +109,9 @@ cask "bartender"
 cask "cleanshot"
 
 # Misc applications.
+cask "adobe-creative-cloud"
 cask "airbuddy"
+cask "imazing"
 cask "transmission"
 cask "qflipper"
 cask "logitech-g-hub"
@@ -134,23 +136,36 @@ cask "avast-security"
 cask "pritunl"
 cask "figma"
 
-# Installed from Mac App Store.
+# Utility Apps.
 mas "The Unarchiver", id: 425424353
 mas "Paste", id: 967805235
 mas "1Blocker", id: 1365531024
+mas "DjVu Reader Pro", id: 895264364
+mas "Velja", id: 1607635845
+mas "Pandan", id: 1569600264
+mas "Dato", id: 1470584107
+mas "Parcel", id: 639968404
+mas "Lungo", id: 1263070803
+mas "Shareful", id: 1522267256
 
+# Productivity Suite.
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 
-mas "Velja", id: 1607635845
-mas "Pandan", id: 1569600264
-mas "Reeder", id: 1529448980
-mas "Shazam", id: 897118787
-mas "Dato", id: 1470584107
-mas "Parcel", id: 639968404
-mas "Lungo", id: 1263070803
-mas "Outline", id: 1356178125
-
+# Communication and Social Media.
+mas "Telegram", id: 747648890
 mas "Slack", id: 803453959
 
+# Information and News.
+mas "Perplexity", id: 6714467650
+mas "Reeder", id: 1529448980
+
+# Entertainment.
+mas "Shazam", id: 897118787
+
+# Security and Privacy.
+mas "Outline", id: 1356178125
+
+# Task Management.
+mas "Flow", id: 1423210932

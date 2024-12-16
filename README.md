@@ -24,8 +24,8 @@ sudo xcodebuild -license
 
 # Enable TouchID for sudo (uncomment corresponding line).
 # Note: at least in the US, you cannot be compelled to give up a password by a court (it's considered a violation of the 5th amendment), but your biometrics are not secret, so you can absolutely be forced by a court to biometric auth.
-sudo cp sudo_local.template sudo_local
-sudo vi sudo_local
+sudo cp /etc/pam.d/sudo_local.template /etc/pam.d/sudo_local
+sudo vi /etc/pam.d/sudo_local
 
 # Install Homebrew.
 if [[ $(command -v brew) == "" ]]; then

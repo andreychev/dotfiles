@@ -4,5 +4,5 @@ NODE_OPTIONS="--max_old_space_size=1536"
 go = "1.21"
 rust = "1.73"
 node = "20.13.1"
-[plugins]
+[alias]
 rust = 'https://github.com/code-lever/asdf-rust'

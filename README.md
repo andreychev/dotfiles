@@ -44,14 +44,14 @@ yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
 ### Things that need to be done manually
 
 1. [Remap Caps Lock to Ctrl](https://support.apple.com/zh-sg/guide/mac-help/mchlp1011/mac), [Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
-1. Install [QuickGPT](https://sindresorhus.gumroad.com/l/quickgpt).
 1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp).
 1. Install [Paragon NTFS](https://uc.paragon-software.com/cabinet).
+1. Install Adobe Lightroom from Adobe Creative Cloud.
+1. Install Microsoft Office and Microsoft Teams.
 1. Authorize Yandex.Disk and wait for sync.
 1. Authorize iCloud Drive and Photos.
 1. Configure extra Mail, Calendar.
 1. Apply all licenses.
-1. Install Microsoft Office and Microsoft Teams.
 
 ## Thanks to…
 

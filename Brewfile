@@ -134,6 +134,7 @@ cask "raindropio"
 cask "outline-manager"
 cask "latest"
 cask "imaging-edge"
+cask "chatgpt"
 
 # Utility Apps from Mac App Store
 mas "The Unarchiver", id: 425424353

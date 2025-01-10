@@ -43,4 +43,5 @@ require("lazy").setup({
       },
     },
   },
+  build = ":TSUpdate",
 })

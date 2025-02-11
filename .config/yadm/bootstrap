@@ -36,8 +36,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
   # Install old-fashioned apps.
   TYPOGRAPHY="3.9"
-  CHROMIUM_GOST="130.0.6723.58"
-  AMNEZIA="4.7.0.0"
+  CHROMIUM_GOST="133.0.6943.53"
+  AMNEZIA="4.8.2.3"
 
   cd "$XDG_DOWNLOAD_DIR"
   [ ! -f "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" ] && curl -fLo "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg"

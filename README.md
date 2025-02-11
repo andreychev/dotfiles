@@ -49,7 +49,7 @@ yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
 1. Install M1-compatible apps: Streisand, Xiaomi Home, SailTies.
 1. Install Adobe Lightroom from Adobe Creative Cloud.
 1. Install Microsoft Office and Microsoft Teams.
-1. [Install T-Mazing](https://www.tbank.ru/bank/help/interfaces/bank-app/get/t-mazing/).
+1. Install [T-Mazing](https://www.tbank.ru/bank/help/interfaces/bank-app/get/t-mazing/).
 1. Authorize Yandex.Disk and wait for sync.
 1. Authorize iCloud Drive and Photos.
 1. Configure extra Mail, Calendar.

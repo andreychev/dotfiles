@@ -46,8 +46,10 @@ yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
 1. [Remap Caps Lock to Ctrl](https://support.apple.com/zh-sg/guide/mac-help/mchlp1011/mac), [Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
 1. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp).
 1. Install [Paragon NTFS](https://uc.paragon-software.com/cabinet).
+1. Install M1-compatible apps: Streisand, Xiaomi Home, SailTies.
 1. Install Adobe Lightroom from Adobe Creative Cloud.
 1. Install Microsoft Office and Microsoft Teams.
+1. [Install T-Mazing](https://www.tbank.ru/bank/help/interfaces/bank-app/get/t-mazing/).
 1. Authorize Yandex.Disk and wait for sync.
 1. Authorize iCloud Drive and Photos.
 1. Configure extra Mail, Calendar.

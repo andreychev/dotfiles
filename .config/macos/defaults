@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# macOS Sonoma configuration
+# macOS Sequoia configuration
 #
-# This configuration applies to macOS Sonoma (14.x) and sets up preferences
+# This configuration applies to macOS Sequoia (15.x) and sets up preferences
 # and configurations for built-in services and apps.
 
 # Close any open System Settings panes to prevent overriding settings

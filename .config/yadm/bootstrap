@@ -13,7 +13,7 @@ chmod 700 "$XDG_CONFIG_HOME"
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # Run brew bundle.
   /opt/homebrew/bin/brew bundle
-  echo "brew dependencies installing is complete."
+  echo "brew dependencies installation is complete."
 
   # Apply all defaults.
   find "$XDG_CONFIG_HOME" -type f -name "defaults" | while read -r file; do
@@ -30,8 +30,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   echo "mackup settings restoring is complete."
 
   # Specify docker-buildx dir
-  mkdir -p $DOCKER_CONFIG/cli-plugins
-  ln -sfn $HOMEBREW_PREFIX/opt/docker-buildx/bin/docker-buildx $DOCKER_CONFIG/cli-plugins/docker-buildx
+  mkdir -p "$DOCKER_CONFIG/cli-plugins"
+  ln -sfn "$HOMEBREW_PREFIX/opt/docker-buildx/bin/docker-buildx" "$DOCKER_CONFIG/cli-plugins/docker-buildx"
   echo "docker-buildx specified."
 
   # Install old-fashioned apps.

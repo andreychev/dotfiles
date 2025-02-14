@@ -17,10 +17,10 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
 export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 
-# To make CryptoPro wort
+# To make CryptoPro work
 export PKG_CONFIG_PATH="/opt/homebrew/opt/pcsc-lite/lib/pkgconfig"
 
-# use antidote for plugin management
+# Use antidote for plugin management
 export ANTIDOTE_HOME=${XDG_CACHE_HOME:=~/.cache}/repos
 [[ -d $ANTIDOTE_HOME/mattmc3/antidote ]] ||
   git clone --depth 1 --quiet https://github.com/mattmc3/antidote $ANTIDOTE_HOME/mattmc3/antidote

@@ -10,29 +10,28 @@ alias .....="cd ../../../.."
 alias sudo="sudo "
 
 # Always enable colored `grep` output
-# Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-# Shortcuts
+# Shortcuts for file operations
 alias exa='eza'
 alias k='exa --color -la --git'
-
 alias o="open"
 alias oo="open ."
 alias e="code"
 
-# Aliases for git aliases :smart:
+# Git aliases
 alias gs="scmpuff_status"
 alias ga="git add"
 
+# Navigation to specific directories
 alias disk='cd "$HOME"/Yandex.Disk.localized'
 alias icloud='cd "$HOME"/Library/Mobile\ Documents/com~apple~CloudDocs'
 
-# All stupidity
-alias :q="exit"
-alias claer="clear"
+# Miscellaneous aliases
+alias :q="exit"  # Exit command
+alias claer="clear"  # Clear the terminal
 
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
@@ -42,15 +41,14 @@ alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[
 # Canonical hex dump; some systems have this symlinked
 command -v hd >/dev/null || alias hd="hexdump -C"
 
-# macOS has no `md5sum`, so use `md5` as a fallback
+# Fallback for md5sum and sha1sum on macOS
 command -v md5sum >/dev/null || alias md5sum="md5"
-
-# macOS has no `sha1sum`, so use `shasum` as a fallback
 command -v sha1sum >/dev/null || alias sha1sum="shasum"
 
 # Open all the dotfiles in editor
 alias dotfiles='e - $(yadm list)'
 
+# System update aliases
 alias macosup="sudo softwareupdate -i -a"
 alias brewup="brew update && brew upgrade && brew cleanup"
 alias zshup='zsh "$ANTIDOTE_HOME"/mattmc3/antidote/antidote update'
@@ -61,5 +59,4 @@ alias chrome="open -na 'Google Chrome' --args --ignore-certificate-errors"
 alias firefox="open -na 'Firefox'"
 
 # Kill all the tabs in Chrome to free up memory
-# [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
 alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"

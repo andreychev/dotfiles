@@ -64,6 +64,7 @@ brew "scmpuff"
 brew "docker"
 brew "docker-buildx"
 brew "colima"
+brew "aider"
 
 # Job-specific tools
 brew "sshuttle"
@@ -96,6 +97,7 @@ cask "1password@7"
 # Development applications
 cask "iterm2"
 cask "visual-studio-code"
+cask "zed"
 cask "proxyman"
 
 # Productivity and UI enhancements

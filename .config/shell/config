@@ -2,6 +2,11 @@
 
 source "$HOME"/.xdg.dirs
 
-source "$XDG_CONFIG_HOME"/shell/environment
-source "$XDG_CONFIG_HOME"/shell/aliases
-source "$XDG_CONFIG_HOME"/shell/xdg
+# Check if XDG_CONFIG_HOME is set before sourcing the shell environment
+if [ -n "$XDG_CONFIG_HOME" ]; then
+    source "$XDG_CONFIG_HOME"/shell/environment
+    source "$XDG_CONFIG_HOME"/shell/aliases/config  # Load alias configuration
+    source "$XDG_CONFIG_HOME"/shell/xdg
+else
+    echo "Warning: XDG_CONFIG_HOME is not set. Skipping shell config."
+fi

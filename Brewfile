@@ -5,27 +5,7 @@ brew "mackup"
 
 ##
 # GNU command line tools
-#
-# If you are moving onto macOS from GNU/Linux, then you would probably
-# find out that the command line tools shipped with macOS are not as
-# powerful and easy to use as the tools in Linux. The reason is that
-# macOS uses the BSD version command line tools, which are different
-# from the Linux version.
-#
-# Note: if you choose to replace the macOS commands with GNU commands,
-# then be aware that you may have some compatibility issues with shell
-# scripts written specifically for macOS.
-#
-# If you like using man pages, then you may also want to add an
-# itemto the to the MANPATH environmental variable:
-#
-#     $HOMEBREW_PREFIX/opt/coreutils/libexec/gnuman
-#
-# For more about the GNU command line tools and brew, see this:
-# https://www.topbug.net/blog/2013/04/14/install-and-use-gnu-command-line-tools-in-mac-os-x/
 ##
-
-# GNU core utilities
 brew "coreutils"
 brew "binutils"
 brew "findutils"

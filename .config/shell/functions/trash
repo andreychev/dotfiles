@@ -1,0 +1,5 @@
+#!/bin/bash
+# trash - Move files to trash instead of permanent deletion
+trash() {
+    mv "$@" ~/.Trash/
+}

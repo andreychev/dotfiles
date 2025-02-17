@@ -1,53 +1,146 @@
 #!/bin/bash
 
-set -eu
+set -euo pipefail
+IFS=$'\n\t'
 
-cd "$HOME"
+# Constants
+readonly TYPOGRAPHY_VERSION="3.9"
+readonly DOWNLOADS_TIMEOUT=300
 
-source "$HOME"/.xdg.dirs
-source "$XDG_CONFIG_HOME"/shell/xdg
+# Logger function
+log() {
+    local level=$1
+    shift
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] [$level] $*"
+}
 
-# Specify permissions.
-chmod 700 "$XDG_CONFIG_HOME"
+# Error handler
+error_handler() {
+    local line_num=$1
+    local error_code=$2
+    log "ERROR" "Failed at line ${line_num} with error code ${error_code}"
+    exit "${error_code}"
+}
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  # Run brew bundle.
-  /opt/homebrew/bin/brew bundle
-  echo "brew dependencies installation is complete."
+trap 'error_handler ${LINENO} $?' ERR
 
-  # Apply all defaults.
-  find "$XDG_CONFIG_HOME" -type f -name "defaults" | while read -r file; do
-    # Check if the file is executable and execute it
-    if [ -x "$file" ]; then
-      # Execute the file
-      /bin/bash -c "$file --no-restart"
+# Check if running on macOS
+check_macos() {
+    if [[ "$OSTYPE" != "darwin"* ]]; then
+        log "ERROR" "This script is intended for macOS only"
+        exit 1
+    }
+}
+
+# Load configuration
+load_config() {
+    cd "$HOME"
+    source "$HOME"/.xdg.dirs
+    source "$XDG_CONFIG_HOME"/shell/xdg
+    chmod 700 "$XDG_CONFIG_HOME"
+}
+
+# Install brew dependencies
+install_brew_deps() {
+    log "INFO" "Installing brew dependencies..."
+    /opt/homebrew/bin/brew bundle
+    log "SUCCESS" "Brew dependencies installation completed"
+}
+
+# Apply defaults
+apply_defaults() {
+    log "INFO" "Applying defaults..."
+    find "$XDG_CONFIG_HOME" -type f -name "defaults" -executable -exec /bin/bash -c "{} --no-restart" \;
+    log "SUCCESS" "Defaults applied successfully"
+}
+
+# Restore mackup settings
+restore_mackup() {
+    log "INFO" "Restoring mackup settings..."
+    /opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
+    log "SUCCESS" "Mackup settings restored"
+}
+
+# Configure docker-buildx
+setup_docker_buildx() {
+    log "INFO" "Configuring docker-buildx..."
+    mkdir -p "$DOCKER_CONFIG/cli-plugins"
+    ln -sfn "$HOMEBREW_PREFIX/opt/docker-buildx/bin/docker-buildx" "$DOCKER_CONFIG/cli-plugins/docker-buildx"
+    log "SUCCESS" "Docker-buildx configured"
+}
+
+# Download application
+download_app() {
+    local url=$1
+    local filename=$2
+    local timeout=$3
+
+    if [ ! -f "$filename" ]; then
+        log "INFO" "Downloading $filename..."
+        curl -fLo "$filename" --connect-timeout "$timeout" "$url"
+        log "SUCCESS" "Downloaded $filename"
+    else
+        log "INFO" "File $filename already exists, skipping download"
     fi
-  done
-  echo "defaults applying is complete."
+}
 
-  # Restore all mackup settings.
-  /opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
-  echo "mackup settings restoring is complete."
+# Download all applications
+download_apps() {
+    cd "$XDG_DOWNLOAD_DIR"
 
-  # Specify docker-buildx dir
-  mkdir -p "$DOCKER_CONFIG/cli-plugins"
-  ln -sfn "$HOMEBREW_PREFIX/opt/docker-buildx/bin/docker-buildx" "$DOCKER_CONFIG/cli-plugins/docker-buildx"
-  echo "docker-buildx specified."
+    # Typography Layout
+    download_app \
+        "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
+        "ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
+        "$DOWNLOADS_TIMEOUT"
 
-  # Install old-fashioned apps.
-  TYPOGRAPHY="3.9"
-  CHROMIUM_GOST="133.0.6943.53"
-  AMNEZIA="4.8.2.3"
+    # Chromium GOST
+    local CHROMIUM_GOST
+    CHROMIUM_GOST=$(curl -s "https://api.github.com/repos/deemru/Chromium-Gost/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
+    download_app \
+        "https://github.com/deemru/Chromium-Gost/releases/download/$CHROMIUM_GOST/chromium-gost-$CHROMIUM_GOST-macos-arm64.tar.bz2" \
+        "$CHROMIUM_GOST-macos-arm64.tar.bz2" \
+        "$DOWNLOADS_TIMEOUT"
 
-  cd "$XDG_DOWNLOAD_DIR"
-  [ ! -f "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" ] && curl -fLo "ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg" "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY-mac.dmg"
-  [ ! -f "$CHROMIUM_GOST-macos-arm64.tar.bz2" ] && curl -fLo "$CHROMIUM_GOST-macos-arm64.tar.bz2" "https://github.com/deemru/Chromium-Gost/releases/download/$CHROMIUM_GOST/chromium-gost-$CHROMIUM_GOST-macos-arm64.tar.bz2"
-  [ ! -f "AmneziaVPN_$AMNEZIA.dmg" ] && curl -fLo "AmneziaVPN_$AMNEZIA.dmg" "https://github.com/amnezia-vpn/amnezia-client/releases/download/${AMNEZIA%.*}/AmneziaVPN_$AMNEZIA.dmg"
-  [ ! -f "Yandex.Disk.dmg" ] && curl -fLo "Yandex.Disk.dmg" "https://disk.yandex.ru/download/Yandex.Disk.dmg/?instant=1"
-  cd "$HOME"
-  echo "Downloading is complete."
+    # Amnezia VPN
+    local AMNEZIA
+    AMNEZIA=$(curl -s "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
+    local AMNEZIA_VERSION="${AMNEZIA#v}"
+    download_app \
+        "https://github.com/amnezia-vpn/amnezia-client/releases/download/$AMNEZIA/AmneziaVPN_$AMNEZIA_VERSION.dmg" \
+        "AmneziaVPN_$AMNEZIA_VERSION.dmg" \
+        "$DOWNLOADS_TIMEOUT"
 
-  # Specify sparse-checkout.
-  /opt/homebrew/bin/yadm sparse-checkout init
-  /opt/homebrew/bin/yadm sparse-checkout set --no-cone '/*' '!README.md' '!LICENSE' '!.editoconfig'
-fi
+    # Yandex.Disk
+    download_app \
+        "https://disk.yandex.ru/download/Yandex.Disk.dmg/?instant=1" \
+        "Yandex.Disk.dmg" \
+        "$DOWNLOADS_TIMEOUT"
+
+    cd "$HOME"
+}
+
+# Configure yadm
+setup_yadm() {
+    log "INFO" "Configuring yadm sparse-checkout..."
+    /opt/homebrew/bin/yadm sparse-checkout init
+    /opt/homebrew/bin/yadm sparse-checkout set --no-cone '/*' '!README.md' '!LICENSE' '!.editoconfig'
+    log "SUCCESS" "Yadm configured"
+}
+
+main() {
+    log "INFO" "Starting setup script..."
+
+    check_macos
+    load_config
+    install_brew_deps
+    apply_defaults
+    restore_mackup
+    setup_docker_buildx
+    download_apps
+    setup_yadm
+
+    log "SUCCESS" "Setup completed successfully"
+}
+
+main

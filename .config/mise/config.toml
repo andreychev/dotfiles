@@ -1,7 +1,7 @@
 [env]
 NODE_OPTIONS="--max_old_space_size=1536"
 [tools]
-go = "1.21"
+go = "1.23.6"
 rust = "1.73"
 node = "20.13.1"
 [alias]

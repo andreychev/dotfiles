@@ -3,9 +3,7 @@ brew "mas"
 brew "yadm"
 brew "mackup"
 
-##
-# GNU command line tools
-##
+# GNU Core Utilities
 brew "coreutils"
 brew "binutils"
 brew "findutils"

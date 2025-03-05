@@ -42,6 +42,7 @@ brew "scmpuff"
 brew "docker"
 brew "docker-buildx"
 brew "colima"
+brew "qemu"
 brew "aider"
 
 # Job-specific tools
@@ -71,6 +72,7 @@ cask "microsoft-edge"
 # Essential applications
 cask "appcleaner"
 cask "1password@7"
+cask "obsidian"
 
 # Development applications
 cask "iterm2"
@@ -88,7 +90,6 @@ cask "cleanshot"
 
 # Communication tools
 cask "zoom"
-cask "discord"
 cask "skype"
 
 # Media applications

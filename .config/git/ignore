@@ -1,5 +1,7 @@
 .vscode
 
+.zed
+
 Brewfile.lock.json
 
 .DS_Store

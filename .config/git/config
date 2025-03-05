@@ -46,5 +46,6 @@ ds = !git diff --staged --stat -p -C
 undo = reset HEAD~1 --mixed
 pushf = push --force-with-lease
 amend = commit --amend --no-edit
+unt = ls-files --other --directory --exclude-standard
 # Show the aliases list
 aliases = !git config -l | grep alias | cut -c 7-

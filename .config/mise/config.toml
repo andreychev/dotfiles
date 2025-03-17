@@ -5,8 +5,10 @@ go = "1.23.6"
 rust = "1.73"
 node = "22.14.0"
 python = "latest"
+teleport = "latest"
 "npm:prettier" = "latest"
 "npm:yarn" = "1.22.19"
 "npm:npm" = "latest"
 [alias]
 rust = 'https://github.com/code-lever/asdf-rust'
+teleport = 'https://github.com/highb/asdf-teleport-ent'

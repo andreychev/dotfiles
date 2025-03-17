@@ -1,7 +1,12 @@
-.vscode
+# Mise
+mise.toml
 
+# Editors
+.vscode
 .zed
 
+# Brew
 Brewfile.lock.json
 
+# MacOS
 .DS_Store

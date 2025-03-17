@@ -3,6 +3,10 @@ NODE_OPTIONS="--max_old_space_size=1536"
 [tools]
 go = "1.23.6"
 rust = "1.73"
-node = "20.13.1"
+node = "22.14.0"
+python = "latest"
+"npm:prettier" = "latest"
+"npm:yarn" = "1.22.19"
+"npm:npm" = "latest"
 [alias]
 rust = 'https://github.com/code-lever/asdf-rust'

@@ -46,10 +46,7 @@ brew "qemu"
 brew "aider"
 
 # Job-specific tools
-brew "sshuttle"
 brew "zopfli"
-brew "teleport"
-brew "awscli"
 
 # System utilities
 brew "xdg-ninja"

@@ -14,6 +14,7 @@ brew "gnutls"
 brew "gnupg"
 brew "gzip"
 brew "bash"
+brew "lsof"
 
 # Essential CLI tools
 brew "nvim"

@@ -88,7 +88,6 @@ cask "cleanshot"
 
 # Communication tools
 cask "zoom"
-cask "skype"
 
 # Media applications
 cask "spotify"

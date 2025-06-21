@@ -111,7 +111,7 @@ cask "linearmouse"
 cask "calibre"
 cask "outline-manager"
 cask "latest"
-cask "imaging-edge"
+cask "nx-studio"
 cask "chatgpt"
 
 # Utility Apps from Mac App Store

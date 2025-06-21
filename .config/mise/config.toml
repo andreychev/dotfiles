@@ -12,3 +12,6 @@ teleport = "latest"
 [alias]
 rust = 'https://github.com/code-lever/asdf-rust'
 teleport = 'https://github.com/highb/asdf-teleport-ent'
+
+[settings]
+idiomatic_version_file_enable_tools = ["node"]

@@ -30,8 +30,8 @@ alias disk='cd "$HOME"/Yandex.Disk.localized'
 alias icloud='cd "$HOME"/Library/Mobile\ Documents/com~apple~CloudDocs'
 
 # Miscellaneous aliases
-alias :q="exit"  # Exit command
-alias claer="clear"  # Clear the terminal
+alias :q="exit"     # Exit command
+alias claer="clear" # Clear the terminal
 
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
@@ -60,3 +60,5 @@ alias firefox="open -na 'Firefox'"
 
 # Kill all the tabs in Chrome to free up memory
 alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
+
+alias rn-photos="exifrename -f '{year}{month}{day}_{hour}{minute}{second}_{fstop}_{focal_length_35}'"

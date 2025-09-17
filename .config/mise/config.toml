@@ -4,11 +4,13 @@ NODE_OPTIONS="--max_old_space_size=1536"
 go = "1.23.6"
 rust = "1.87"
 node = "22.14.0"
-python = "latest"
+python = "3.11.11"
 teleport = "latest"
 "npm:prettier" = "latest"
 "npm:yarn" = "1.22.22"
 "npm:npm" = "latest"
+"npm:pnpm" = "latest"
+"npm:@anthropic-ai/claude-code" = "latest"
 [alias]
 rust = 'https://github.com/code-lever/asdf-rust'
 teleport = 'https://github.com/highb/asdf-teleport-ent'

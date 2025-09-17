@@ -44,7 +44,6 @@ brew "docker"
 brew "docker-buildx"
 brew "colima"
 brew "qemu"
-brew "aider"
 
 # Job-specific tools
 brew "zopfli"
@@ -60,7 +59,6 @@ cask "font-fira-code-nerd-font"
 cask "quicklook-json"
 cask "qlmarkdown"
 cask "quicklook-csv"
-cask "qlimagesize"
 
 # Browsers
 cask "google-chrome"

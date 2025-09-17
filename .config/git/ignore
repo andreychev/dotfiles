@@ -10,3 +10,12 @@ Brewfile.lock.json
 
 # MacOS
 .DS_Store
+
+# Npm
+.npmrc
+
+# Agents
+.claude
+CLAUDE.md
+AGENTS.md
+.serena

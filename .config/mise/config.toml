@@ -1,8 +1,8 @@
 [env]
 NODE_OPTIONS="--max_old_space_size=1536"
+
 [tools]
 go = "1.23.6"
-rust = "1.87"
 node = "22.14.0"
 python = "3.11.11"
 teleport = "latest"
@@ -11,9 +11,14 @@ teleport = "latest"
 "npm:npm" = "latest"
 "npm:pnpm" = "latest"
 "npm:@anthropic-ai/claude-code" = "latest"
+rust = "stable"
+
 [alias]
-rust = 'https://github.com/code-lever/asdf-rust'
 teleport = 'https://github.com/highb/asdf-teleport-ent'
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
+
+[settings.rust]
+cargo_home = "/Users/andreychev/.local/share/cargo"
+rustup_home = "/Users/andreychev/.local/share/rustup"

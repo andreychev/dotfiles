@@ -77,7 +77,7 @@ cask "zed"
 cask "proxyman"
 
 # Productivity and UI enhancements
-cask "sensiblesidebuttons"
+cask "sanesidebuttons"
 cask "raycast"
 cask "quitter"
 cask "rescuetime"

@@ -91,9 +91,6 @@ cask "zoom"
 cask "spotify"
 cask "vlc"
 
-# Security
-cask "avast-security"
-
 # Job-specific applications
 cask "pritunl"
 cask "figma"

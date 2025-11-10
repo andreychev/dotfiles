@@ -14,16 +14,8 @@
 				<vlc:id>0</vlc:id>
 			</extension>
 		</track>
-		<track>
-			<location>file:///Users/andreychev/Downloads/Nymphomaniac.Vol1%2C2.Directors.Cut.2013.bdrip_%5B2.18%5D_%5Bteko%5D/Nymphomaniac.Vol2.Directors.Cut.2013.bdrip_%5B2.18%5D.avi</location>
-			<duration>10692000</duration>
-			<extension application="http://www.videolan.org/vlc/playlist/0">
-				<vlc:id>1</vlc:id>
-			</extension>
-		</track>
 	</trackList>
 	<extension application="http://www.videolan.org/vlc/playlist/0">
 		<vlc:item tid="0"/>
-		<vlc:item tid="1"/>
 	</extension>
 </playlist>

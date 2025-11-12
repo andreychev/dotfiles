@@ -19,7 +19,6 @@ alias exa='eza'
 alias k='exa --color -la --git'
 alias o="open"
 alias oo="open ."
-alias e="code"
 
 # Git aliases
 alias gs="scmpuff_status"

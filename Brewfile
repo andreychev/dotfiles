@@ -45,9 +45,6 @@ brew "docker-buildx"
 brew "colima"
 brew "qemu"
 
-# Job-specific tools
-brew "zopfli"
-
 # System utilities
 brew "xdg-ninja"
 brew "pcsc-lite"
@@ -74,7 +71,7 @@ cask "obsidian"
 cask "iterm2"
 cask "visual-studio-code"
 cask "zed"
-cask "proxyman"
+# cask "proxyman"
 
 # Productivity and UI enhancements
 cask "sanesidebuttons"
@@ -91,10 +88,6 @@ cask "zoom"
 cask "spotify"
 cask "vlc"
 
-# Job-specific applications
-cask "pritunl"
-cask "figma"
-
 # Miscellaneous applications
 cask "adobe-creative-cloud"
 cask "airbuddy"
@@ -107,6 +100,7 @@ cask "calibre"
 cask "outline-manager"
 cask "latest"
 cask "nx-studio"
+cask "samsung-magician"
 cask "chatgpt"
 
 # Utility Apps from Mac App Store
@@ -122,9 +116,9 @@ mas "Lungo", id: 1263070803
 mas "Shareful", id: 1522267256
 
 # Productivity Suite from Mac App Store
-mas "Keynote", id: 409183694
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
+mas "Keynote", id: 361285480
+mas "Numbers", id: 361304891
+mas "Pages", id: 361309726
 
 # Communication and Social Media from Mac App Store
 mas "Telegram", id: 747648890

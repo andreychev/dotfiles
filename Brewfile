@@ -102,6 +102,7 @@ cask "latest"
 cask "nx-studio"
 cask "samsung-magician"
 cask "chatgpt"
+cask "handbrake"
 
 # Utility Apps from Mac App Store
 mas "The Unarchiver", id: 425424353

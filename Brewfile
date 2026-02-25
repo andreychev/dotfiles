@@ -48,6 +48,7 @@ brew "qemu"
 # System utilities
 brew "xdg-ninja"
 brew "pcsc-lite"
+brew "mole"
 
 # Fonts
 cask "font-fira-code-nerd-font"
@@ -63,7 +64,6 @@ cask "firefox"
 cask "microsoft-edge"
 
 # Essential applications
-cask "appcleaner"
 cask "1password@7"
 cask "obsidian"
 

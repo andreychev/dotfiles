@@ -12,7 +12,7 @@ teleport = "latest"
 "npm:@anthropic-ai/claude-code" = "latest"
 rust = "stable"
 
-[alias]
+[tool_alias]
 teleport = 'https://github.com/highb/asdf-teleport-ent'
 
 [settings]

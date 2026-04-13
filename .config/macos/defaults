@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# macOS Sequoia configuration
+# macOS Tahoe configuration
 #
-# This configuration applies to macOS Sequoia (15.x) and sets up preferences
+# This configuration applies to macOS Tahoe (26.x) and sets up preferences
 # and configurations for built-in services and apps.
 
 # Close any open System Settings panes to prevent overriding settings
@@ -150,9 +150,6 @@ defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
 defaults write com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically -bool false
 defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically -bool false
 
-# Enable "Do Not Track"
-defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
-
 ###############################################################################
 # Mail
 ###############################################################################
@@ -226,9 +223,6 @@ defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 
 # Disable automatic emoji substitution
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
-
-# Make CryptoPro work
-defaults write /Library/Preferences/com.apple.security.smartcard useIFDCCID -bool yes
 
 # Disable language indicator
 defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled 0

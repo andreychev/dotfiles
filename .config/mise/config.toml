@@ -2,14 +2,14 @@
 NODE_OPTIONS="--max_old_space_size=1536"
 
 [tools]
-go = "1.23.6"
+go = "1.26.1"
 node = "22.14.0"
 python = "3.11.11"
 teleport = "latest"
 "npm:yarn" = "1.22.22"
 "npm:npm" = "latest"
-"npm:pnpm" = "latest"
-"npm:@anthropic-ai/claude-code" = "latest"
+"npm:pnpm" = "10.33.0"
+"npm:sql-formatter" = "latest"
 rust = "stable"
 
 [tool_alias]

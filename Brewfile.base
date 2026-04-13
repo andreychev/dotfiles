@@ -90,11 +90,9 @@ cask "linearmouse"
 cask "zoom"
 
 # Media
-cask "spotify"
 cask "vlc"
 
 # Miscellaneous
-cask "outline-manager"
 cask "latest"
 cask "chatgpt"
 cask "claude"
@@ -103,7 +101,6 @@ cask "claude-code"
 # Utility Apps from Mac App Store
 mas "The Unarchiver", id: 425424353
 mas "Paste", id: 967805235
-mas "1Blocker", id: 1365531024
 mas "Velja", id: 1607635845
 mas "Dato", id: 1470584107
 mas "Lungo", id: 1263070803
@@ -118,8 +115,4 @@ mas "Pages", id: 361309726
 mas "Telegram", id: 747648890
 mas "Slack", id: 803453959
 
-# Information and News from Mac App Store
-mas "Perplexity", id: 6714467650
-
 # Security and Privacy from Mac App Store
-mas "Outline", id: 1356178125

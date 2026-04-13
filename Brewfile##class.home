@@ -1,6 +1,10 @@
 # Include shared base packages
 instance_eval(File.read(File.expand_path("~/Brewfile.base")))
 
+# Personal apps
+cask "spotify"
+cask "outline-manager"
+
 # Personal hardware and media tools
 cask "adobe-creative-cloud"
 cask "airbuddy"
@@ -15,6 +19,8 @@ cask "handbrake-app"
 cask "handy"
 
 # Personal Mac App Store apps
+mas "1Blocker", id: 1365531024
+mas "Outline", id: 1356178125
 mas "DjVu Reader Pro", id: 895264364
 mas "Pandan", id: 1569600264
 mas "Parcel", id: 639968404

@@ -43,7 +43,6 @@ yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
 ### Things that need to be done manually
 
 1. [Remap Caps Lock to Ctrl](https://support.apple.com/zh-sg/guide/mac-help/mchlp1011/mac), [Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
-2. Install [CryptoPRO 5.0](https://www.cryptopro.ru/products/csp).
 3. Install [Paragon NTFS](https://uc.paragon-software.com/cabinet).
 4. Install M1-compatible apps: Streisand, Xiaomi Home, SailTies.
 5. Install Adobe Lightroom from Adobe Creative Cloud.

@@ -1,0 +1,4 @@
+docs/
+.config/git/config.work
+.config/shell/environment.work
+.config/shell/environment.home

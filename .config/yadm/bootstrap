@@ -94,14 +94,6 @@ download_apps() {
         "ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
         "$DOWNLOADS_TIMEOUT"
 
-    # Chromium GOST
-    local CHROMIUM_GOST
-    CHROMIUM_GOST=$(curl -s "https://api.github.com/repos/deemru/Chromium-Gost/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
-    download_app \
-        "https://github.com/deemru/Chromium-Gost/releases/download/$CHROMIUM_GOST/chromium-gost-$CHROMIUM_GOST-macos-arm64.tar.bz2" \
-        "$CHROMIUM_GOST-macos-arm64.tar.bz2" \
-        "$DOWNLOADS_TIMEOUT"
-
     # Amnezia VPN
     local AMNEZIA
     AMNEZIA=$(curl -s "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)

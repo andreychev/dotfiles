@@ -1,0 +1,4 @@
+# Include shared base packages
+instance_eval(File.read(File.expand_path("~/Brewfile.base")))
+
+# Work-specific tools — add as needed

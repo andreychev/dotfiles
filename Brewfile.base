@@ -52,7 +52,6 @@ brew "umputun/apps/revdiff"
 
 # System utilities
 brew "xdg-ninja"
-brew "pcsc-lite"
 brew "mole"
 
 # Fonts

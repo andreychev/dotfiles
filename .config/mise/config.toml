@@ -17,7 +17,3 @@ teleport = 'https://github.com/highb/asdf-teleport-ent'
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
-
-[settings.rust]
-cargo_home = "~/.local/share/cargo"
-rustup_home = "~/.local/share/rustup"

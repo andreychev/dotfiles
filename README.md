@@ -18,7 +18,6 @@ sudo softwareupdate -i -a
 
 # Ensure Apple's command line tools are installed.
 xcode-select --install
-sudo xcodebuild -license
 
 # **Ensure you are authorized in the Mac App Store**.
 
@@ -29,7 +28,7 @@ sudo vi /etc/pam.d/sudo_local
 
 # Install Homebrew.
 if [[ $(command -v brew) == "" ]]; then
-  /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 # Install mas, yadm, mackup.
@@ -48,8 +47,6 @@ yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
 3. Install [Paragon NTFS](https://uc.paragon-software.com/cabinet).
 4. Install M1-compatible apps: Streisand, Xiaomi Home, SailTies.
 5. Install Adobe Lightroom from Adobe Creative Cloud.
-6. Install Microsoft Office and Microsoft Teams.
-7. Install [T-Mazing](https://www.tbank.ru/bank/help/interfaces/bank-app/get/t-mazing/).
 8. Authorize Yandex.Disk and wait for sync.
 9. Authorize iCloud Drive and Photos.
 10. Configure extra Mail, Calendar.

@@ -42,7 +42,9 @@ load_config() {
 
 # Install brew dependencies
 install_brew_deps() {
-    log "INFO" "Installing brew dependencies..."
+    local class
+    class=$(yadm config local.class 2>/dev/null || echo "unset")
+    log "INFO" "Installing brew dependencies (class: $class)..."
     /opt/homebrew/bin/brew bundle
     log "SUCCESS" "Brew dependencies installation completed"
 }

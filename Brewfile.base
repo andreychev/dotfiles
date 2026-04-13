@@ -80,7 +80,6 @@ cask "zed"
 cask "sanesidebuttons"
 cask "raycast"
 cask "quitter"
-cask "rescuetime"
 cask "bartender"
 cask "cleanshot"
 cask "linearmouse"
@@ -93,7 +92,6 @@ cask "vlc"
 
 # Miscellaneous
 cask "latest"
-cask "chatgpt"
 cask "claude"
 cask "claude-code"
 
@@ -111,7 +109,6 @@ mas "Numbers", id: 361304891
 mas "Pages", id: 361309726
 
 # Communication and Social Media from Mac App Store
-mas "Telegram", id: 747648890
 mas "Slack", id: 803453959
 
 # Security and Privacy from Mac App Store

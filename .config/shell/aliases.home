@@ -1,0 +1,4 @@
+#!/bin/bash
+
+alias disk='cd "$HOME"/Yandex.Disk.localized'
+alias rn-photos="exifrename -f '{year}{month}{day}_{hour}{minute}{second}_{fstop}_{focal_length_35}'"

@@ -88,28 +88,32 @@ download_app() {
 
 # Download all applications
 download_apps() {
+    local class=$1
     cd "$XDG_DOWNLOAD_DIR"
 
-    # Typography Layout
+    # Typography Layout (all machines)
     download_app \
         "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
         "ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
         "$DOWNLOADS_TIMEOUT"
 
-    # Amnezia VPN
-    local AMNEZIA
-    AMNEZIA=$(curl -s "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
-    local AMNEZIA_VERSION="${AMNEZIA#v}"
-    download_app \
-        "https://github.com/amnezia-vpn/amnezia-client/releases/download/$AMNEZIA/AmneziaVPN_$AMNEZIA_VERSION.dmg" \
-        "AmneziaVPN_$AMNEZIA_VERSION.dmg" \
-        "$DOWNLOADS_TIMEOUT"
+    # Home-only downloads
+    if [[ "$class" == "home" ]]; then
+        # Amnezia VPN
+        local AMNEZIA
+        AMNEZIA=$(curl -s "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
+        local AMNEZIA_VERSION="${AMNEZIA#v}"
+        download_app \
+            "https://github.com/amnezia-vpn/amnezia-client/releases/download/$AMNEZIA/AmneziaVPN_$AMNEZIA_VERSION.dmg" \
+            "AmneziaVPN_$AMNEZIA_VERSION.dmg" \
+            "$DOWNLOADS_TIMEOUT"
 
-    # Yandex.Disk
-    download_app \
-        "https://disk.yandex.ru/download/Yandex.Disk.dmg/?instant=1" \
-        "Yandex.Disk.dmg" \
-        "$DOWNLOADS_TIMEOUT"
+        # Yandex.Disk
+        download_app \
+            "https://disk.yandex.ru/download/Yandex.Disk.dmg/?instant=1" \
+            "Yandex.Disk.dmg" \
+            "$DOWNLOADS_TIMEOUT"
+    fi
 
     cd "$HOME"
 }
@@ -125,13 +129,17 @@ setup_yadm() {
 main() {
     log "INFO" "Starting setup script..."
 
+    local class
+    class=$(yadm config local.class 2>/dev/null || echo "unset")
+    log "INFO" "Machine class: $class"
+
     check_macos
     load_config
     install_brew_deps
     apply_defaults
     restore_mackup
     setup_docker_buildx
-    download_apps
+    download_apps "$class"
     setup_yadm
 
     log "SUCCESS" "Setup completed successfully"

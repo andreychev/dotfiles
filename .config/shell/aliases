@@ -25,7 +25,6 @@ alias gs="scmpuff_status"
 alias ga="git add"
 
 # Navigation to specific directories
-alias disk='cd "$HOME"/Yandex.Disk.localized'
 alias icloud='cd "$HOME"/Library/Mobile\ Documents/com~apple~CloudDocs'
 
 # Miscellaneous aliases
@@ -60,4 +59,3 @@ alias firefox="open -na 'Firefox'"
 # Kill all the tabs in Chrome to free up memory
 alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
 
-alias rn-photos="exifrename -f '{year}{month}{day}_{hour}{minute}{second}_{fstop}_{focal_length_35}'"

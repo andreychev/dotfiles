@@ -17,9 +17,6 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
 export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 
-# CryptoPro Configuration
-export PKG_CONFIG_PATH="/opt/homebrew/opt/pcsc-lite/lib/pkgconfig"
-
 # Plugin Management (antidote)
 export ANTIDOTE_HOME=${XDG_CACHE_HOME:=~/.cache}/repos
 

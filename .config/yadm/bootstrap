@@ -52,7 +52,7 @@ install_brew_deps() {
 # Apply defaults
 apply_defaults() {
     log "INFO" "Applying defaults..."
-    find "$XDG_CONFIG_HOME" -type f -name "defaults" -executable -exec /bin/bash -c "{} --no-restart" \;
+    find "$XDG_CONFIG_HOME" -type f -name "defaults" -executable -exec /bin/bash -c "{}" \;
     log "SUCCESS" "Defaults applied successfully"
 }
 
@@ -122,7 +122,7 @@ download_apps() {
 setup_yadm() {
     log "INFO" "Configuring yadm sparse-checkout..."
     /opt/homebrew/bin/yadm sparse-checkout init
-    /opt/homebrew/bin/yadm sparse-checkout set --no-cone '/*' '!README.md' '!LICENSE' '!.editoconfig'
+    /opt/homebrew/bin/yadm sparse-checkout set --no-cone '/*' '!README.md' '!LICENSE' '!.editorconfig'
     log "SUCCESS" "Yadm configured"
 }
 

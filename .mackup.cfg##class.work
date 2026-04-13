@@ -1,0 +1,8 @@
+[storage]
+engine = file_system
+path = .config
+
+[applications_to_sync]
+mail
+vlc
+zoom

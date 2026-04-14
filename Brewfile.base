@@ -58,7 +58,6 @@ brew "mole"
 cask "font-fira-code-nerd-font"
 
 # QuickLook plugins
-cask "quicklook-json"
 cask "qlmarkdown"
 cask "quicklook-csv"
 
@@ -91,7 +90,6 @@ cask "claude"
 cask "claude-code"
 
 # Utility Apps from Mac App Store
-mas "The Unarchiver", id: 425424353
 mas "Paste", id: 967805235
 mas "Velja", id: 1607635845
 mas "Dato", id: 1470584107

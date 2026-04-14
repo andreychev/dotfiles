@@ -40,8 +40,8 @@ fi
 # yadm clone --bootstrap doesn't support passing a class, so do it in steps:
 yadm clone git@github.com:andreychev/dotfiles.git
 yadm config local.class home   # or: work
-yadm alt                        # applies symlinks for the active class
-~/.config/yadm/bootstrap
+yadm alt
+yadm bootstrap
 ```
 
 ### Things that need to be done manually

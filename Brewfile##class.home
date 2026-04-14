@@ -5,7 +5,9 @@ instance_eval(File.read(File.expand_path("~/Brewfile.base")))
 cask "spotify"
 cask "outline-manager"
 cask "chatgpt"
-cask "rescuetime"
+
+# Essential apps
+cask "1password@7"
 
 # Personal hardware and media tools
 cask "adobe-creative-cloud"
@@ -13,12 +15,17 @@ cask "airbuddy"
 cask "imazing"
 cask "transmission"
 cask "qflipper"
-cask "logitech-g-hub"
 cask "calibre"
 cask "nx-studio"
 cask "samsung-magician"
 cask "handbrake-app"
 cask "handy"
+
+# Communication tools
+cask "zoom"
+
+# Media
+cask "vlc"
 
 # Personal Mac App Store apps
 mas "Telegram", id: 747648890

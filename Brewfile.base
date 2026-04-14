@@ -65,30 +65,25 @@ cask "quicklook-csv"
 # Browsers
 cask "google-chrome"
 cask "firefox"
-cask "microsoft-edge"
 
-# Essential applications
-cask "1password@7"
+# Essential apps
 cask "obsidian"
 
-# Development applications
+# Development apps
 cask "iterm2"
 cask "visual-studio-code"
 cask "zed"
 
 # Productivity and UI enhancements
-cask "sanesidebuttons"
 cask "raycast"
 cask "quitter"
 cask "bartender"
 cask "cleanshot"
+
+# Hardware tools
+cask "sanesidebuttons"
 cask "linearmouse"
-
-# Communication tools
-cask "zoom"
-
-# Media
-cask "vlc"
+cask "logitech-g-hub"
 
 # Miscellaneous
 cask "latest"
@@ -107,8 +102,3 @@ mas "Shareful", id: 1522267256
 mas "Keynote", id: 361285480
 mas "Numbers", id: 361304891
 mas "Pages", id: 361309726
-
-# Communication and Social Media from Mac App Store
-mas "Slack", id: 803453959
-
-# Security and Privacy from Mac App Store

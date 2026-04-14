@@ -36,8 +36,12 @@ fi
 /opt/homebrew/bin/brew install yadm
 /opt/homebrew/bin/brew install mackup
 
-# Clone this repository to your local drive using yadm.
-yadm clone git@github.com:andreychev/dotfiles.git --bootstrap
+# Clone this repository and set the machine class before running bootstrap.
+# yadm clone --bootstrap doesn't support passing a class, so do it in steps:
+yadm clone git@github.com:andreychev/dotfiles.git
+yadm config local.class home   # or: work
+yadm alt                        # applies symlinks for the active class
+~/.config/yadm/bootstrap
 ```
 
 ### Things that need to be done manually

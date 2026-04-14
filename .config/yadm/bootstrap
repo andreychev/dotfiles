@@ -67,7 +67,7 @@ apply_defaults() {
 # Restore mackup settings
 restore_mackup() {
     log "INFO" "Restoring mackup settings..."
-    /opt/homebrew/bin/mackup restore && /opt/homebrew/bin/mackup uninstall
+    /opt/homebrew/bin/mackup restore
     log "SUCCESS" "Mackup settings restored"
 }
 

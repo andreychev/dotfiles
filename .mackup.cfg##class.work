@@ -4,5 +4,3 @@ path = .config
 
 [applications_to_sync]
 mail
-vlc
-zoom

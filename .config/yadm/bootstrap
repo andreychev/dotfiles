@@ -52,7 +52,7 @@ install_brew_deps() {
 # Apply defaults
 apply_defaults() {
     log "INFO" "Applying defaults..."
-    find "$XDG_CONFIG_HOME" -type f -name "defaults" -executable -exec /bin/bash -c "{}" \;
+    find "$XDG_CONFIG_HOME" -type f -name "defaults" -perm /a=x -exec /bin/bash -c "{}" \;
     log "SUCCESS" "Defaults applied successfully"
 }
 

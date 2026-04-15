@@ -1,0 +1,75 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "agent": {
+    "default_profile": "ask",
+    "default_model": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-latest"
+    },
+    "model_parameters": []
+  },
+  "format_on_save": "off",
+  "use_system_path_prompts": true,
+  "edit_predictions": {
+    "disabled_globs": [],
+    "mode": "eager"
+  },
+  "features": {
+    "edit_prediction_provider": "zed"
+  },
+  /* Duplicated key auto-commented: "agent": {
+    "always_allow_tool_actions": true,
+    "default_profile": "minimal",
+    "default_model": {
+      "provider": "zed.dev",
+      "model": "claude-sonnet-4"
+    },
+    "version": "2"
+  }, */
+  "icon_theme": "Catppuccin Macchiato",
+  "ui_font_size": 14,
+  "ui_font_family": "FiraCode Nerd Font",
+  "buffer_font_size": 14.0,
+  "theme": {
+    "mode": "system",
+    "light": "Catppuccin Macchiato",
+    "dark": "Catppuccin Latte"
+  },
+  "languages": {
+    "JavaScript": {
+      "format_on_save": "on"
+    },
+    "Lua": {
+      "format_on_save": "off"
+    }
+  },
+  "lsp": {
+    "yaml-language-server": {
+      "settings": {
+        "yaml": {
+          "customTags": [
+            "!reference",
+            "!reference sequence",
+            "!reference mapping",
+            "!include",
+            "!include scalar",
+            "!include sequence",
+            "!include mapping"
+          ],
+          "schemas": {
+            "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": [
+              "/.gitlab-ci.yml"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

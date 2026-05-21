@@ -7,6 +7,7 @@ export LESSKEY="$XDG_CONFIG_HOME"/less/lesskey
 export LESSHISTFILE="$XDG_CACHE_HOME"/less/history
 
 export HISTFILE="$XDG_STATE_HOME"/zsh/history
+
 export TERMINFO="$XDG_DATA_HOME"/terminfo
 export TERMINFO_DIRS="$XDG_DATA_HOME"/terminfo:/usr/share/terminfo
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/config

@@ -9,14 +9,6 @@ fi
 source "$XDG_CONFIG_HOME/shell/config"
 source "$XDG_CONFIG_HOME/zsh/environment.zsh"
 
-# Homebrew Configuration
-export HOMEBREW_PREFIX="/opt/homebrew"
-export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
-export HOMEBREW_REPOSITORY="/opt/homebrew"
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
-export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
-export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
-
 # Plugin Management (antidote)
 export ANTIDOTE_HOME=${XDG_CACHE_HOME:=~/.cache}/repos
 

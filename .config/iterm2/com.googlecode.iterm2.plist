@@ -19,13 +19,13 @@ The script should do this: \(ai.prompt)</string>
 	<key>AITermAPI</key>
 	<integer>2</integer>
 	<key>AIVectorStore</key>
-	<integer>1</integer>
+	<integer>0</integer>
 	<key>AiMaxTokens</key>
-	<integer>1000000</integer>
+	<integer>1050000</integer>
 	<key>AiModel</key>
-	<string>gpt-4.1</string>
+	<string>gpt-5.5</string>
 	<key>AiResponseMaxTokens</key>
-	<integer>32768</integer>
+	<integer>128000</integer>
 	<key>AitermURL</key>
 	<string>https://api.openai.com/v1/responses</string>
 	<key>AutoHideTmuxClientSession</key>
@@ -585,6 +585,10 @@ The script should do this: \(ai.prompt)</string>
 	<true/>
 	<key>IRMemory</key>
 	<integer>4</integer>
+	<key>NeverWarnAboutShortLivedSessions_610F9140-773A-429C-B9D9-8059FE031A11</key>
+	<true/>
+	<key>NeverWarnAboutShortLivedSessions_610F9140-773A-429C-B9D9-8059FE031A11_selection</key>
+	<integer>0</integer>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -1144,6 +1148,19 @@ The script should do this: \(ai.prompt)</string>
 					<key>Text</key>
 					<string>0x1b 0x7f</string>
 				</dict>
+				<key>0xd-0x20000-0x24</key>
+				<dict>
+					<key>Action</key>
+					<integer>10</integer>
+					<key>Apply Mode</key>
+					<integer>0</integer>
+					<key>Escaping</key>
+					<integer>2</integer>
+					<key>Text</key>
+					<string>[13;2u</string>
+					<key>Version</key>
+					<integer>2</integer>
+				</dict>
 				<key>0xf700-0x220000-0x0</key>
 				<dict>
 					<key>Action</key>
@@ -1585,6 +1602,10 @@ The script should do this: \(ai.prompt)</string>
 			<string>/Users/andreychev</string>
 		</dict>
 	</array>
+	<key>OpenArrangementAtStartup</key>
+	<false/>
+	<key>OpenNoWindowsAtStartup</key>
+	<false/>
 	<key>PointerActions</key>
 	<dict>
 		<key>Button,1,1,,</key>
@@ -1618,8 +1639,10 @@ The script should do this: \(ai.prompt)</string>
 			<string>kNextWindowPointerAction</string>
 		</dict>
 	</dict>
+	<key>Print In Black And White</key>
+	<true/>
 	<key>ShowFullScreenTabBar</key>
-	<false/>
+	<true/>
 	<key>SoundForEsc</key>
 	<false/>
 	<key>SplitPaneDimmingAmount</key>

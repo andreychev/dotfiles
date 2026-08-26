@@ -28,7 +28,7 @@ source "${zsh_plugins}".zsh
 
 # Functions and Theming
 fpath=("$XDG_CONFIG_HOME/shell/functions" $fpath)
-autoload -Uz "$XDG_CONFIG_HOME/shell/functions/*(.:t)"
+autoload -Uz $XDG_CONFIG_HOME/shell/functions/*(.:t)
 
 # Set theme
 fast-theme -q XDG:catppuccin-mocha

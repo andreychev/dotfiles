@@ -15,7 +15,8 @@ Brewfile.lock.json
 .npmrc
 
 # Agents
+.tickets
+.codex
 .claude
-CLAUDE.md
-AGENTS.md
-.serena
+.agents
+.omp

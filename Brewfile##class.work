@@ -2,3 +2,6 @@
 instance_eval(File.read(File.expand_path("~/Brewfile.base")))
 
 # Work-specific tools — add as needed
+brew "can1357/tap/omp"
+
+cask "chatgpt"

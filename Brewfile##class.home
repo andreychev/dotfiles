@@ -1,6 +1,10 @@
 # Include shared base packages
 instance_eval(File.read(File.expand_path("~/Brewfile.base")))
 
+# AI
+cask "claude"
+cask "claude-code"
+
 # Personal apps
 cask "spotify"
 cask "chatgpt"

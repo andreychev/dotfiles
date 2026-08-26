@@ -86,8 +86,6 @@ cask "logitech-g-hub"
 
 # Miscellaneous
 cask "latest"
-cask "claude"
-cask "claude-code"
 
 # Utility Apps from Mac App Store
 mas "Paste", id: 967805235

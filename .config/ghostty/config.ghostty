@@ -1,0 +1,39 @@
+# Shell
+command = /opt/homebrew/bin/zsh
+
+# Font & Theme
+font-family = FiraCode Nerd Font Mono
+font-size = 13
+theme = Catppuccin Mocha
+
+# Cursor
+cursor-style = bar
+cursor-style-blink = false
+shell-integration-features = no-cursor
+
+# Initial terminal dimensions
+window-width = 80
+window-height = 25
+
+# Appearance
+macos-icon = retro
+window-padding-x = 5
+window-padding-y = 2
+background-opacity = 1
+background-blur-radius = 0
+unfocused-split-opacity = 0.95
+
+# History
+scrollback-limit = 10000
+
+# Working directory behavior
+working-directory = home
+window-inherit-working-directory = false
+tab-inherit-working-directory = false
+split-inherit-working-directory = true
+
+# macOS
+macos-titlebar-style = tabs
+
+# Match iTerm2 close behavior
+confirm-close-surface = false

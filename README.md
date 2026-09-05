@@ -78,6 +78,11 @@ Direct helper phases and targeted workstation defaults/tools phases also validat
 the class. For applying a subset, use the guarded entry, for example
 `"$HOME/.config/yadm/bootstrap" --only macos-defaults`.
 
+Class reads use Git directly against `$XDG_DATA_HOME/yadm/repo.git/config`, the
+standard yadm repository location used here, with includes disabled. They do not
+invoke yadm: even `yadm config local.class` can run hooks, relink alternates and
+change permissions. Set the class and apply alternates explicitly with yadm.
+
 Application downloads use a same-directory temporary file and an atomic rename
 only after curl succeeds. Failures remove the partial file so a later run retries.
 Our curl requests use a 15-second connection deadline and a 300-second total
@@ -108,7 +113,7 @@ mise -C "$HOME" -E workstation bootstrap macos defaults status
 
 # List tasks, then run one explicit maintenance operation.
 mise tasks
-mise -C "$HOME" run update:tools
+mise -C "$HOME" run --skip-tools update:tools
 ```
 
 | Task | Operation |
@@ -123,6 +128,12 @@ mise -C "$HOME" run update:tools
 These tasks replace `brewup`, `zshup`, `nvimup` and `macosup`. Navigation and other
 interactive aliases remain in the shell. Exact runtime pins and `NODE_OPTIONS`
 are unchanged; `mise upgrade` does not advance an exact pin automatically.
+
+Use `--skip-tools` for all six maintenance tasks. It skips the runner's implicit
+runtime installation, not the requested `upgrade` or `self-update` operation.
+Bare `mise run update:...` retains mise's normal auto-install behavior. Mise
+2026.9.1 has no task-local opt-out for its initial installation pass; global
+auto-install settings remain unchanged so ordinary project tasks still work.
 
 To preview a task without installing tools or running commands:
 
@@ -141,6 +152,10 @@ History is shell-specific: `$XDG_STATE_HOME/bash/history` and
 and Zsh setup. Existing history contents are not rewritten or automatically split.
 The shared XDG file no longer owns `HISTFILE`.
 
+Shared configuration loads XDG tool defaults first, then general and class-specific
+environment settings, then aliases. `environment.home` / `environment.work`
+overrides therefore survive and are visible to aliases. Class lookup is read-only.
+
 ### Regression checks
 
 On macOS with mise installed, run from this checkout:
@@ -154,6 +169,9 @@ recording substitutes for macOS/package commands and downloads. They cover
 workstation isolation, class validation, both profiles, interrupted transfers and
 retry, installer failure/cleanup, dry-run, shell activation/history, PATH precedence
 and maintenance tasks without network access, runtime installs or host preferences.
+The preview regression also uses real yadm with a temporary repository. The
+maintenance regression keeps auto-install enabled and uses a local, network-free
+probe tool: maintenance skips its installer while an ordinary project task runs it.
 
 ### Things that need to be done manually
 

@@ -14,6 +14,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 MISE = shutil.which("mise")
+YADM = shutil.which("yadm")
 SOURCES = (
     ".xdg.dirs", ".config/shell/xdg", ".config/yadm/bootstrap",
     ".config/mise/bootstrap", ".config/mise/config.toml",
@@ -46,11 +47,7 @@ elif name == "brew":
     elif args not in (["update"], ["upgrade"], ["cleanup"]):
         sys.exit("Unexpected brew operation")
 elif name == "yadm":
-    if args == ["config", "local.class"]:
-        if os.environ.get("FAIL_CLASS_READ"):
-            sys.exit(19)
-        print(os.environ["MACHINE_CLASS"])
-    elif args != ["sparse-checkout", "init"] and args[:3] != ["sparse-checkout", "set", "--no-cone"]:
+    if args != ["sparse-checkout", "init"] and args[:3] != ["sparse-checkout", "set", "--no-cone"]:
         sys.exit("Unexpected yadm operation")
 elif name == "curl":
     for flag, expected in (("--connect-timeout", "15"), ("--max-time", "300")):
@@ -135,7 +132,7 @@ class MiseBootstrapTests(unittest.TestCase):
             "HOME": str(self.home), "USER": os.environ.get("USER", "test"),
             "PATH": f"{self.bin}:/usr/bin:/bin:/usr/sbin:/sbin",
             "HOMEBREW_PREFIX": str(self.prefix), "REAL_MISE": str(Path(MISE).absolute()),
-            "COMMAND_LOG": str(self.log), "MACHINE_CLASS": "work",
+            "COMMAND_LOG": str(self.log),
             "INSTALLER_EXECUTED": str(self.base / "installer-executed"),
             "TERM": "dumb", "NO_COLOR": "1", "CI": "1", "MISE_YES": "1",
             "MISE_CONFIG_DIR": str(self.config.parent),
@@ -160,6 +157,9 @@ class MiseBootstrapTests(unittest.TestCase):
             if key.startswith("XDG_") or key.endswith("_DIR") or key == "TMPDIR":
                 Path(value).mkdir(parents=True, exist_ok=True)
         (self.home / "Downloads").mkdir()
+        self.class_config = Path(self.env["XDG_DATA_HOME"]) / "yadm/repo.git/config"
+        self.class_config.parent.mkdir(parents=True)
+        self.set_machine_class("work")
         for name in ("defaults", "brew", "yadm", "mackup", "curl", "jq", "osascript", "zsh", "nvim", "sudo"):
             self.make_stub(name)
         self.make_stub("mise")
@@ -183,6 +183,24 @@ class MiseBootstrapTests(unittest.TestCase):
         # Only runtimes are omitted; all production hooks/tasks/preferences remain.
         self.config.write_text(re.sub(r"(?ms)^\[tools\]\n.*?(?=^\[settings\])", "",
                                       self.production_config, count=1))
+
+    def set_machine_class(self, profile):
+        self.class_config.write_text(f'[local]\nclass = {json.dumps(profile)}\n')
+
+    def set_class_failure(self, state):
+        if self.class_config.exists():
+            self.class_config.chmod(0o600)
+        self.set_machine_class("work")
+        if state == "missing-file":
+            self.class_config.unlink()
+        elif state == "missing-key":
+            self.class_config.write_text("[local]\n")
+        elif state == "malformed":
+            self.class_config.write_text("[invalid config\n")
+        elif state == "unreadable":
+            self.class_config.chmod(0o000)
+        else:
+            self.set_machine_class(state)
 
     def make_stub(self, name, directory=None):
         path = (directory or self.bin) / name
@@ -239,7 +257,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertEqual(os.readlink(link), str(self.prefix / "opt/docker-buildx/bin/docker-buildx"))
 
     def exercise_profile(self, profile):
-        self.env["MACHINE_CLASS"] = profile
+        self.set_machine_class(profile)
         self.assert_success(self.bootstrap())
         self.assertFalse(any(row["command"] == "curl" and "https://mise.run" in row["args"]
                              for row in self.records()))
@@ -293,8 +311,7 @@ class MiseBootstrapTests(unittest.TestCase):
     def assert_class_failure(self, result):
         self.assertNotEqual(result.returncode, 0, result.stdout)
         self.assertIn("local.class", result.stdout)
-        self.assertTrue(self.records(), "Class must be read before failing")
-        self.assertTrue(all(self.is_class_read(row) for row in self.records()), self.records())
+        self.assertEqual(self.records(), [], "Class validation must not invoke external mutations")
         self.assertEqual((self.home / ".config").stat().st_mode & 0o777, 0o755)
         self.assertFalse(Path(self.env["INSTALLER_EXECUTED"]).exists())
         self.assertFalse((self.home / ".config/docker").exists())
@@ -306,13 +323,52 @@ class MiseBootstrapTests(unittest.TestCase):
         for installed in (True, False):
             if not installed:
                 self.local_mise.unlink()
-            for profile, read_failure in (("", False), ("unknown", False), ("work", True)):
-                with self.subTest(installed=installed, profile=profile, read_failure=read_failure):
-                    self.env["MACHINE_CLASS"] = profile
-                    self.env["FAIL_CLASS_READ"] = "1" if read_failure else ""
+            for state in ("", "unknown", "missing-file", "missing-key", "malformed", "unreadable"):
+                with self.subTest(installed=installed, state=state):
+                    if state == "unreadable" and os.geteuid() == 0:
+                        continue  # root bypasses file read permissions
+                    self.set_class_failure(state)
                     self.clear_records()
-                    self.assert_class_failure(self.bootstrap())
+                    result = self.bootstrap()
+                    self.assert_class_failure(result)
+                    self.assertIn("Invalid" if state in ("", "unknown") else "Cannot read", result.stdout)
                     self.assertEqual(self.local_mise.exists(), installed)
+
+    def test_missing_yadm_storage_is_not_created(self):
+        (self.home / ".config").chmod(0o755)
+        self.class_config.unlink()
+        self.class_config.parent.rmdir()
+        self.class_config.parent.parent.rmdir()
+        yadm_config = self.home / ".config/yadm"
+        (yadm_config / "bootstrap").unlink()
+        yadm_config.rmdir()
+        self.assert_class_failure(self.run_command(
+            "/bin/bash", str(self.home / ".config/mise/bootstrap"), "preflight"))
+        self.assertFalse(self.class_config.parent.parent.exists())
+        self.assertFalse(yadm_config.exists())
+
+    def test_class_lookup_ignores_ambient_git_config_and_includes(self):
+        unrelated = self.other / "unrelated.git"
+        unrelated.mkdir()
+        (unrelated / "config").write_text("[local]\nclass = unknown\n")
+        included = self.base / "included.gitconfig"
+        included.write_text("[local]\nclass = unknown\n")
+        self.class_config.write_text(self.class_config.read_text() +
+                                     f'[include]\npath = {json.dumps(str(included))}\n')
+        self.env.update({
+            "GIT_DIR": str(unrelated), "GIT_WORK_TREE": str(self.other),
+            "GIT_CONFIG_GLOBAL": str(included), "GIT_CONFIG_SYSTEM": str(included),
+            "GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "local.class",
+            "GIT_CONFIG_VALUE_0": "unknown",
+        })
+        self.assert_success(self.run_command(
+            "/bin/bash", str(self.home / ".config/mise/bootstrap"), "preflight"))
+        self.assertEqual(self.records(), [])
+        # Ambient values must not supply a missing machine-local class either.
+        self.class_config.write_text(f'[include]\npath = {json.dumps(str(included))}\n')
+        (self.home / ".config").chmod(0o755)
+        self.assert_class_failure(self.run_command(
+            "/bin/bash", str(self.home / ".config/mise/bootstrap"), "preflight"))
 
     def test_invalid_class_stops_direct_phases_and_native_only_paths(self):
         (self.home / ".config").chmod(0o755)
@@ -321,13 +377,16 @@ class MiseBootstrapTests(unittest.TestCase):
                     for phase in ("preflight", "packages", "defaults", "finish")]
         commands += [(MISE, "-C", str(self.home), "-E", "workstation", "bootstrap",
                       "--only", phase, "--yes") for phase in ("macos-defaults", "tools")]
-        for profile, read_failure in (("", False), ("unknown", False), ("work", True)):
-            self.env["MACHINE_CLASS"] = profile
-            self.env["FAIL_CLASS_READ"] = "1" if read_failure else ""
+        for state in ("", "unknown", "missing-file", "missing-key", "malformed", "unreadable"):
+            if state == "unreadable" and os.geteuid() == 0:
+                continue  # root bypasses file read permissions
+            self.set_class_failure(state)
             for command in commands:
-                with self.subTest(profile=profile, read_failure=read_failure, command=command):
+                with self.subTest(state=state, command=command):
                     self.clear_records()
-                    self.assert_class_failure(self.run_command(*command))
+                    result = self.run_command(*command)
+                    self.assert_class_failure(result)
+                    self.assertIn("Invalid" if state in ("", "unknown") else "Cannot read", result.stdout)
 
     def test_interrupted_app_download_is_cleaned_and_retry_is_complete(self):
         self.env["FAIL_APP_DOWNLOAD"] = "1"
@@ -352,7 +411,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertEqual(list(downloads.iterdir()), [destination])
 
     def test_invalid_release_response_stops_before_release_download(self):
-        self.env["MACHINE_CLASS"] = "home"
+        self.set_machine_class("home")
         for payload in ("not json", "{}", '{"tag_name": null}', '{"tag_name": 12}',
                         '{"tag_name": ""}'):
             with self.subTest(payload=payload):
@@ -370,8 +429,8 @@ class MiseBootstrapTests(unittest.TestCase):
         # Runtimes remain omitted to keep this test offline; production tools
         # are covered by the separate native dry-run during migration.
         self.assert_success(self.bootstrap("--dry-run"))
-        self.assertTrue(all(self.is_class_read(row) or (row["command"] == "defaults" and
-                            row["args"][0] in ("read", "read-type"))
+        self.assertTrue(all(row["command"] == "defaults" and
+                            row["args"][0] in ("read", "read-type")
                             for row in self.records()))
         self.assertFalse((self.home / ".config/docker/cli-plugins/docker-buildx").is_symlink())
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
@@ -384,9 +443,77 @@ class MiseBootstrapTests(unittest.TestCase):
                 result = self.bootstrap(option)
                 self.assertNotEqual(result.returncode, 0, result.stdout)
                 self.assertIn("nothing was changed", result.stdout)
-                self.assertTrue(all(self.is_class_read(row) for row in self.records()))
+                self.assertEqual(self.records(), [])
                 self.assertFalse(self.local_mise.exists())
                 self.assertTrue((self.bin / "mise").exists())
+
+    @unittest.skipUnless(YADM, "Requires installed yadm")
+    def test_real_yadm_preview_and_preflight_preserve_files_and_permissions(self):
+        # Real yadm setup is confined to the fixture HOME/XDG paths. The fixture
+        # preference interception probe still guards every real mise invocation.
+        self.class_config.unlink()
+        self.class_config.parent.rmdir()
+        (self.bin / "yadm").unlink()
+        (self.bin / "yadm").symlink_to(YADM)
+        self.env.update({
+            "GIT_DIR": str(self.class_config.parent),
+            "GIT_CONFIG_SYSTEM": os.devnull,
+        })
+        for args in (("init",), ("config", "local.class", "work")):
+            self.assert_success(self.run_command(YADM, *args))
+        self.assertTrue((self.class_config.parent / "HEAD").is_file(),
+                        "Real yadm setup must create a Git repository")
+        alternate = self.home / ".config/class-probe##class.work"
+        alternate.write_text("work alternate\n")
+        self.assert_success(self.run_command(YADM, "add", str(alternate)))
+        generated = self.home / ".config/class-probe"
+        self.assertTrue(generated.is_symlink(), "Setup must exercise real yadm auto-alt")
+        generated.unlink()
+
+        private_dir = self.home / ".ssh"
+        private_dir.mkdir(exist_ok=True)
+        sentinel = private_dir / "permission-sentinel"
+        sentinel.write_text("not a real key\n")
+        sentinel.chmod(0o644)
+        private_dir.chmod(0o755)
+        (self.home / ".config").chmod(0o755)
+        modes = {path: path.stat().st_mode for path in (private_dir, sentinel, self.home / ".config")}
+        hooks = self.home / ".config/yadm/hooks"
+        hooks.mkdir()
+        hook = hooks / "pre_config"
+        hook.write_text('#!/bin/sh\n: > "$HOME/yadm-hook-executed"\n')
+        hook.chmod(0o755)
+
+        for installed in (True, False):
+            if not installed:
+                self.local_mise.unlink()
+            commands = [
+                ("preflight", ("/bin/bash", str(self.home / ".config/mise/bootstrap"), "preflight")),
+                ("--dry-run", ("/bin/bash", str(self.home / ".config/yadm/bootstrap"), "--dry-run")),
+                ("--help", ("/bin/bash", str(self.home / ".config/yadm/bootstrap"), "--help")),
+            ]
+            for option, command in commands:
+                with self.subTest(installed=installed, option=option):
+                    self.clear_records()
+                    result = self.run_command(*command)
+                    if installed or option == "preflight":
+                        self.assert_success(result)
+                    else:
+                        self.assertNotEqual(result.returncode, 0, result.stdout)
+                        self.assertIn("nothing was changed", result.stdout)
+                        self.assertEqual(self.records(), [])
+                    self.assertFalse(os.path.lexists(generated), result.stdout)
+                    self.assertEqual({path: path.stat().st_mode for path in modes}, modes)
+                    self.assertFalse((self.home / "yadm-hook-executed").exists())
+                    self.assertEqual(sentinel.read_text(), "not a real key\n")
+                    self.assertEqual(alternate.read_text(), "work alternate\n")
+                    self.assertEqual(self.local_mise.exists(), installed)
+                    self.assertFalse(Path(self.env["INSTALLER_EXECUTED"]).exists())
+                    self.assertTrue(all(row["command"] == "defaults" and
+                                        row["args"][0] in ("read", "read-type")
+                                        for row in self.records()), self.records())
+                    self.assertEqual(list((self.home / "Downloads").iterdir()), [])
+                    self.assertFalse((self.home / ".config/docker").exists())
 
     def test_cold_start_installs_mise_then_continues(self):
         self.local_mise.unlink()
@@ -417,10 +544,6 @@ class MiseBootstrapTests(unittest.TestCase):
         self.env["FAIL_INSTALLER"] = "1"
         self.assert_installation_failure(executed=True)
 
-    @staticmethod
-    def is_class_read(row):
-        return row["command"] == "yadm" and row["args"] == ["config", "local.class"]
-
     def assert_installer_cleaned(self):
         calls = [row for row in self.records() if row["command"] == "curl" and
                  "https://mise.run" in row["args"]]
@@ -433,7 +556,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.local_mise.unlink()
         result = self.bootstrap()
         self.assertNotEqual(result.returncode, 0, result.stdout)
-        rows = [row for row in self.records() if not self.is_class_read(row)]
+        rows = self.records()
         self.assertEqual(len(rows), 1, rows)
         self.assert_installer_cleaned()
         self.assertEqual(Path(self.env["INSTALLER_EXECUTED"]).exists(), executed)
@@ -472,7 +595,7 @@ class MiseBootstrapTests(unittest.TestCase):
             with self.subTest(task=task):
                 self.clear_records()
                 # No -C: task.dir must work when launched from another directory.
-                self.assert_success(self.run_command(MISE, "run", task))
+                self.assert_success(self.run_command(MISE, "run", "--skip-tools", task))
                 self.assertEqual([(row["command"], row["args"]) for row in self.records()], expected)
                 self.assertTrue(all(Path(row["cwd"]).resolve() == self.home for row in self.records()))
 

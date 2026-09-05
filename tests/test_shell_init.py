@@ -161,6 +161,83 @@ export HISTFILE="$HOME/custom history"
                 self.assertEqual(result["exported_history"], result["history"])
         self.assertEqual(self.records(), [])
 
+    def check_shared_environment(self, shell):
+        for source in (".config/shell/config", ".config/shell/environment"):
+            shutil.copy2(ROOT / source, self.home / source)
+        shell_config = self.home / ".config/shell"
+        (shell_config / "aliases").write_text(
+            'export ALIASES_DOCKER_CONFIG="$DOCKER_CONFIG"\n'
+            'export ALIASES_GNUPGHOME="$GNUPGHOME"\n'
+        )
+        (shell_config / "aliases.work").write_text(
+            'export CLASS_ALIASES_DOCKER_CONFIG="$DOCKER_CONFIG"\n'
+            'export CLASS_ALIASES_GNUPGHOME="$GNUPGHOME"\n'
+        )
+        self.make_stub(self.local_bin / "yadm", r'''
+printf 'forbidden yadm %s\n' "$*" >> "$COMMAND_LOG"
+exit 35
+''')
+        self.make_stub(self.local_bin / "tty", "printf '/dev/tty-test\\n'\n")
+        self.env["PATH"] = str(self.local_bin) + os.pathsep + self.env["PATH"]
+        repo_config = self.home / ".local/share/yadm/repo.git/config"
+        repo_config.parent.mkdir(parents=True)
+        unrelated_git_dir = self.base / "unrelated.git"
+        unrelated_git_dir.mkdir()
+        (unrelated_git_dir / "config").write_text("[local]\nclass = home\n")
+        self.env["GIT_DIR"] = str(unrelated_git_dir)
+        override = shell_config / "environment.work"
+        script = ('OSTYPE=darwin-test; source "$HOME/.bashrc"\n' if shell == BASH else
+                  'source "$HOME/.config/shell/config"\n'
+                  'source "$XDG_CONFIG_HOME/zsh/environment.zsh"\n')
+        script += r'''
+printf 'docker=%s\ngnupg=%s\nalias_docker=%s\nalias_gnupg=%s\n' \
+    "$DOCKER_CONFIG" "$GNUPGHOME" "$ALIASES_DOCKER_CONFIG" "$ALIASES_GNUPGHOME"
+printf 'class_alias_docker=%s\nclass_alias_gnupg=%s\n' \
+    "${CLASS_ALIASES_DOCKER_CONFIG:-}" "${CLASS_ALIASES_GNUPGHOME:-}"
+printf 'history=%s\neditor=%s\npython_encoding=%s\n' \
+    "$HISTFILE" "$EDITOR" "$PYTHONIOENCODING"
+/bin/sh -c 'printf "exported_history=%s\nexported_docker=%s\nexported_gnupg=%s\n" \
+    "$HISTFILE" "$DOCKER_CONFIG" "$GNUPGHOME"'
+'''
+        for case in ("work_override", "work_defaults", "no_class"):
+            with self.subTest(case=case):
+                if case == "no_class":
+                    repo_config.unlink()
+                else:
+                    repo_config.write_text("[local]\nclass = work\n")
+                if case == "work_override":
+                    override.write_text(
+                        'export DOCKER_CONFIG="$HOME/work docker"\n'
+                        'export GNUPGHOME="$HOME/work gnupg"\n'
+                    )
+                    docker = str(self.home / "work docker")
+                    gnupg = str(self.home / "work gnupg")
+                else:
+                    if override.exists():
+                        override.unlink()
+                    docker = str(self.home / ".config/docker")
+                    gnupg = str(self.home / ".local/share/gnupg")
+                result = self.run_shell(shell, script)
+                for key in ("docker", "alias_docker", "exported_docker"):
+                    self.assertEqual(result[key], docker)
+                for key in ("gnupg", "alias_gnupg", "exported_gnupg"):
+                    self.assertEqual(result[key], gnupg)
+                self.assertEqual(result["class_alias_docker"],
+                                 "" if case == "no_class" else docker)
+                self.assertEqual(result["class_alias_gnupg"],
+                                 "" if case == "no_class" else gnupg)
+                self.assert_history(result, "bash" if shell == BASH else "zsh")
+                self.assertEqual(result["editor"], "nvim")
+                self.assertEqual(result["python_encoding"], "UTF-8")
+        self.assertEqual(self.records(), ["brew shellenv"] * 3 if shell == BASH else [])
+
+    def test_bash_shared_config_preserves_class_overrides_and_defaults(self):
+        self.check_shared_environment(BASH)
+
+    @unittest.skipUnless(ZSH, "Requires Zsh")
+    def test_zsh_shared_config_preserves_class_overrides_and_defaults(self):
+        self.check_shared_environment(ZSH)
+
 
 if __name__ == "__main__":
     unittest.main()

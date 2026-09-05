@@ -31,18 +31,79 @@ if [[ $(command -v brew) == "" ]]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-# Install mas, yadm, mackup.
+# Install bootstrap prerequisites.
 /opt/homebrew/bin/brew install mas
 /opt/homebrew/bin/brew install yadm
 /opt/homebrew/bin/brew install mackup
+/opt/homebrew/bin/brew install mise
 
 # Clone this repository and set the machine class before running bootstrap.
 # yadm clone --bootstrap doesn't support passing a class, so do it in steps:
 yadm clone git@github.com:andreychev/dotfiles.git
 yadm config local.class home   # or: work
 yadm alt
+# Preview first: "$HOME/.config/yadm/bootstrap" --dry-run
 yadm bootstrap
 ```
+
+### Bootstrap and maintenance
+
+The yadm entry point prepares XDG paths, installs mise if missing, and delegates to
+`mise bootstrap` (mise 2026.9.1 or newer). Homebrew still owns packages and uses the
+home/work Brewfile selected by yadm. Bootstrap runs Homebrew, macOS preferences,
+mise tool installation, then Mackup restore, Docker buildx setup, downloads and
+yadm sparse-checkout. It does not run `mackup uninstall`.
+
+Scalar macOS preferences live in `.config/mise/conf.d/macos.toml`. Arrays,
+dictionary updates, host-scoped preferences and the dynamic screenshot path remain
+in `.config/macos/defaults-extra`. Mise 2026.9.1 does not expand templates in raw
+defaults values or bootstrap hooks; hooks use shell variables instead. Existing
+application `defaults` scripts still run after the native preferences.
+
+After the configs are deployed to `$HOME`:
+
+```sh
+# Preview the whole machine bootstrap without installing or applying anything.
+"$HOME/.config/yadm/bootstrap" --dry-run
+
+# Inspect only the declarative macOS preferences; this excludes the shell extras.
+mise -C "$HOME" bootstrap macos defaults status
+
+# List tasks, then run one explicit maintenance operation.
+mise tasks
+mise -C "$HOME" run update:tools
+```
+
+| Task | Operation |
+|---|---|
+| `update:tools` | `mise upgrade`, preserving version constraints; no `--bump` |
+| `update:brew` | Homebrew update, upgrade and cleanup |
+| `update:zsh` | Update antidote plugins |
+| `update:nvim` | Synchronize Neovim plugins |
+| `update:macos` | Install macOS updates; explicit and potentially restart-requiring |
+
+These tasks replace `brewup`, `zshup`, `nvimup` and `macosup`. Navigation and other
+interactive aliases remain in the shell. Exact runtime pins and `NODE_OPTIONS`
+are unchanged; `mise upgrade` does not advance an exact pin automatically.
+
+To preview a task without installing tools or running commands:
+
+```sh
+mise -C "$HOME" run --dry-run --skip-tools update:brew
+```
+
+### Regression checks
+
+On macOS with mise installed, run from this checkout:
+
+```sh
+python3 tests/test_mise_bootstrap.py -v
+```
+
+The tests run real mise with temporary homes and recording substitutes for
+macOS/package commands. They cover both profiles, reruns, cold start, dry-run,
+failure propagation and maintenance tasks without installing runtimes or changing
+the current user's preferences.
 
 ### Things that need to be done manually
 

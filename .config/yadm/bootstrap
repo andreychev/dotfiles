@@ -1,156 +1,28 @@
 #!/bin/bash
 
 set -euo pipefail
-IFS=$'\n\t'
 
-# Constants
-readonly TYPOGRAPHY_VERSION="3.9"
-readonly DOWNLOADS_TIMEOUT=300
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "This script is intended for macOS only" >&2
+    exit 1
+fi
 
-# Logger function
-log() {
-    local level=$1
-    shift
-    echo "[$(date +'%Y-%m-%d %H:%M:%S')] [$level] $*"
-}
+source "$HOME/.xdg.dirs"
+source "$XDG_CONFIG_HOME/shell/xdg"
+export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+export PATH="$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
 
-# Error handler
-error_handler() {
-    local line_num=$1
-    local error_code=$2
-    log "ERROR" "Failed at line ${line_num} with error code ${error_code}"
-    exit "${error_code}"
-}
-
-trap 'error_handler ${LINENO} $?' ERR
-
-# Check if running on macOS
-check_macos() {
-    if [[ "$OSTYPE" != "darwin"* ]]; then
-        log "ERROR" "This script is intended for macOS only"
-        exit 1
-    fi
-}
-
-# Load configuration
-load_config() {
-    cd "$HOME"
-    source "$HOME"/.xdg.dirs
-    source "$XDG_CONFIG_HOME"/shell/xdg
-    chmod 700 "$XDG_CONFIG_HOME"
-}
-
-# Install brew dependencies
-install_brew_deps() {
-    local class
-    class=$(yadm config local.class 2>/dev/null || echo "unset")
-    log "INFO" "Installing brew dependencies (class: $class)..."
-    /opt/homebrew/bin/brew bundle
-    log "SUCCESS" "Brew dependencies installation completed"
-}
-
-# Apply defaults
-apply_defaults() {
-    log "INFO" "Applying defaults..."
-
-    find "$XDG_CONFIG_HOME" -type f -name "defaults" | while read -r file; do
-        # Check if the file is executable and execute it
-        if [ -x "$file" ]; then
-            # Execute the file
-            /bin/bash -c "$file --no-restart"
-        fi
+# mise must exist before it can run the remaining bootstrap phases.
+if [[ ! -x "$HOMEBREW_PREFIX/bin/mise" ]]; then
+    for arg in "$@"; do
+        case "$arg" in
+            -n|--dry-run|-h|--help)
+                echo "Install mise with Homebrew before previewing bootstrap; nothing was changed." >&2
+                exit 1
+                ;;
+        esac
     done
+    "$HOMEBREW_PREFIX/bin/brew" install mise
+fi
 
-    log "SUCCESS" "Defaults applied successfully"
-}
-
-# Restore mackup settings
-restore_mackup() {
-    log "INFO" "Restoring mackup settings..."
-    /opt/homebrew/bin/mackup restore
-    log "SUCCESS" "Mackup settings restored"
-}
-
-# Configure docker-buildx
-setup_docker_buildx() {
-    log "INFO" "Configuring docker-buildx..."
-    mkdir -p "$DOCKER_CONFIG/cli-plugins"
-    ln -sfn "$HOMEBREW_PREFIX/opt/docker-buildx/bin/docker-buildx" "$DOCKER_CONFIG/cli-plugins/docker-buildx"
-    log "SUCCESS" "Docker-buildx configured"
-}
-
-# Download application
-download_app() {
-    local url=$1
-    local filename=$2
-    local timeout=$3
-
-    if [ ! -f "$filename" ]; then
-        log "INFO" "Downloading $filename..."
-        curl -fLo "$filename" --connect-timeout "$timeout" "$url"
-        log "SUCCESS" "Downloaded $filename"
-    else
-        log "INFO" "File $filename already exists, skipping download"
-    fi
-}
-
-# Download all applications
-download_apps() {
-    local class=$1
-    cd "$XDG_DOWNLOAD_DIR"
-
-    # Typography Layout (all machines)
-    download_app \
-        "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
-        "ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
-        "$DOWNLOADS_TIMEOUT"
-
-    # Home-only downloads
-    if [[ "$class" == "home" ]]; then
-        # Amnezia VPN
-        local AMNEZIA
-        AMNEZIA=$(curl -s "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
-        local AMNEZIA_VERSION="${AMNEZIA#v}"
-        download_app \
-            "https://github.com/amnezia-vpn/amnezia-client/releases/download/$AMNEZIA/AmneziaVPN_$AMNEZIA_VERSION.dmg" \
-            "AmneziaVPN_$AMNEZIA_VERSION.dmg" \
-            "$DOWNLOADS_TIMEOUT"
-
-        # Yandex.Disk
-        download_app \
-            "https://disk.yandex.ru/download/Yandex.Disk.dmg/?instant=1" \
-            "Yandex.Disk.dmg" \
-            "$DOWNLOADS_TIMEOUT"
-    fi
-
-    cd "$HOME"
-}
-
-# Configure yadm
-setup_yadm() {
-    log "INFO" "Configuring yadm sparse-checkout..."
-    /opt/homebrew/bin/yadm sparse-checkout init
-    /opt/homebrew/bin/yadm sparse-checkout set --no-cone '/*' '!README.md' '!LICENSE' '!.editorconfig'
-    log "SUCCESS" "Yadm configured"
-}
-
-main() {
-    log "INFO" "Starting setup script..."
-
-    local class
-    class=$(yadm config local.class 2>/dev/null || echo "unset")
-    log "INFO" "Machine class: $class"
-
-    check_macos
-    load_config
-    install_brew_deps
-    apply_defaults
-    restore_mackup
-    setup_docker_buildx
-    download_apps "$class"
-    setup_yadm
-
-    log "SUCCESS" "Setup completed successfully"
-}
-
-main
+exec "$HOMEBREW_PREFIX/bin/mise" -C "$HOME" bootstrap "$@"

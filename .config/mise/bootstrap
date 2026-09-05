@@ -6,6 +6,7 @@ IFS=$'\n\t'
 # Constants
 readonly TYPOGRAPHY_VERSION="3.9"
 readonly DOWNLOADS_TIMEOUT=300
+readonly CONNECT_TIMEOUT=15
 
 # Logger function
 log() {
@@ -32,6 +33,22 @@ check_macos() {
     fi
 }
 
+# One class policy for the entry point and every directly invoked phase.
+read_machine_class() {
+    local class
+    if ! class=$("$HOMEBREW_PREFIX/bin/yadm" config local.class); then
+        log "ERROR" "Cannot read yadm local.class. Run: yadm config local.class home (or work)" >&2
+        return 1
+    fi
+    case "$class" in
+        home|work) printf '%s\n' "$class" ;;
+        *)
+            log "ERROR" "Invalid yadm local.class '$class'; expected home or work." >&2
+            return 1
+            ;;
+    esac
+}
+
 # Load configuration
 load_config() {
     cd "$HOME"
@@ -39,13 +56,11 @@ load_config() {
     source "$XDG_CONFIG_HOME"/shell/xdg
     export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
     export PATH="$HOME/.local/bin:$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
-    chmod 700 "$XDG_CONFIG_HOME"
 }
 
 # Install brew dependencies
 install_brew_deps() {
-    local class
-    class=$(yadm config local.class 2>/dev/null || echo "unset")
+    local class=$1
     log "INFO" "Installing brew dependencies (class: $class)..."
     "$HOMEBREW_PREFIX/bin/brew" bundle
     log "SUCCESS" "Brew dependencies installation completed"
@@ -82,19 +97,26 @@ setup_docker_buildx() {
 }
 
 # Download application
-download_app() {
+download_app() (
     local url=$1
     local filename=$2
     local timeout=$3
 
-    if [ ! -f "$filename" ]; then
-        log "INFO" "Downloading $filename..."
-        curl -fLo "$filename" --connect-timeout "$timeout" "$url"
-        log "SUCCESS" "Downloaded $filename"
-    else
+    if [ -f "$filename" ]; then
         log "INFO" "File $filename already exists, skipping download"
+        return 0
     fi
-}
+
+    local temporary
+    temporary=$(mktemp "${filename}.part.XXXXXX")
+    trap 'rm -f "$temporary"' EXIT
+    log "INFO" "Downloading $filename..."
+    curl -fL -o "$temporary" --connect-timeout "$CONNECT_TIMEOUT" \
+        --max-time "$timeout" "$url"
+    mv -f "$temporary" "$filename"
+    trap - EXIT
+    log "SUCCESS" "Downloaded $filename"
+)
 
 # Download all applications
 download_apps() {
@@ -111,7 +133,10 @@ download_apps() {
     if [[ "$class" == "home" ]]; then
         # Amnezia VPN
         local AMNEZIA
-        AMNEZIA=$(curl -s "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
+        AMNEZIA=$(curl -fsSL --connect-timeout "$CONNECT_TIMEOUT" \
+            --max-time "$DOWNLOADS_TIMEOUT" \
+            "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest" \
+            | jq -er '.tag_name | select(type == "string" and length > 0)')
         local AMNEZIA_VERSION="${AMNEZIA#v}"
         download_app \
             "https://github.com/amnezia-vpn/amnezia-client/releases/download/$AMNEZIA/AmneziaVPN_$AMNEZIA_VERSION.dmg" \
@@ -141,9 +166,9 @@ setup_yadm() {
 main() {
     local phase=${1:-}
     case "$phase" in
-        packages|defaults|finish) ;;
+        preflight|packages|defaults|finish) ;;
         *)
-            log "ERROR" "Usage: $0 {packages|defaults|finish}"
+            log "ERROR" "Usage: $0 {preflight|packages|defaults|finish}"
             exit 1
             ;;
     esac
@@ -151,17 +176,22 @@ main() {
     check_macos
     load_config
 
+    local class
+    class=$(read_machine_class)
+    if [[ "$phase" == "preflight" ]]; then
+        return 0
+    fi
+    chmod 700 "$XDG_CONFIG_HOME"
+
     case "$phase" in
         packages)
-            install_brew_deps
+            install_brew_deps "$class"
             ;;
         defaults)
             /bin/bash "$XDG_CONFIG_HOME/macos/defaults-extra"
             apply_defaults
             ;;
         finish)
-            local class
-            class=$(yadm config local.class 2>/dev/null || echo "unset")
             log "INFO" "Machine class: $class"
             restore_mackup
             setup_docker_buildx

@@ -18,22 +18,6 @@ rust = "stable"
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
 
-# Homebrew remains the package owner; do not duplicate Brewfiles in bootstrap.packages.
-[bootstrap.hooks.pre-packages]
-run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" packages'
-
-[bootstrap.hooks.pre-defaults]
-run = "osascript -e 'tell application \"System Settings\" to quit'"
-
-[bootstrap.hooks.post-defaults]
-run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" defaults'
-
-# Native bootstrap installs [tools] before running this task.
-[tasks.bootstrap]
-description = "Restore app preferences and finish machine setup"
-dir = "{{env.HOME}}"
-run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" finish'
-
 [tasks."update:mise"]
 description = "Update the mise.run binary without updating plugins"
 dir = "{{env.HOME}}"

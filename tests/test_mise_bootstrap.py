@@ -17,7 +17,7 @@ MISE = shutil.which("mise")
 SOURCES = (
     ".xdg.dirs", ".config/shell/xdg", ".config/yadm/bootstrap",
     ".config/mise/bootstrap", ".config/mise/config.toml",
-    ".config/mise/conf.d/macos.toml", ".config/macos/defaults-extra",
+    ".config/mise/config.workstation.toml", ".config/macos/defaults-extra",
     ".config/iterm2/defaults", ".config/transmission/defaults",
 )
 STUB = r'''
@@ -41,16 +41,27 @@ if name == "defaults":
 elif name == "brew":
     if args == ["bundle"]:
         sys.exit(int(os.environ.get("FAIL_BUNDLE", "0")))
+    elif args == ["shellenv"]:
+        print('export PATH="' + os.environ["HOMEBREW_PREFIX"] + '/bin:$PATH"')
     elif args not in (["update"], ["upgrade"], ["cleanup"]):
         sys.exit("Unexpected brew operation")
 elif name == "yadm":
     if args == ["config", "local.class"]:
+        if os.environ.get("FAIL_CLASS_READ"):
+            sys.exit(19)
         print(os.environ["MACHINE_CLASS"])
     elif args != ["sparse-checkout", "init"] and args[:3] != ["sparse-checkout", "set", "--no-cone"]:
         sys.exit("Unexpected yadm operation")
 elif name == "curl":
-    if len(args) == 4 and args[:3] == ["-fsSL", "https://mise.run", "-o"]:
-        destination = Path(args[3]).resolve()
+    for flag, expected in (("--connect-timeout", "15"), ("--max-time", "300")):
+        if args.count(flag) != 1 or args[args.index(flag) + 1] != expected:
+            sys.exit("Missing bounded curl timeout: " + flag)
+    options = args.copy()
+    for flag in ("--connect-timeout", "--max-time"):
+        index = options.index(flag)
+        del options[index:index + 2]
+    if len(options) == 4 and options[:3] == ["-fsSL", "https://mise.run", "-o"]:
+        destination = Path(options[3]).resolve()
         if destination.parent != Path(os.environ["TMPDIR"]).resolve():
             sys.exit("Refusing installer outside temporary TMPDIR")
         installer = '#!/bin/sh\n: > "$INSTALLER_EXECUTED"\n'
@@ -62,15 +73,31 @@ elif name == "curl":
         destination.chmod(0o755)
         if os.environ.get("FAIL_INSTALLER_DOWNLOAD"):
             sys.exit(22)
-    elif args == ["-s", "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest"]:
-        print('{"tag_name": "v1.2.3"}')
-    elif len(args) == 5 and args[0] == "-fLo" and args[2:4] == ["--connect-timeout", "300"]:
-        destination = Path(args[1]).resolve()
+    elif options == ["-fsSL", "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest"]:
+        print(os.environ.get("RELEASE_JSON", '{"tag_name": "v1.2.3"}'))
+    elif len(options) == 4 and options[:2] == ["-fL", "-o"]:
+        destination = Path(options[2]).resolve()
         if destination.parent != Path(os.environ["HOME"], "Downloads").resolve():
             sys.exit("Refusing download outside temporary Downloads")
-        destination.touch()
+        if not destination.name.rsplit(".part.", 1)[-1] or ".part." not in destination.name:
+            sys.exit("App downloads must use temporary part files")
+        if os.environ.get("FAIL_APP_DOWNLOAD"):
+            destination.write_bytes(b"partial")
+            sys.exit(18)
+        destination.write_bytes(b"complete application download")
     else:
         sys.exit("Unexpected curl operation")
+elif name == "jq":
+    if len(args) != 2 or args[0] != "-er":
+        sys.exit("Release lookup must reject missing values")
+    try:
+        payload = json.load(sys.stdin)
+    except (ValueError, TypeError):
+        sys.exit(4)
+    tag = payload.get("tag_name") if isinstance(payload, dict) else None
+    if not isinstance(tag, str) or not tag:
+        sys.exit(4)
+    print(tag)
 elif name == "mise":
     if Path(sys.argv[0]).parent != Path(os.environ["HOME"], ".local/bin"):
         sys.exit("Homebrew mise must never be selected")
@@ -112,7 +139,6 @@ class MiseBootstrapTests(unittest.TestCase):
             "INSTALLER_EXECUTED": str(self.base / "installer-executed"),
             "TERM": "dumb", "NO_COLOR": "1", "CI": "1", "MISE_YES": "1",
             "MISE_CONFIG_DIR": str(self.config.parent),
-            "MISE_GLOBAL_CONFIG_FILE": str(self.config),
             "MISE_SYSTEM_CONFIG_DIR": str(self.base / "system-mise"),
             "MISE_DATA_DIR": str(self.home / ".local/share/mise"),
             "MISE_STATE_DIR": str(self.home / ".local/state/mise"),
@@ -134,7 +160,7 @@ class MiseBootstrapTests(unittest.TestCase):
             if key.startswith("XDG_") or key.endswith("_DIR") or key == "TMPDIR":
                 Path(value).mkdir(parents=True, exist_ok=True)
         (self.home / "Downloads").mkdir()
-        for name in ("defaults", "brew", "yadm", "mackup", "curl", "osascript", "zsh", "nvim", "sudo"):
+        for name in ("defaults", "brew", "yadm", "mackup", "curl", "jq", "osascript", "zsh", "nvim", "sudo"):
             self.make_stub(name)
         self.make_stub("mise")
         self.local_mise.symlink_to(MISE)
@@ -229,7 +255,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.clear_records()
         self.assert_success(self.bootstrap())
         self.assert_pipeline()
-        self.assertFalse(any(row["command"] == "curl" and "-fLo" in row["args"] for row in self.records()))
+        self.assertFalse(any(row["command"] == "curl" and "-fL" in row["args"] for row in self.records()))
         self.assertFalse(any(row["command"] == "curl" and "https://mise.run" in row["args"]
                              for row in self.records()))
         self.assertEqual({path.name for path in (self.home / "Downloads").iterdir()}, expected)
@@ -240,12 +266,112 @@ class MiseBootstrapTests(unittest.TestCase):
     def test_home_pipeline(self):
         self.exercise_profile("home")
 
+    def test_project_bootstrap_does_not_inherit_workstation(self):
+        (self.other / "mise.toml").write_text(
+            '[tasks.bootstrap]\nrun = "printf project-bootstrap-only"\n')
+        self.assert_success(result := self.run_command(MISE, "bootstrap", "--yes"))
+        self.assertIn("project-bootstrap-only", result.stdout)
+        self.assertEqual(self.records(), [], "Even global defaults reads must be opt-in")
+        self.assertEqual(list((self.home / "Downloads").iterdir()), [])
+        self.assertFalse((self.home / ".config/docker").exists())
+
+    def test_explicit_workstation_pipeline(self):
+        self.assert_success(self.run_mise("-E", "workstation", "bootstrap", "--yes"))
+        self.assert_pipeline()
+
+    def test_entry_ignores_conflicting_global_config(self):
+        conflicting = self.base / "unowned-mise"
+        conflicting.mkdir()
+        (conflicting / "config.toml").write_text('[tasks.bootstrap]\nrun = "exit 71"\n')
+        (conflicting / "config.workstation.toml").write_text(
+            '[tasks.bootstrap]\nrun = "exit 72"\n')
+        self.env["MISE_CONFIG_DIR"] = str(conflicting)
+        self.env["MISE_GLOBAL_CONFIG_FILE"] = str(conflicting / "config.toml")
+        self.assert_success(self.bootstrap())
+        self.assert_pipeline()
+
+    def assert_class_failure(self, result):
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("local.class", result.stdout)
+        self.assertTrue(self.records(), "Class must be read before failing")
+        self.assertTrue(all(self.is_class_read(row) for row in self.records()), self.records())
+        self.assertEqual((self.home / ".config").stat().st_mode & 0o777, 0o755)
+        self.assertFalse(Path(self.env["INSTALLER_EXECUTED"]).exists())
+        self.assertFalse((self.home / ".config/docker").exists())
+        self.assertEqual(list((self.home / "Downloads").iterdir()), [])
+        self.assertEqual(list(Path(self.env["TMPDIR"]).glob("mise-install.*")), [])
+
+    def test_invalid_class_stops_entry_before_installation_or_mutations(self):
+        (self.home / ".config").chmod(0o755)
+        for installed in (True, False):
+            if not installed:
+                self.local_mise.unlink()
+            for profile, read_failure in (("", False), ("unknown", False), ("work", True)):
+                with self.subTest(installed=installed, profile=profile, read_failure=read_failure):
+                    self.env["MACHINE_CLASS"] = profile
+                    self.env["FAIL_CLASS_READ"] = "1" if read_failure else ""
+                    self.clear_records()
+                    self.assert_class_failure(self.bootstrap())
+                    self.assertEqual(self.local_mise.exists(), installed)
+
+    def test_invalid_class_stops_direct_phases_and_native_only_paths(self):
+        (self.home / ".config").chmod(0o755)
+        helper = str(self.home / ".config/mise/bootstrap")
+        commands = [("/bin/bash", helper, phase)
+                    for phase in ("preflight", "packages", "defaults", "finish")]
+        commands += [(MISE, "-C", str(self.home), "-E", "workstation", "bootstrap",
+                      "--only", phase, "--yes") for phase in ("macos-defaults", "tools")]
+        for profile, read_failure in (("", False), ("unknown", False), ("work", True)):
+            self.env["MACHINE_CLASS"] = profile
+            self.env["FAIL_CLASS_READ"] = "1" if read_failure else ""
+            for command in commands:
+                with self.subTest(profile=profile, read_failure=read_failure, command=command):
+                    self.clear_records()
+                    self.assert_class_failure(self.run_command(*command))
+
+    def test_interrupted_app_download_is_cleaned_and_retry_is_complete(self):
+        self.env["FAIL_APP_DOWNLOAD"] = "1"
+        result = self.bootstrap()
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        downloads = self.home / "Downloads"
+        self.assertEqual(list(downloads.iterdir()), [])
+        self.assertTrue(any(row["command"] == "curl" and "-fL" in row["args"]
+                            for row in self.records()))
+        self.env.pop("FAIL_APP_DOWNLOAD")
+        self.clear_records()
+        self.assert_success(self.bootstrap())
+        destination = downloads / "ilya-birman-typolayout-3.9-mac.dmg"
+        self.assertEqual(list(downloads.iterdir()), [destination])
+        self.assertEqual(destination.read_bytes(), b"complete application download")
+        self.assertTrue(any(row["command"] == "curl" and "-fL" in row["args"]
+                            for row in self.records()))
+        self.clear_records()
+        self.assert_success(self.bootstrap())
+        self.assertFalse(any(row["command"] == "curl" for row in self.records()))
+        self.assertEqual(destination.read_bytes(), b"complete application download")
+        self.assertEqual(list(downloads.iterdir()), [destination])
+
+    def test_invalid_release_response_stops_before_release_download(self):
+        self.env["MACHINE_CLASS"] = "home"
+        for payload in ("not json", "{}", '{"tag_name": null}', '{"tag_name": 12}',
+                        '{"tag_name": ""}'):
+            with self.subTest(payload=payload):
+                self.env["RELEASE_JSON"] = payload
+                self.clear_records()
+                result = self.run_command("/bin/bash", str(self.home / ".config/mise/bootstrap"), "finish")
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertTrue(any(row["command"] == "jq" for row in self.records()))
+                self.assertFalse(any("/releases/download/" in arg or "disk.yandex.ru" in arg
+                                     for row in self.records() for arg in row["args"]))
+                self.assertEqual({path.name for path in (self.home / "Downloads").iterdir()},
+                                 {"ilya-birman-typolayout-3.9-mac.dmg"})
+
     def test_preview_has_no_external_mutations(self):
         # Runtimes remain omitted to keep this test offline; production tools
         # are covered by the separate native dry-run during migration.
         self.assert_success(self.bootstrap("--dry-run"))
-        self.assertTrue(all(row["command"] == "defaults" and
-                            row["args"][0] in ("read", "read-type")
+        self.assertTrue(all(self.is_class_read(row) or (row["command"] == "defaults" and
+                            row["args"][0] in ("read", "read-type"))
                             for row in self.records()))
         self.assertFalse((self.home / ".config/docker/cli-plugins/docker-buildx").is_symlink())
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
@@ -258,18 +384,14 @@ class MiseBootstrapTests(unittest.TestCase):
                 result = self.bootstrap(option)
                 self.assertNotEqual(result.returncode, 0, result.stdout)
                 self.assertIn("nothing was changed", result.stdout)
-                self.assertEqual(self.records(), [])
+                self.assertTrue(all(self.is_class_read(row) for row in self.records()))
                 self.assertFalse(self.local_mise.exists())
                 self.assertTrue((self.bin / "mise").exists())
 
     def test_cold_start_installs_mise_then_continues(self):
         self.local_mise.unlink()
         self.assert_success(self.bootstrap())
-        first = self.records()[0]
-        self.assertEqual(first["command"], "curl")
-        self.assertEqual(first["args"][:3], ["-fsSL", "https://mise.run", "-o"])
-        self.assertEqual(len(first["args"]), 4)
-        self.assertFalse(Path(first["args"][3]).exists())
+        self.assert_installer_cleaned()
         self.assertTrue(Path(self.env["INSTALLER_EXECUTED"]).exists())
         self.assertEqual(self.local_mise.resolve(), Path(MISE).resolve())
         self.assert_pipeline()
@@ -283,10 +405,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.local_mise.write_text("incomplete installation\n")
         self.local_mise.chmod(0o644)
         self.assert_success(self.bootstrap())
-        first = self.records()[0]
-        self.assertEqual(first["command"], "curl")
-        self.assertEqual(first["args"][:3], ["-fsSL", "https://mise.run", "-o"])
-        self.assertFalse(Path(first["args"][3]).exists())
+        self.assert_installer_cleaned()
         self.assertEqual(self.local_mise.resolve(), Path(MISE).resolve())
         self.assert_pipeline()
 
@@ -298,15 +417,25 @@ class MiseBootstrapTests(unittest.TestCase):
         self.env["FAIL_INSTALLER"] = "1"
         self.assert_installation_failure(executed=True)
 
+    @staticmethod
+    def is_class_read(row):
+        return row["command"] == "yadm" and row["args"] == ["config", "local.class"]
+
+    def assert_installer_cleaned(self):
+        calls = [row for row in self.records() if row["command"] == "curl" and
+                 "https://mise.run" in row["args"]]
+        self.assertEqual(len(calls), 1)
+        args = calls[0]["args"]
+        self.assertFalse(Path(args[args.index("-o") + 1]).exists())
+        self.assertEqual(list(Path(self.env["TMPDIR"]).glob("mise-install.*")), [])
+
     def assert_installation_failure(self, executed):
         self.local_mise.unlink()
         result = self.bootstrap()
         self.assertNotEqual(result.returncode, 0, result.stdout)
-        rows = self.records()
+        rows = [row for row in self.records() if not self.is_class_read(row)]
         self.assertEqual(len(rows), 1, rows)
-        self.assertEqual(rows[0]["command"], "curl")
-        self.assertEqual(rows[0]["args"][:3], ["-fsSL", "https://mise.run", "-o"])
-        self.assertFalse(Path(rows[0]["args"][3]).exists())
+        self.assert_installer_cleaned()
         self.assertEqual(Path(self.env["INSTALLER_EXECUTED"]).exists(), executed)
         self.assertFalse(self.local_mise.exists())
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])

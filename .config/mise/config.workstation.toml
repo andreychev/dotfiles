@@ -1,4 +1,27 @@
-# macOS Tahoe scalar preferences; unsupported types/scopes and dynamic paths live in defaults-extra.
+# Workstation setup is opt-in: mise -E workstation bootstrap.
+# Keep this out of conf.d so project bootstrap never inherits machine operations.
+
+# Homebrew remains the package owner; do not duplicate Brewfiles in bootstrap.packages.
+[bootstrap.hooks.pre-packages]
+run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" packages'
+
+[bootstrap.hooks.pre-defaults]
+run = [
+  '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight',
+  "osascript -e 'tell application \"System Settings\" to quit'",
+]
+
+[bootstrap.hooks.post-defaults]
+run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" defaults'
+
+[bootstrap.hooks.pre-tools]
+run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight'
+
+# Native bootstrap installs [tools] before running this task.
+[tasks.bootstrap]
+description = "Restore app preferences and finish machine setup"
+dir = "{{env.HOME}}"
+run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" finish'
 
 [bootstrap.macos.defaults."NSGlobalDomain"]
 # Medium sidebar icons; expand save and print panels.

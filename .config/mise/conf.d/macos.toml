@@ -1,0 +1,113 @@
+# macOS Tahoe scalar preferences; unsupported types/scopes and dynamic paths live in defaults-extra.
+
+[bootstrap.macos.defaults."NSGlobalDomain"]
+# Medium sidebar icons; expand save and print panels.
+NSTableViewDefaultSizeMode = 2
+NSNavPanelExpandedStateForSaveMode = true
+NSNavPanelExpandedStateForSaveMode2 = true
+PMPrintingExpandedStateForPrint = true
+PMPrintingExpandedStateForPrint2 = true
+# Save to disk rather than iCloud.
+NSDocumentSaveNewDocumentsToCloud = false
+# Disable automatic capitalization, substitutions and spelling correction.
+NSAutomaticCapitalizationEnabled = false
+NSAutomaticDashSubstitutionEnabled = false
+NSAutomaticPeriodSubstitutionEnabled = false
+NSAutomaticQuoteSubstitutionEnabled = false
+NSAutomaticSpellingCorrectionEnabled = false
+# Language and text formats.
+AppleLocale = "en_US@currency=USD"
+AppleMeasurementUnits = "Centimeters"
+AppleMetricUnits = true
+# Show all filename extensions.
+AppleShowAllExtensions = true
+
+[bootstrap.macos.defaults."com.apple.print.PrintingPrefs"]
+# Quit the printer app once print jobs complete.
+"Quit When Finished" = true
+
+[bootstrap.macos.defaults."com.apple.LaunchServices"]
+# Disable the application-open confirmation dialog.
+LSQuarantine = false
+
+[bootstrap.macos.defaults."com.apple.screensaver"]
+# Require a password immediately after sleep or screen saver begins.
+askForPassword = 1
+askForPasswordDelay = 0
+
+[bootstrap.macos.defaults."com.apple.screencapture"]
+# Save screenshots in PNG format; the dynamic location is set by defaults-extra.
+type = "png"
+
+[bootstrap.macos.defaults."com.apple.finder"]
+# Show external drives, servers and removable media on the desktop.
+ShowExternalHardDrivesOnDesktop = true
+ShowMountedServersOnDesktop = true
+ShowRemovableMediaOnDesktop = true
+ShowStatusBar = true
+ShowPathbar = true
+# Keep folders first when sorting by name.
+_FXSortFoldersFirst = true
+FXEnableExtensionChangeWarning = false
+# Use list view by default.
+FXPreferredViewStyle = "Nlsv"
+
+[bootstrap.macos.defaults."com.apple.desktopservices"]
+# Avoid .DS_Store files on network and USB volumes.
+DSDontWriteNetworkStores = true
+DSDontWriteUSBStores = true
+
+[bootstrap.macos.defaults."com.apple.dock"]
+minimize-to-application = true
+show-process-indicators = true
+# Do not rearrange Spaces based on most recent use.
+mru-spaces = false
+autohide = true
+show-recents = false
+
+[bootstrap.macos.defaults."com.apple.Safari"]
+# Do not send search queries to Apple.
+UniversalSearchEnabled = false
+SuppressSearchSuggestions = true
+ShowFullURLInSmartSearchField = true
+# Enable the Develop menu and Web Inspector.
+IncludeDevelopMenu = true
+WebKitDeveloperExtrasEnabledPreferenceKey = true
+"com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true
+WarnAboutFraudulentWebsites = true
+# Block pop-up windows.
+WebKitJavaScriptCanOpenWindowsAutomatically = false
+"com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically" = false
+
+[bootstrap.macos.defaults."com.apple.mail"]
+# Copy addresses without names; display attachment icons rather than inline previews.
+AddressesIncludeNameOnPasteboard = false
+DisableInlineAttachmentViewing = true
+
+[bootstrap.macos.defaults."com.apple.terminal"]
+SecureKeyboardEntry = true
+
+[bootstrap.macos.defaults."com.apple.TimeMachine"]
+# Do not offer new hard drives as backup volumes.
+DoNotOfferNewDisksForBackup = true
+
+[bootstrap.macos.defaults."com.apple.ActivityMonitor"]
+OpenMainWindow = true
+# Show all processes, sorted by CPU usage.
+ShowCategory = 0
+SortColumn = "CPUUsage"
+SortDirection = 0
+
+[bootstrap.macos.defaults."com.apple.SoftwareUpdate"]
+AutomaticCheckEnabled = true
+# Check daily, download in the background, and install system data/security updates.
+ScheduleFrequency = 1
+AutomaticDownload = 1
+CriticalUpdateInstall = 1
+
+[bootstrap.macos.defaults."com.apple.commerce"]
+AutoUpdate = true
+
+[bootstrap.macos.defaults."kCFPreferencesAnyApplication"]
+# Disable the language indicator; preserve the original defaults string type.
+TSMLanguageIndicatorEnabled = "0"

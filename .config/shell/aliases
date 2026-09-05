@@ -46,12 +46,6 @@ command -v sha1sum >/dev/null || alias sha1sum="shasum"
 # Open all the dotfiles in editor
 alias dotfiles='e - $(yadm list)'
 
-# System update aliases
-alias macosup="sudo softwareupdate -i -a"
-alias brewup="brew update && brew upgrade && brew cleanup"
-alias zshup='zsh "$ANTIDOTE_HOME"/mattmc3/antidote/antidote update'
-alias nvimup='nvim --headless "+Lazy! sync" +qa'
-
 # Default application aliases
 alias chrome="open -na 'Google Chrome' --args --ignore-certificate-errors"
 alias firefox="open -na 'Firefox'"

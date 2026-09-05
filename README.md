@@ -51,27 +51,51 @@ yadm bootstrap
 
 ### Bootstrap and maintenance
 
-The yadm entry point prepares XDG paths, installs mise from [mise.run](https://mise.run)
-into `~/.local/bin/mise` if missing, and delegates to `mise bootstrap`
-(mise 2026.9.1 or newer). Homebrew still owns the other packages and uses the
-home/work Brewfile selected by yadm. Bootstrap runs Homebrew, macOS preferences,
-mise tool installation, then Mackup restore, Docker buildx setup, downloads and
-yadm sparse-checkout. It does not run `mackup uninstall`.
+The yadm entry point prepares XDG paths and requires `local.class` to be `home` or
+`work` before installation or other changes. It installs mise from
+[mise.run](https://mise.run) into `~/.local/bin/mise` if missing, then invokes
+`mise -C "$HOME" -E workstation bootstrap` (mise 2026.9.1 or newer). Homebrew owns
+the other packages and uses the Brewfile selected by yadm. Bootstrap runs Homebrew,
+macOS preferences, mise tool installation, then Mackup restore, Docker buildx,
+downloads and yadm sparse-checkout. It does not run `mackup uninstall`.
+
+Global `config.toml` contains tools, environment and maintenance tasks only.
+Machine hooks, preferences and the finishing task live in
+`.config/mise/config.workstation.toml`, loaded only with `-E workstation`.
+Ordinary project bootstrap does not inherit these operations. Do not export
+`MISE_ENV=workstation` globally. The yadm entry fixes `MISE_CONFIG_DIR` to the
+deployed XDG config and clears `MISE_GLOBAL_CONFIG_FILE` for its child process:
+that override disables environment-sibling discovery in mise 2026.9.1.
 
 Bootstrap downloads the installer completely before executing it and removes the
 temporary script on success or failure. Preview/help with missing local mise does
 not download anything and does not fall back to a Homebrew binary. Use the plain
 installer endpoint, not `/zsh` or `/bash`: shell activation is already managed here.
 
+Missing, unknown or unreadable `local.class` stops bootstrap before mutations.
+Set it with `yadm config local.class home` (or `work`), then run `yadm alt`.
+Direct helper phases and targeted workstation defaults/tools phases also validate
+the class. For applying a subset, use the guarded entry, for example
+`"$HOME/.config/yadm/bootstrap" --only macos-defaults`.
+
+Application downloads use a same-directory temporary file and an atomic rename
+only after curl succeeds. Failures remove the partial file so a later run retries.
+Our curl requests use a 15-second connection deadline and a 300-second total
+deadline; release metadata is parsed with `jq`. A damaged final DMG left by an
+older bootstrap still needs explicit removal before retrying.
+
 When migrating an existing machine, verify `command -v mise` resolves to
 `~/.local/bin/mise` before separately removing the old formula with
 `brew uninstall mise`. Bootstrap does not uninstall that formula automatically.
 
-Scalar macOS preferences live in `.config/mise/conf.d/macos.toml`. Arrays,
+Scalar macOS preferences live in `.config/mise/config.workstation.toml`. Arrays,
 dictionary updates, host-scoped preferences and the dynamic screenshot path remain
 in `.config/macos/defaults-extra`. Mise 2026.9.1 does not expand templates in raw
 defaults values or bootstrap hooks; hooks use shell variables instead. Existing
 application `defaults` scripts still run after the native preferences.
+
+Deploy the rename, including removal of the old `conf.d/macos.toml`; leaving that
+file in `$HOME` would keep its preferences globally active.
 
 After the configs are deployed to `$HOME`:
 
@@ -80,7 +104,7 @@ After the configs are deployed to `$HOME`:
 "$HOME/.config/yadm/bootstrap" --dry-run
 
 # Inspect only the declarative macOS preferences; this excludes the shell extras.
-mise -C "$HOME" bootstrap macos defaults status
+mise -C "$HOME" -E workstation bootstrap macos defaults status
 
 # List tasks, then run one explicit maintenance operation.
 mise tasks
@@ -106,19 +130,30 @@ To preview a task without installing tools or running commands:
 mise -C "$HOME" run --dry-run --skip-tools update:brew
 ```
 
+### Shell initialization
+
+Bash initializes available Homebrew before shared shell configuration and keeps
+`~/.local/bin` first in PATH. Interactive `.bashrc` loading activates the official
+mise binary; noninteractive loading does not install a mise shell hook.
+
+History is shell-specific: `$XDG_STATE_HOME/bash/history` and
+`$XDG_STATE_HOME/zsh/history`. Parent directories are created by interactive Bash
+and Zsh setup. Existing history contents are not rewritten or automatically split.
+The shared XDG file no longer owns `HISTFILE`.
+
 ### Regression checks
 
 On macOS with mise installed, run from this checkout:
 
 ```sh
-python3 tests/test_mise_bootstrap.py -v
+python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-The tests run real mise with temporary homes and recording substitutes for
-macOS/package commands and the installer download. They cover both profiles,
-reruns, cold start, interrupted downloads, installer failure/cleanup, dry-run,
-PATH precedence and maintenance tasks without network access, runtime installs or
-changes to the current user's preferences.
+The tests run real mise and finite Bash/Zsh sessions with temporary homes and
+recording substitutes for macOS/package commands and downloads. They cover
+workstation isolation, class validation, both profiles, interrupted transfers and
+retry, installer failure/cleanup, dry-run, shell activation/history, PATH precedence
+and maintenance tasks without network access, runtime installs or host preferences.
 
 ### Things that need to be done manually
 

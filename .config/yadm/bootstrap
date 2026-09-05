@@ -13,6 +13,11 @@ export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
 export PATH="$HOME/.local/bin:$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
 readonly mise_bin="$HOME/.local/bin/mise"
 
+# This entry point always provisions the deployed dotfiles configuration.
+export MISE_CONFIG_DIR="$XDG_CONFIG_HOME/mise"
+unset MISE_GLOBAL_CONFIG_FILE
+/bin/bash "$XDG_CONFIG_HOME/mise/bootstrap" preflight
+
 # mise must exist before it can run the remaining bootstrap phases.
 if [[ ! -x "$mise_bin" ]]; then
     for arg in "$@"; do
@@ -26,10 +31,11 @@ if [[ ! -x "$mise_bin" ]]; then
     # Download completely before executing, so a failed transfer cannot run a partial script.
     installer=$(mktemp "${TMPDIR:-/tmp}/mise-install.XXXXXX")
     trap 'rm -f "$installer"' EXIT
-    curl -fsSL https://mise.run -o "$installer"
+    curl -fsSL --connect-timeout 15 --max-time 300 \
+        https://mise.run -o "$installer"
     MISE_INSTALL_PATH="$mise_bin" /bin/sh "$installer"
     rm -f "$installer"
     trap - EXIT
 fi
 
-exec "$mise_bin" -C "$HOME" bootstrap "$@"
+exec "$mise_bin" -C "$HOME" -E workstation bootstrap "$@"

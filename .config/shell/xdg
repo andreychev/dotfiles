@@ -6,8 +6,6 @@ export GNUPGHOME="$XDG_DATA_HOME"/gnupg
 export LESSKEY="$XDG_CONFIG_HOME"/less/lesskey
 export LESSHISTFILE="$XDG_CACHE_HOME"/less/history
 
-export HISTFILE="$XDG_STATE_HOME"/zsh/history
-
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/config
 export ZSH_CACHE_DIR="$XDG_CACHE_HOME"/zsh
 

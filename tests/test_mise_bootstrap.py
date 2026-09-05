@@ -39,9 +39,7 @@ if name == "defaults":
     elif "write" not in args:
         sys.exit("Unexpected defaults operation")
 elif name == "brew":
-    if args == ["install", "mise"]:
-        Path(os.environ["HOMEBREW_PREFIX"], "bin", "mise").symlink_to(os.environ["REAL_MISE"])
-    elif args == ["bundle"]:
+    if args == ["bundle"]:
         sys.exit(int(os.environ.get("FAIL_BUNDLE", "0")))
     elif args not in (["update"], ["upgrade"], ["cleanup"]):
         sys.exit("Unexpected brew operation")
@@ -51,7 +49,20 @@ elif name == "yadm":
     elif args != ["sparse-checkout", "init"] and args[:3] != ["sparse-checkout", "set", "--no-cone"]:
         sys.exit("Unexpected yadm operation")
 elif name == "curl":
-    if args == ["-s", "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest"]:
+    if len(args) == 4 and args[:3] == ["-fsSL", "https://mise.run", "-o"]:
+        destination = Path(args[3]).resolve()
+        if destination.parent != Path(os.environ["TMPDIR"]).resolve():
+            sys.exit("Refusing installer outside temporary TMPDIR")
+        installer = '#!/bin/sh\n: > "$INSTALLER_EXECUTED"\n'
+        if os.environ.get("FAIL_INSTALLER"):
+            installer += 'exit 24\n'
+        else:
+            installer += '/bin/mkdir -p "$HOME/.local/bin"\n/bin/ln -sf "$REAL_MISE" "$MISE_INSTALL_PATH"\n'
+        destination.write_text(installer)
+        destination.chmod(0o755)
+        if os.environ.get("FAIL_INSTALLER_DOWNLOAD"):
+            sys.exit(22)
+    elif args == ["-s", "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest"]:
         print('{"tag_name": "v1.2.3"}')
     elif len(args) == 5 and args[0] == "-fLo" and args[2:4] == ["--connect-timeout", "300"]:
         destination = Path(args[1]).resolve()
@@ -61,7 +72,9 @@ elif name == "curl":
     else:
         sys.exit("Unexpected curl operation")
 elif name == "mise":
-    if args != ["upgrade"]:
+    if Path(sys.argv[0]).parent != Path(os.environ["HOME"], ".local/bin"):
+        sys.exit("Homebrew mise must never be selected")
+    if args not in (["upgrade"], ["self-update", "--no-plugins"]):
         sys.exit("Unexpected inner mise operation")
 elif name == "sudo":
     if args != ["softwareupdate", "-i", "-a"]:
@@ -84,6 +97,9 @@ class MiseBootstrapTests(unittest.TestCase):
         self.prefix = self.base / "homebrew"
         self.bin = self.prefix / "bin"
         self.bin.mkdir(parents=True)
+        self.local_bin = self.home / ".local/bin"
+        self.local_bin.mkdir(parents=True)
+        self.local_mise = self.local_bin / "mise"
         self.log = self.base / "commands.jsonl"
         self.config = self.home / ".config/mise/config.toml"
         self.config.parent.mkdir(parents=True)
@@ -93,6 +109,7 @@ class MiseBootstrapTests(unittest.TestCase):
             "PATH": f"{self.bin}:/usr/bin:/bin:/usr/sbin:/sbin",
             "HOMEBREW_PREFIX": str(self.prefix), "REAL_MISE": str(Path(MISE).absolute()),
             "COMMAND_LOG": str(self.log), "MACHINE_CLASS": "work",
+            "INSTALLER_EXECUTED": str(self.base / "installer-executed"),
             "TERM": "dumb", "NO_COLOR": "1", "CI": "1", "MISE_YES": "1",
             "MISE_CONFIG_DIR": str(self.config.parent),
             "MISE_GLOBAL_CONFIG_FILE": str(self.config),
@@ -119,7 +136,8 @@ class MiseBootstrapTests(unittest.TestCase):
         (self.home / "Downloads").mkdir()
         for name in ("defaults", "brew", "yadm", "mackup", "curl", "osascript", "zsh", "nvim", "sudo"):
             self.make_stub(name)
-        (self.bin / "mise").symlink_to(MISE)
+        self.make_stub("mise")
+        self.local_mise.symlink_to(MISE)
 
         # Before exposing actual domains, prove native mise uses our fake defaults.
         # A failed interception can only affect an absolute temporary plist domain.
@@ -140,8 +158,8 @@ class MiseBootstrapTests(unittest.TestCase):
         self.config.write_text(re.sub(r"(?ms)^\[tools\]\n.*?(?=^\[settings\])", "",
                                       self.production_config, count=1))
 
-    def make_stub(self, name):
-        path = self.bin / name
+    def make_stub(self, name, directory=None):
+        path = (directory or self.bin) / name
         path.write_text(f"#!{sys.executable}\n" + STUB)
         path.chmod(0o755)
 
@@ -166,6 +184,7 @@ class MiseBootstrapTests(unittest.TestCase):
 
     def assert_pipeline(self):
         rows = self.records()
+        self.assertFalse(any(row["command"] == "brew" and "install" in row["args"] for row in rows))
         writes = [row["args"] for row in rows if row["command"] == "defaults" and "write" in row["args"]]
         self.assertEqual(len(writes), 75)
         identities = [(tuple(args[:args.index("write")]), *args[args.index("write") + 1:args.index("write") + 3])
@@ -196,6 +215,8 @@ class MiseBootstrapTests(unittest.TestCase):
     def exercise_profile(self, profile):
         self.env["MACHINE_CLASS"] = profile
         self.assert_success(self.bootstrap())
+        self.assertFalse(any(row["command"] == "curl" and "https://mise.run" in row["args"]
+                             for row in self.records()))
         self.assert_pipeline()
         expected = {"ilya-birman-typolayout-3.9-mac.dmg"}
         if profile == "home":
@@ -209,6 +230,8 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assert_success(self.bootstrap())
         self.assert_pipeline()
         self.assertFalse(any(row["command"] == "curl" and "-fLo" in row["args"] for row in self.records()))
+        self.assertFalse(any(row["command"] == "curl" and "https://mise.run" in row["args"]
+                             for row in self.records()))
         self.assertEqual({path.name for path in (self.home / "Downloads").iterdir()}, expected)
 
     def test_work_pipeline(self):
@@ -228,19 +251,73 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
 
     def test_preview_without_mise_never_installs(self):
-        (self.bin / "mise").unlink()
-        result = self.bootstrap("--dry-run")
-        self.assertNotEqual(result.returncode, 0, result.stdout)
-        self.assertIn("nothing was changed", result.stdout)
-        self.assertEqual(self.records(), [])
-        self.assertFalse((self.bin / "mise").exists())
+        self.local_mise.unlink()
+        for option in ("--dry-run", "--help"):
+            with self.subTest(option=option):
+                self.clear_records()
+                result = self.bootstrap(option)
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn("nothing was changed", result.stdout)
+                self.assertEqual(self.records(), [])
+                self.assertFalse(self.local_mise.exists())
+                self.assertTrue((self.bin / "mise").exists())
 
     def test_cold_start_installs_mise_then_continues(self):
-        (self.bin / "mise").unlink()
+        self.local_mise.unlink()
         self.assert_success(self.bootstrap())
         first = self.records()[0]
-        self.assertEqual((first["command"], first["args"]), ("brew", ["install", "mise"]))
+        self.assertEqual(first["command"], "curl")
+        self.assertEqual(first["args"][:3], ["-fsSL", "https://mise.run", "-o"])
+        self.assertEqual(len(first["args"]), 4)
+        self.assertFalse(Path(first["args"][3]).exists())
+        self.assertTrue(Path(self.env["INSTALLER_EXECUTED"]).exists())
+        self.assertEqual(self.local_mise.resolve(), Path(MISE).resolve())
         self.assert_pipeline()
+        self.clear_records()
+        self.assert_success(self.bootstrap())
+        self.assert_pipeline()
+        self.assertFalse(any(row["command"] == "curl" for row in self.records()))
+
+    def test_nonexecutable_local_mise_is_reinstalled(self):
+        self.local_mise.unlink()
+        self.local_mise.write_text("incomplete installation\n")
+        self.local_mise.chmod(0o644)
+        self.assert_success(self.bootstrap())
+        first = self.records()[0]
+        self.assertEqual(first["command"], "curl")
+        self.assertEqual(first["args"][:3], ["-fsSL", "https://mise.run", "-o"])
+        self.assertFalse(Path(first["args"][3]).exists())
+        self.assertEqual(self.local_mise.resolve(), Path(MISE).resolve())
+        self.assert_pipeline()
+
+    def test_failed_installer_download_is_never_executed(self):
+        self.env["FAIL_INSTALLER_DOWNLOAD"] = "1"
+        self.assert_installation_failure(executed=False)
+
+    def test_failed_installer_stops_pipeline(self):
+        self.env["FAIL_INSTALLER"] = "1"
+        self.assert_installation_failure(executed=True)
+
+    def assert_installation_failure(self, executed):
+        self.local_mise.unlink()
+        result = self.bootstrap()
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        rows = self.records()
+        self.assertEqual(len(rows), 1, rows)
+        self.assertEqual(rows[0]["command"], "curl")
+        self.assertEqual(rows[0]["args"][:3], ["-fsSL", "https://mise.run", "-o"])
+        self.assertFalse(Path(rows[0]["args"][3]).exists())
+        self.assertEqual(Path(self.env["INSTALLER_EXECUTED"]).exists(), executed)
+        self.assertFalse(self.local_mise.exists())
+        self.assertEqual(list((self.home / "Downloads").iterdir()), [])
+        self.assertFalse((self.home / ".config/docker/cli-plugins/docker-buildx").is_symlink())
+
+    def test_bash_startup_prefers_local_mise(self):
+        shell_config = self.home / ".config/shell/config"
+        shell_config.write_text('command -v mise\n')
+        self.assert_success(result := self.run_command(
+            "/bin/bash", "--noprofile", "--norc", "-c", 'source "$1"', "bash", str(ROOT / ".bashrc")))
+        self.assertEqual(result.stdout.strip(), str(self.local_mise))
 
     def test_package_failure_stops_pipeline(self):
         self.env["FAIL_BUNDLE"] = "23"
@@ -252,9 +329,10 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertFalse((self.home / ".config/docker/cli-plugins/docker-buildx").is_symlink())
 
     def test_maintenance_runs_exact_operations_from_home(self):
-        (self.bin / "mise").unlink()
-        self.make_stub("mise")
+        self.local_mise.unlink()
+        self.make_stub("mise", self.local_bin)
         tasks = {
+            "update:mise": [("mise", ["self-update", "--no-plugins"])],
             "update:tools": [("mise", ["upgrade"])],
             "update:brew": [("brew", ["update"]), ("brew", ["upgrade"]), ("brew", ["cleanup"])],
             "update:zsh": [("zsh", [str(self.home / "Library/Caches/repos/mattmc3/antidote/antidote"), "update"])],

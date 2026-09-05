@@ -35,7 +35,10 @@ fi
 /opt/homebrew/bin/brew install mas
 /opt/homebrew/bin/brew install yadm
 /opt/homebrew/bin/brew install mackup
-/opt/homebrew/bin/brew install mise
+
+# Install the official mise binary (also installed automatically by bootstrap if missing).
+curl -fsSL https://mise.run | MISE_INSTALL_PATH="$HOME/.local/bin/mise" sh
+export PATH="$HOME/.local/bin:$PATH"
 
 # Clone this repository and set the machine class before running bootstrap.
 # yadm clone --bootstrap doesn't support passing a class, so do it in steps:
@@ -48,11 +51,21 @@ yadm bootstrap
 
 ### Bootstrap and maintenance
 
-The yadm entry point prepares XDG paths, installs mise if missing, and delegates to
-`mise bootstrap` (mise 2026.9.1 or newer). Homebrew still owns packages and uses the
+The yadm entry point prepares XDG paths, installs mise from [mise.run](https://mise.run)
+into `~/.local/bin/mise` if missing, and delegates to `mise bootstrap`
+(mise 2026.9.1 or newer). Homebrew still owns the other packages and uses the
 home/work Brewfile selected by yadm. Bootstrap runs Homebrew, macOS preferences,
 mise tool installation, then Mackup restore, Docker buildx setup, downloads and
 yadm sparse-checkout. It does not run `mackup uninstall`.
+
+Bootstrap downloads the installer completely before executing it and removes the
+temporary script on success or failure. Preview/help with missing local mise does
+not download anything and does not fall back to a Homebrew binary. Use the plain
+installer endpoint, not `/zsh` or `/bash`: shell activation is already managed here.
+
+When migrating an existing machine, verify `command -v mise` resolves to
+`~/.local/bin/mise` before separately removing the old formula with
+`brew uninstall mise`. Bootstrap does not uninstall that formula automatically.
 
 Scalar macOS preferences live in `.config/mise/conf.d/macos.toml`. Arrays,
 dictionary updates, host-scoped preferences and the dynamic screenshot path remain
@@ -76,6 +89,7 @@ mise -C "$HOME" run update:tools
 
 | Task | Operation |
 |---|---|
+| `update:mise` | Update the official mise binary with `self-update --no-plugins` |
 | `update:tools` | `mise upgrade`, preserving version constraints; no `--bump` |
 | `update:brew` | Homebrew update, upgrade and cleanup |
 | `update:zsh` | Update antidote plugins |
@@ -101,9 +115,10 @@ python3 tests/test_mise_bootstrap.py -v
 ```
 
 The tests run real mise with temporary homes and recording substitutes for
-macOS/package commands. They cover both profiles, reruns, cold start, dry-run,
-failure propagation and maintenance tasks without installing runtimes or changing
-the current user's preferences.
+macOS/package commands and the installer download. They cover both profiles,
+reruns, cold start, interrupted downloads, installer failure/cleanup, dry-run,
+PATH precedence and maintenance tasks without network access, runtime installs or
+changes to the current user's preferences.
 
 ### Things that need to be done manually
 

@@ -10,19 +10,26 @@ fi
 source "$HOME/.xdg.dirs"
 source "$XDG_CONFIG_HOME/shell/xdg"
 export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
-export PATH="$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
+export PATH="$HOME/.local/bin:$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
+readonly mise_bin="$HOME/.local/bin/mise"
 
 # mise must exist before it can run the remaining bootstrap phases.
-if [[ ! -x "$HOMEBREW_PREFIX/bin/mise" ]]; then
+if [[ ! -x "$mise_bin" ]]; then
     for arg in "$@"; do
         case "$arg" in
             -n|--dry-run|-h|--help)
-                echo "Install mise with Homebrew before previewing bootstrap; nothing was changed." >&2
+                echo "Install mise to $mise_bin via https://mise.run before previewing bootstrap; nothing was changed." >&2
                 exit 1
                 ;;
         esac
     done
-    "$HOMEBREW_PREFIX/bin/brew" install mise
+    # Download completely before executing, so a failed transfer cannot run a partial script.
+    installer=$(mktemp "${TMPDIR:-/tmp}/mise-install.XXXXXX")
+    trap 'rm -f "$installer"' EXIT
+    curl -fsSL https://mise.run -o "$installer"
+    MISE_INSTALL_PATH="$mise_bin" /bin/sh "$installer"
+    rm -f "$installer"
+    trap - EXIT
 fi
 
-exec "$HOMEBREW_PREFIX/bin/mise" -C "$HOME" bootstrap "$@"
+exec "$mise_bin" -C "$HOME" bootstrap "$@"

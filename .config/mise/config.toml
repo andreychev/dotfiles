@@ -34,10 +34,16 @@ description = "Restore app preferences and finish machine setup"
 dir = "{{env.HOME}}"
 run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" finish'
 
+[tasks."update:mise"]
+description = "Update the mise.run binary without updating plugins"
+dir = "{{env.HOME}}"
+raw = true
+run = '"$HOME/.local/bin/mise" self-update --no-plugins'
+
 [tasks."update:tools"]
 description = "Update mise tools within configured version constraints"
 dir = "{{env.HOME}}"
-run = "mise upgrade"
+run = '"$HOME/.local/bin/mise" upgrade'
 
 [tasks."update:brew"]
 description = "Update Homebrew packages and clean downloads"

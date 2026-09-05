@@ -38,7 +38,7 @@ load_config() {
     source "$HOME"/.xdg.dirs
     source "$XDG_CONFIG_HOME"/shell/xdg
     export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
-    export PATH="$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
+    export PATH="$HOME/.local/bin:$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
     chmod 700 "$XDG_CONFIG_HOME"
 }
 

@@ -41,7 +41,6 @@ brew "ripgrep"
 brew "fd"
 
 # Development tools
-brew "mise"
 brew "scmpuff"
 brew "docker"
 brew "docker-buildx"

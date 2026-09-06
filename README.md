@@ -3,7 +3,7 @@ This scripts installs and configures most of the software I use on my Mac for we
 ## Intro
 
 1. Setup uses [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) and is heavily inspired by [this blog post](https://gist.github.com/sharadhr/39b804236c1941e9c30d90af828ad41e).
-2. [`yadm`](https://yadm.io/) is used for managing dotfiles, and [`mackup`](https://github.com/lra/mackup) is used for managing some desktop application preferences.
+2. [`yadm`](https://yadm.io/) manages dotfiles and app snapshots; [`mise`](https://mise.jdx.dev/) manages tools, bootstrap and explicit snapshot restore/capture.
 3. [`zsh`](https://en.wikipedia.org/wiki/Z_shell), [`powerlevel10k`](https://github.com/romkatv/powerlevel10k), and [`antidote`](https://github.com/mattmc3/antidote) work together with [`Ghostty`](https://ghostty.org/) to provide high-performance, beautiful, and handy terminal defaults.
 4. Some things in macOS are slightly difficult to automate, so there are a few manual installation steps, but at least it's all documented here.
 
@@ -34,7 +34,6 @@ fi
 # Install bootstrap prerequisites.
 /opt/homebrew/bin/brew install mas
 /opt/homebrew/bin/brew install yadm
-/opt/homebrew/bin/brew install mackup
 
 # Install the official mise binary (also installed automatically by bootstrap if missing).
 curl -fsSL https://mise.run | MISE_INSTALL_PATH="$HOME/.local/bin/mise" sh
@@ -56,8 +55,8 @@ The yadm entry point prepares XDG paths and requires `local.class` to be `home` 
 [mise.run](https://mise.run) into `~/.local/bin/mise` if missing, then invokes
 `mise -C "$HOME" -E workstation bootstrap` (mise 2026.9.1 or newer). Homebrew owns
 the other packages and uses the Brewfile selected by yadm. Bootstrap runs Homebrew,
-macOS preferences, mise tool installation, then Mackup restore, Docker buildx,
-downloads and yadm sparse-checkout. It does not run `mackup uninstall`.
+macOS preferences, mise tool installation, then home app snapshot restore, Docker
+buildx, downloads and yadm sparse-checkout. Work uses Mail defaults without file restore.
 
 Global `config.toml` contains tools, environment and maintenance tasks only.
 Machine hooks, preferences and the finishing task live in
@@ -140,6 +139,53 @@ To preview a task without installing tools or running commands:
 ```sh
 mise -C "$HOME" run --dry-run --skip-tools update:brew
 ```
+
+### Application preference snapshots
+
+Yadm selects `.config/mise/config.app-preferences.toml` from the `##class.home` or
+`##class.work` alternate. Home declares 13 explicit `copy` entries sourced from
+`.config/app-preferences/home/Library/`; work declares no file snapshots. Both classes
+apply six Mail preferences through workstation defaults. Archived Mail and Raycast
+snapshots under `.config/app-preferences/archive/` are never selected.
+
+After deploying both alternates to HOME, run `yadm alt`, then use native mise commands:
+
+```sh
+# Inspect or preview without changing snapshots or target files.
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap dotfiles status
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap dotfiles apply --dry-run
+
+# Close affected apps and back up current preferences before applying.
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap dotfiles apply
+
+# After changing settings and quitting the apps, capture changed selected files.
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap dotfiles add --changed --no-apply
+```
+
+There is no custom status/restore/capture shell interface. `-E app-preferences` opts
+into the selected profile; `-C` plus the HOME ceiling excludes the caller's project
+and HOME-local configs. System/global configuration still follows native mise merging.
+These commands assume normal XDG discovery, without a `MISE_GLOBAL_CONFIG_FILE`
+override. Keep the profile out of `conf.d` and do not activate it globally.
+
+The native `pre-dotfiles` hook runs the existing class preflight. The home hook also
+restricts source-tree permissions so native copies inherit private file modes. Apply
+must run with hooks enabled. Status, dry-run and `add --changed --no-apply` do not run
+the apply hook. Capture updates existing selected regular files without rewriting the
+profile or its yadm symlink; missing targets and archives are skipped. Review changes
+in yadm before committing.
+
+Apply overwrites selected files even without `--force`; it is not a merge or a
+transaction. Full workstation bootstrap invokes the same native apply command before
+buildx/downloads. Ordinary project bootstrap and maintenance do not select this profile.
+Existing target symlinks are replaced with regular files; preserve their former data.
+
+Deployment and removal of an installed Mackup remain separate from checkout edits.
+Preserve local config additions and live targets, run `yadm alt`, and remove the old
+standalone `app-preferences.home.toml` and obsolete Mackup paths only after checking
+their data. Rollback restores backed-up live files and the exported Mail domain, not
+merely Git state; native `unapply` is not undo. See
+[MACKUP-REMOVAL-PLAN.md](MACKUP-REMOVAL-PLAN.md) for deployment gates.
 
 ### Shell initialization
 

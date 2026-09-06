@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 
 
@@ -18,6 +19,8 @@ YADM = shutil.which("yadm")
 SOURCES = (
     ".xdg.dirs", ".config/shell/xdg", ".config/yadm/bootstrap",
     ".config/mise/bootstrap", ".config/mise/config.toml",
+    ".config/mise/config.app-preferences.toml##class.home",
+    ".config/mise/config.app-preferences.toml##class.work",
     ".config/mise/config.workstation.toml", ".config/macos/defaults-extra",
     ".config/iterm2/defaults", ".config/transmission/defaults",
 )
@@ -103,7 +106,7 @@ elif name == "mise":
 elif name == "sudo":
     if args != ["softwareupdate", "-i", "-a"]:
         sys.exit("Unexpected sudo operation")
-elif name not in ("mackup", "osascript", "zsh", "nvim"):
+elif name not in ("osascript", "zsh", "nvim"):
     sys.exit("Unexpected external command")
 '''
 
@@ -160,7 +163,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.class_config = Path(self.env["XDG_DATA_HOME"]) / "yadm/repo.git/config"
         self.class_config.parent.mkdir(parents=True)
         self.set_machine_class("work")
-        for name in ("defaults", "brew", "yadm", "mackup", "curl", "jq", "osascript", "zsh", "nvim", "sudo"):
+        for name in ("defaults", "brew", "yadm", "curl", "jq", "osascript", "zsh", "nvim", "sudo"):
             self.make_stub(name)
         self.make_stub("mise")
         self.local_mise.symlink_to(MISE)
@@ -179,6 +182,17 @@ class MiseBootstrapTests(unittest.TestCase):
             destination = self.home / source
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / source, destination)
+        self.manifest = self.config.parent / "config.app-preferences.toml##class.home"
+        entries = tomllib.loads(self.manifest.read_text())["dotfiles"]
+        self.assertEqual(len(entries), 13)
+        self.snapshots = {}
+        for target, entry in entries.items():
+            self.assertTrue(target.startswith("~/"))
+            source = (self.manifest.parent / entry["source"]).resolve()
+            relative = source.relative_to(self.home)
+            source.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, source)
+            self.snapshots[self.home / target[2:]] = source
         self.production_config = self.config.read_text()
         # Only runtimes are omitted; all production hooks/tasks/preferences remain.
         self.config.write_text(re.sub(r"(?ms)^\[tools\]\n.*?(?=^\[settings\])", "",
@@ -186,6 +200,10 @@ class MiseBootstrapTests(unittest.TestCase):
 
     def set_machine_class(self, profile):
         self.class_config.write_text(f'[local]\nclass = {json.dumps(profile)}\n')
+        if profile in ("home", "work"):
+            active = self.config.parent / "config.app-preferences.toml"
+            active.unlink(missing_ok=True)
+            active.symlink_to(f"config.app-preferences.toml##class.{profile}")
 
     def set_class_failure(self, state):
         if self.class_config.exists():
@@ -226,14 +244,235 @@ class MiseBootstrapTests(unittest.TestCase):
     def assert_success(self, result):
         self.assertEqual(result.returncode, 0, result.stdout)
 
+    def snapshot_command(self, *args):
+        return subprocess.run(
+            (MISE, "-C", str(self.home), "-E", "app-preferences", "bootstrap", "dotfiles", *args),
+            cwd=self.other, env={**self.env, "MISE_CEILING_PATHS": str(self.home)}, text=True,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=90)
+
+    def assert_snapshot_success(self, result):
+        # Native diagnostics can contain private preference content; never echo it.
+        self.assertEqual(result.returncode, 0, "App preference command failed")
+
+    def assert_snapshots(self, restored):
+        for target, source in self.snapshots.items():
+            with self.subTest(target=target.relative_to(self.home)):
+                if restored:
+                    self.assertTrue(target.is_file() and not target.is_symlink())
+                    self.assertTrue(target.read_bytes() == source.read_bytes(),
+                                    "Restored snapshot bytes differ")
+                    self.assertEqual(target.stat().st_mode & 0o077, 0,
+                                     "Restored preferences must remain private")
+                else:
+                    self.assertFalse(os.path.lexists(target))
+
+    def snapshot_state(self):
+        return {path: (path.read_bytes(), path.stat().st_mode)
+                for path in (self.manifest, *self.snapshots.values()) if path.exists()}
+
+    def assert_snapshot_idle(self, before, config_mode):
+        self.assertTrue(self.snapshot_state() == before, "Snapshot sources or modes changed")
+        self.assertEqual((self.home / ".config").stat().st_mode, config_mode)
+        self.assert_snapshots(restored=False)
+        self.assertEqual(self.records(), [])
+        self.assertFalse(Path(self.env["INSTALLER_EXECUTED"]).exists())
+        self.assertFalse((self.home / ".config/docker").exists())
+        self.assertEqual(list((self.home / "Downloads").iterdir()), [])
+
+    def test_app_preferences_apply_capture_round_trip(self):
+        self.set_machine_class("home")
+        for source in self.snapshots.values():
+            source.chmod(0o644)
+        manifest = self.manifest.read_bytes()
+        self.assert_snapshot_success(self.snapshot_command("apply", "--yes"))
+        self.assert_snapshots(restored=True)
+        self.assertTrue(all(source.stat().st_mode & 0o077 == 0
+                            for source in self.snapshots.values()))
+        before = self.snapshot_state()
+        target, source = next(iter(self.snapshots.items()))
+        changed = b"bplist00\x00\xffisolated local preference\x00\x80"
+        target.write_bytes(changed)
+        self.assert_snapshot_success(self.snapshot_command("add", "--changed", "--no-apply"))
+        self.assertTrue(source.read_bytes() == changed, "Capture did not copy local bytes")
+        self.assertTrue(target.read_bytes() == changed, "Capture unexpectedly applied files")
+        self.assertTrue(self.manifest.read_bytes() == manifest, "Capture changed selection")
+        active = self.config.parent / "config.app-preferences.toml"
+        self.assertTrue(active.is_symlink(), "Capture replaced the yadm alternate symlink")
+        self.assertEqual(active.resolve(), self.manifest)
+        self.assertEqual(source.stat().st_mode & 0o077, 0, "Captured preferences must remain private")
+        for other_source in self.snapshots.values():
+            if other_source != source:
+                self.assertTrue((other_source.read_bytes(), other_source.stat().st_mode) ==
+                                before[other_source], "Capture changed an unchanged source")
+        target.write_bytes(b"second local edit")
+        self.assert_snapshot_success(self.snapshot_command("apply", "--yes"))
+        self.assert_snapshots(restored=True)
+        self.assertEqual(self.records(), [])
+
+    def test_app_preferences_preserve_unmanaged_and_archive_targets(self):
+        self.set_machine_class("home")
+        unmanaged = [self.home / "Library/Preferences/unmanaged-neighbor.plist"]
+        archive = ROOT / ".config/app-preferences/archive"
+        unmanaged += [self.home / path.relative_to(archive)
+                      for path in archive.rglob("*") if path.is_file()]
+        self.assertEqual(len(unmanaged), 3)
+        for path in unmanaged:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"isolated unmanaged preference")
+            path.chmod(0o640)
+        before = {path: (path.read_bytes(), path.stat().st_mode) for path in unmanaged}
+        for args in (("apply", "--yes"), ("add", "--changed", "--no-apply"), ("apply", "--yes")):
+            self.assert_snapshot_success(self.snapshot_command(*args))
+            self.assertTrue(all((path.read_bytes(), path.stat().st_mode) == state
+                                for path, state in before.items()), "Unmanaged target changed")
+        self.assert_snapshots(restored=True)
+
+    def test_app_preferences_status_and_dry_run_are_read_only(self):
+        (self.home / ".config").chmod(0o755)
+        for source in self.snapshots.values():
+            source.chmod(0o644)
+        before = self.snapshot_state()
+        mode = (self.home / ".config").stat().st_mode
+        for profile in ("home", "work"):
+            self.set_machine_class(profile)
+            for args in (("status",), ("apply", "--dry-run"), ("apply", "--dry-run", "--yes")):
+                with self.subTest(profile=profile, args=args):
+                    self.assert_snapshot_success(self.snapshot_command(*args))
+                    self.assert_snapshot_idle(before, mode)
+
+    def test_app_preferences_work_selects_no_snapshots(self):
+        before = self.snapshot_state()
+        mode = (self.home / ".config").stat().st_mode
+        for args in (("status",), ("apply", "--yes"), ("add", "--changed", "--no-apply")):
+            result = self.snapshot_command(*args)
+            self.assert_snapshot_success(result)
+            self.assert_snapshot_idle(before, mode)
+
+    def test_app_preferences_excludes_project_and_home_configs_and_inherited_env(self):
+        self.set_machine_class("home")
+        marker = self.home / "unexpected-hook"
+        env_script = self.base / "ambient-env.sh"
+        env_script.write_text(f'touch {json.dumps(str(marker))}\n')
+        unwanted = self.home / "unexpected-dotfile"
+        ambient_source = self.base / "ambient-source"
+        ambient_source.write_text("unselected config source\n")
+        conflict = (f'[dotfiles]\n{json.dumps(str(unwanted))} = '
+                    f'{{ source = {json.dumps(str(ambient_source))}, mode = "copy" }}\n'
+                    f'[env]\n_.source = {json.dumps(str(env_script))}\n'
+                    f'[hooks]\nenter = {json.dumps("touch " + json.dumps(str(marker)))}\n')
+        for path in (self.other / "mise.toml", self.home / "mise.toml",
+                     self.home / "mise.hostile.toml",
+                     self.config.parent / "config.hostile.toml"):
+            path.write_text(conflict)
+        self.env["MISE_ENV"] = "hostile"
+        for args in (("status",), ("apply", "--yes"), ("add", "--changed", "--no-apply")):
+            self.assert_snapshot_success(self.snapshot_command(*args))
+            self.assertFalse(marker.exists(), "Ambient environment or hook executed")
+            self.assertFalse(unwanted.exists(), "Ambient dotfile selection applied")
+            self.assertEqual(self.records(), [])
+        self.assert_snapshots(restored=True)
+
+    def test_app_preferences_missing_source_fails_without_installation(self):
+        self.set_machine_class("home")
+        missing = next(iter(self.snapshots.values()))
+        missing.unlink()
+        before = {path: state[0] for path, state in self.snapshot_state().items()}
+        self.assertNotEqual(self.snapshot_command("apply", "--yes").returncode, 0,
+                            "Missing source must fail apply")
+        self.assertTrue({path: state[0] for path, state in self.snapshot_state().items()} == before,
+                        "Failure changed snapshot bytes")
+        self.assertEqual(self.records(), [])
+        self.assertFalse(Path(self.env["INSTALLER_EXECUTED"]).exists())
+        self.assertFalse((self.home / ".config/docker").exists())
+        self.assertEqual(list((self.home / "Downloads").iterdir()), [])
+        self.assertFalse(missing.exists())
+
+    def test_missing_snapshot_stops_finish_before_buildx_and_downloads(self):
+        self.set_machine_class("home")
+        next(iter(self.snapshots.values())).unlink()
+        result = self.run_command("/bin/bash", str(self.home / ".config/mise/bootstrap"), "finish")
+        self.assertNotEqual(result.returncode, 0, "Missing snapshot must fail finish")
+        self.assertEqual(self.records(), [])
+        self.assertFalse((self.home / ".config/docker").exists())
+        self.assertEqual(list((self.home / "Downloads").iterdir()), [])
+        self.assertFalse(Path(self.env["INSTALLER_EXECUTED"]).exists())
+
+    def test_app_preferences_invalid_class_stops_apply_hook(self):
+        before = self.snapshot_state()
+        mode = (self.home / ".config").stat().st_mode
+        for state in ("", "unknown", "missing-file", "missing-key", "malformed", "unreadable"):
+            if state == "unreadable" and os.geteuid() == 0:
+                continue
+            self.set_class_failure(state)
+            with self.subTest(state=state):
+                result = self.snapshot_command("apply", "--yes")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("local.class", result.stdout)
+                self.assert_snapshot_idle(before, mode)
+
+    def test_capture_does_not_add_missing_or_unselected_files(self):
+        self.set_machine_class("home")
+        self.assert_snapshot_success(self.snapshot_command("apply", "--yes"))
+        missing = next(iter(self.snapshots))
+        missing.unlink()
+        unselected = missing.parent / "unselected-capture.plist"
+        unselected.write_bytes(b"not selected for capture")
+        before = self.snapshot_state()
+        self.assert_snapshot_success(self.snapshot_command("add", "--changed", "--no-apply"))
+        self.assertFalse(missing.exists(), "Capture must not apply missing targets")
+        self.assertTrue(self.snapshot_state() == before, "Capture changed missing or unselected sources")
+        self.assertFalse((next(iter(self.snapshots.values())).parent / unselected.name).exists())
+        self.assertTrue(unselected.read_bytes() == b"not selected for capture")
+
+    def test_apply_replaces_symlink_without_changing_referent(self):
+        self.set_machine_class("home")
+        target = next(iter(self.snapshots))
+        referent = self.base / "former-symlink-referent"
+        referent.write_bytes(b"former external preference")
+        referent.chmod(0o640)
+        mode = referent.stat().st_mode
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.symlink_to(referent)
+        self.assert_snapshot_success(self.snapshot_command("apply", "--yes"))
+        self.assert_snapshots(restored=True)
+        self.assertTrue(referent.read_bytes() == b"former external preference")
+        self.assertEqual(referent.stat().st_mode, mode)
+
+    def test_capture_does_not_run_apply_hook(self):
+        self.set_machine_class("home")
+        self.assert_snapshot_success(self.snapshot_command("apply", "--yes"))
+        target, source = next(iter(self.snapshots.items()))
+        target.write_bytes(b"captured without running the permission hook")
+        source.parent.chmod(0o755)
+        self.class_config.unlink()
+        self.assert_snapshot_success(self.snapshot_command("add", "--changed", "--no-apply"))
+        self.assertTrue(source.read_bytes() == target.read_bytes())
+        self.assertEqual(source.parent.stat().st_mode & 0o777, 0o755)
+        self.assertEqual(self.records(), [])
+
+    def test_missing_active_snapshot_profile_stops_finish(self):
+        active = self.config.parent / "config.app-preferences.toml"
+        for profile in ("home", "work"):
+            with self.subTest(profile=profile):
+                self.set_machine_class(profile)
+                active.unlink()
+                result = self.run_command("/bin/bash", str(self.home / ".config/mise/bootstrap"), "finish")
+                self.assertNotEqual(result.returncode, 0, "Missing active profile must fail finish")
+                self.assertEqual(self.records(), [])
+                self.assert_snapshots(restored=False)
+                self.assertFalse((self.home / ".config/docker").exists())
+                self.assertEqual(list((self.home / "Downloads").iterdir()), [])
+                self.assertFalse(Path(self.env["INSTALLER_EXECUTED"]).exists())
+
+
     def assert_pipeline(self):
         rows = self.records()
         self.assertFalse(any(row["command"] == "brew" and "install" in row["args"] for row in rows))
         writes = [row["args"] for row in rows if row["command"] == "defaults" and "write" in row["args"]]
-        self.assertEqual(len(writes), 75)
+        self.assertEqual(len(writes), 79)
         identities = [(tuple(args[:args.index("write")]), *args[args.index("write") + 1:args.index("write") + 3])
                       for args in writes]
-        self.assertEqual(len(set(identities)), 75, "Each domain/key/scope must be written once")
+        self.assertEqual(len(set(identities)), 79, "Each domain/key/scope must be written once")
         applications = sum(args[args.index("write") + 1] in
                            ("org.m0k.transmission", "com.googlecode.iterm2.plist") for args in writes)
         self.assertEqual(applications, 12)
@@ -248,10 +487,8 @@ class MiseBootstrapTests(unittest.TestCase):
         ):
             self.assertIn(expected, writes)
         package = next(i for i, row in enumerate(rows) if row["command"] == "brew" and row["args"] == ["bundle"])
-        restore = next(i for i, row in enumerate(rows) if row["command"] == "mackup" and row["args"] == ["restore"])
         defaults = [i for i, row in enumerate(rows) if row["command"] == "defaults" and "write" in row["args"]]
         self.assertLess(package, min(defaults))
-        self.assertLess(max(defaults), restore)
         link = self.home / ".config/docker/cli-plugins/docker-buildx"
         self.assertTrue(link.is_symlink())
         self.assertEqual(os.readlink(link), str(self.prefix / "opt/docker-buildx/bin/docker-buildx"))
@@ -262,6 +499,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertFalse(any(row["command"] == "curl" and "https://mise.run" in row["args"]
                              for row in self.records()))
         self.assert_pipeline()
+        self.assert_snapshots(restored=profile == "home")
         expected = {"ilya-birman-typolayout-3.9-mac.dmg"}
         if profile == "home":
             expected |= {"AmneziaVPN_1.2.3.dmg", "Yandex.Disk.dmg"}
@@ -273,6 +511,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.clear_records()
         self.assert_success(self.bootstrap())
         self.assert_pipeline()
+        self.assert_snapshots(restored=profile == "home")
         self.assertFalse(any(row["command"] == "curl" and "-fL" in row["args"] for row in self.records()))
         self.assertFalse(any(row["command"] == "curl" and "https://mise.run" in row["args"]
                              for row in self.records()))
@@ -448,6 +687,40 @@ class MiseBootstrapTests(unittest.TestCase):
                 self.assertTrue((self.bin / "mise").exists())
 
     @unittest.skipUnless(YADM, "Requires installed yadm")
+    def test_real_yadm_selects_native_snapshot_profiles(self):
+        self.class_config.unlink()
+        self.class_config.parent.rmdir()
+        (self.bin / "yadm").unlink()
+        (self.bin / "yadm").symlink_to(YADM)
+        self.env.update({"GIT_DIR": str(self.class_config.parent),
+                         "GIT_CONFIG_SYSTEM": os.devnull})
+        active = self.config.parent / "config.app-preferences.toml"
+        active.unlink()
+        self.assert_success(self.run_command(YADM, "init"))
+        self.assert_success(self.run_command(YADM, "config", "local.class", "work"))
+        variants = [self.config.parent / f"config.app-preferences.toml##class.{profile}"
+                    for profile in ("home", "work")]
+        self.assert_success(self.run_command(YADM, "add", *(str(path) for path in variants)))
+        self.assertTrue(active.is_symlink())
+        self.assertEqual(active.resolve(), variants[1])
+        self.assert_snapshot_success(self.snapshot_command("apply", "--yes"))
+        self.assert_snapshots(restored=False)
+        self.assert_success(self.run_command(YADM, "config", "local.class", "home"))
+        self.assert_success(self.run_command(YADM, "alt"))
+        self.assertTrue(active.is_symlink())
+        self.assertEqual(active.resolve(), variants[0])
+        self.assert_snapshot_success(self.snapshot_command("apply", "--yes"))
+        self.assert_snapshots(restored=True)
+        self.assert_success(self.run_command(YADM, "config", "local.class", "work"))
+        self.assert_success(self.run_command(YADM, "alt"))
+        self.assertTrue(active.is_symlink())
+        self.assertEqual(active.resolve(), variants[1])
+        next(iter(self.snapshots)).write_bytes(b"not captured by work profile")
+        before = self.snapshot_state()
+        self.assert_snapshot_success(self.snapshot_command("add", "--changed", "--no-apply"))
+        self.assertTrue(self.snapshot_state() == before, "Work captured home preferences")
+
+    @unittest.skipUnless(YADM, "Requires installed yadm")
     def test_real_yadm_preview_and_preflight_preserve_files_and_permissions(self):
         # Real yadm setup is confined to the fixture HOME/XDG paths. The fixture
         # preference interception probe still guards every real mise invocation.
@@ -577,7 +850,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, result.stdout)
         rows = self.records()
         self.assertTrue(any(row["command"] == "brew" and row["args"] == ["bundle"] for row in rows))
-        self.assertFalse(any(row["command"] in ("defaults", "osascript", "mackup", "curl") for row in rows))
+        self.assertFalse(any(row["command"] in ("defaults", "osascript", "curl") for row in rows))
         self.assertFalse((self.home / ".config/docker/cli-plugins/docker-buildx").is_symlink())
 
     def test_maintenance_runs_exact_operations_from_home(self):

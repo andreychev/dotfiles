@@ -19,7 +19,7 @@ run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight'
 
 # Native bootstrap installs [tools] before running this task.
 [tasks.bootstrap]
-description = "Restore app preferences and finish machine setup"
+description = "Restore app snapshots and finish machine setup"
 dir = "{{env.HOME}}"
 run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" finish'
 
@@ -106,6 +106,9 @@ WebKitJavaScriptCanOpenWindowsAutomatically = false
 # Copy addresses without names; display attachment icons rather than inline previews.
 AddressesIncludeNameOnPasteboard = false
 DisableInlineAttachmentViewing = true
+DisableReplyAnimations = true
+DisableSendAnimations = true
+SpellCheckingBehavior = "NoSpellCheckingEnabled"
 
 [bootstrap.macos.defaults."com.apple.terminal"]
 SecureKeyboardEntry = true

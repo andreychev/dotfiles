@@ -1,0 +1,21 @@
+# Selected by yadm; loaded only with mise -E app-preferences.
+[bootstrap.hooks.pre-dotfiles]
+run = [
+  '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight',
+  'chmod -R go-rwx "${XDG_CONFIG_HOME:-$HOME/.config}/app-preferences/home"',
+]
+
+[dotfiles]
+"~/Library/Preferences/net.freemacsoft.AppCleaner.plist" = { source = "../app-preferences/home/Library/Preferences/net.freemacsoft.AppCleaner.plist", mode = "copy" }
+"~/Library/Preferences/net.freemacsoft.AppCleaner-SmartDelete.plist" = { source = "../app-preferences/home/Library/Preferences/net.freemacsoft.AppCleaner-SmartDelete.plist", mode = "copy" }
+"~/Library/Preferences/com.surteesstudios.Bartender.plist" = { source = "../app-preferences/home/Library/Preferences/com.surteesstudios.Bartender.plist", mode = "copy" }
+"~/Library/Preferences/pl.maketheweb.cleanshotx.plist" = { source = "../app-preferences/home/Library/Preferences/pl.maketheweb.cleanshotx.plist", mode = "copy" }
+"~/Library/Preferences/com.marcoarment.quitter.plist" = { source = "../app-preferences/home/Library/Preferences/com.marcoarment.quitter.plist", mode = "copy" }
+"~/Library/Preferences/com.spotify.client.plist" = { source = "../app-preferences/home/Library/Preferences/com.spotify.client.plist", mode = "copy" }
+"~/Library/Preferences/org.videolan.vlc.plist" = { source = "../app-preferences/home/Library/Preferences/org.videolan.vlc.plist", mode = "copy" }
+"~/Library/Preferences/org.videolan.vlc/vlcrc" = { source = "../app-preferences/home/Library/Preferences/org.videolan.vlc/vlcrc", mode = "copy" }
+"~/Library/Application Support/org.videolan.vlc/ml.xspf" = { source = "../app-preferences/home/Library/Application Support/org.videolan.vlc/ml.xspf", mode = "copy" }
+"~/Library/Application Support/org.videolan.vlc/lua/extensions/userdata/vlsub/vlsub_conf.xml" = { source = "../app-preferences/home/Library/Application Support/org.videolan.vlc/lua/extensions/userdata/vlsub/vlsub_conf.xml", mode = "copy" }
+"~/Library/Preferences/ZoomChat.plist" = { source = "../app-preferences/home/Library/Preferences/ZoomChat.plist", mode = "copy" }
+"~/Library/Preferences/us.zoom.ZoomAutoUpdater.plist" = { source = "../app-preferences/home/Library/Preferences/us.zoom.ZoomAutoUpdater.plist", mode = "copy" }
+"~/Library/Preferences/us.zoom.xos.plist" = { source = "../app-preferences/home/Library/Preferences/us.zoom.xos.plist", mode = "copy" }

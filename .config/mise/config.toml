@@ -16,6 +16,7 @@ uv = "latest"
 rust = "stable"
 
 [settings]
+auto_update = true
 idiomatic_version_file_enable_tools = ["node"]
 
 [tasks."update:mise"]

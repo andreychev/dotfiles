@@ -66,22 +66,6 @@ install_brew_deps() {
     log "SUCCESS" "Brew dependencies installation completed"
 }
 
-# Apply defaults
-apply_defaults() {
-    log "INFO" "Applying defaults..."
-
-    find "$XDG_CONFIG_HOME" -type f -name "defaults" -print0 | while IFS= read -r -d '' file; do
-        # Check if the file is executable and execute it
-        if [ -x "$file" ]; then
-            # Execute the file
-            /bin/bash "$file" --no-restart
-        fi
-    done
-
-    log "SUCCESS" "Defaults applied successfully"
-}
-
-
 # Configure docker-buildx
 setup_docker_buildx() {
     log "INFO" "Configuring docker-buildx..."
@@ -160,9 +144,9 @@ setup_yadm() {
 main() {
     local phase=${1:-}
     case "$phase" in
-        preflight|packages|defaults|finish) ;;
+        preflight|packages|finish) ;;
         *)
-            log "ERROR" "Usage: $0 {preflight|packages|defaults|finish}"
+            log "ERROR" "Usage: $0 {preflight|packages|finish}"
             exit 1
             ;;
     esac
@@ -181,10 +165,6 @@ main() {
         packages)
             install_brew_deps "$class"
             ;;
-        defaults)
-            /bin/bash "$XDG_CONFIG_HOME/macos/defaults-extra"
-            apply_defaults
-            ;;
         finish)
             log "INFO" "Machine class: $class"
             if [[ ! -r "$XDG_CONFIG_HOME/mise/config.app-preferences.toml" ]]; then
@@ -193,6 +173,8 @@ main() {
             fi
             MISE_CEILING_PATHS="$HOME" "$HOME/.local/bin/mise" -C "$HOME" -E app-preferences \
                 bootstrap dotfiles apply
+            MISE_CEILING_PATHS="$HOME" "$HOME/.local/bin/mise" -C "$HOME" -E app-preferences \
+                bootstrap --only macos-defaults
             setup_docker_buildx
             download_apps "$class"
             setup_yadm

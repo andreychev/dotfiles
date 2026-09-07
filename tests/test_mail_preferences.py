@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check managed Mail preferences against the archived snapshot without live domains."""
+"""Check managed Mail preferences against a minimal golden without live domains."""
 
 import os
 from pathlib import Path
@@ -13,7 +13,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-GOLDEN = ROOT / ".config/app-preferences/archive/Library/Preferences/com.apple.mail.plist"
+GOLDEN = ROOT / "tests/fixtures/mail-preferences.plist"
 DEFAULTS = Path("/usr/bin/defaults")
 
 

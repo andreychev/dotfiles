@@ -18,11 +18,16 @@ run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" packages'
 [bootstrap.hooks.pre-defaults]
 run = [
   '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight',
+  'chmod 700 "${XDG_CONFIG_HOME:-$HOME/.config}"',
   "osascript -e 'tell application \"System Settings\" to quit'",
 ]
 
 [bootstrap.hooks.post-defaults]
-run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" defaults'
+run = [
+  '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/macos/defaults-extra"',
+  '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/iterm2/defaults" --no-restart',
+  '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/transmission/defaults" --no-restart',
+]
 
 [bootstrap.hooks.pre-tools]
 run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight'

@@ -33,7 +33,7 @@ check_macos() {
     fi
 }
 
-# One class policy for the entry point and every directly invoked phase.
+# One class policy for native bootstrap hooks and directly invoked phases.
 read_machine_class() {
     local class
     if ! class=$(git config --no-includes --file "$XDG_DATA_HOME/yadm/repo.git/config" --get local.class); then

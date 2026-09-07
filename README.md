@@ -35,47 +35,57 @@ fi
 /opt/homebrew/bin/brew install mas
 /opt/homebrew/bin/brew install yadm
 
-# Install the official mise binary (also installed automatically by bootstrap if missing).
-curl -fsSL https://mise.run | MISE_INSTALL_PATH="$HOME/.local/bin/mise" sh
-export PATH="$HOME/.local/bin:$PATH"
+# Install the official mise binary once, before invoking bootstrap.
+(
+  set -eu
+  installer=$(mktemp "${TMPDIR:-/tmp}/mise-install.XXXXXX")
+  trap 'rm -f "$installer"' EXIT
+  curl -fsSL --connect-timeout 15 --max-time 300 https://mise.run -o "$installer"
+  MISE_INSTALL_PATH="$HOME/.local/bin/mise" /bin/sh "$installer"
+)
+export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+export PATH="$HOME/.local/bin:$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
 
 # Clone this repository and set the machine class before running bootstrap.
-# yadm clone --bootstrap doesn't support passing a class, so do it in steps:
+# yadm manages files and alternates; mise performs machine setup.
 yadm clone git@github.com:andreychev/dotfiles.git
 yadm config local.class home   # or: work
 yadm alt
-# Preview first: "$HOME/.config/yadm/bootstrap" --dry-run
-yadm bootstrap
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E workstation bootstrap --dry-run
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E workstation bootstrap
 ```
 
 ### Bootstrap and maintenance
 
-The yadm entry point prepares XDG paths and requires `local.class` to be `home` or
-`work` before installation or other changes. It installs mise from
-[mise.run](https://mise.run) into `~/.local/bin/mise` if missing, then invokes
-`mise -C "$HOME" -E workstation bootstrap` (mise 2026.9.1 or newer). Homebrew owns
-the other packages and uses the Brewfile selected by yadm. Bootstrap runs Homebrew,
-macOS preferences, mise tool installation, then home app snapshot restore, Docker
-buildx, downloads and yadm sparse-checkout. Work uses Mail defaults without file restore.
+The sole machine-setup entry is `mise -C "$HOME" -E workstation bootstrap`, with
+`MISE_CEILING_PATHS="$HOME"` to exclude HOME-local and caller-project configuration.
+Install the official mise binary first (minimum version is declared in global config);
+bootstrap does not install or replace mise itself. Yadm only deploys files and selects
+home/work alternates. Homebrew still owns system packages through the selected Brewfile.
+Bootstrap runs Homebrew, macOS preferences, mise tool installation, app snapshot apply,
+Docker buildx, downloads and yadm sparse-checkout. Work has Mail defaults but no file snapshots.
 
 Global `config.toml` contains tools, environment and maintenance tasks only.
 Machine hooks, preferences and the finishing task live in
 `.config/mise/config.workstation.toml`, loaded only with `-E workstation`.
 Ordinary project bootstrap does not inherit these operations. Do not export
-`MISE_ENV=workstation` globally. The yadm entry fixes `MISE_CONFIG_DIR` to the
-deployed XDG config and clears `MISE_GLOBAL_CONFIG_FILE` for its child process:
-that override disables environment-sibling discovery in mise 2026.9.1.
+`MISE_ENV=workstation` globally. Native config discovery is not overridden by a launcher:
+`MISE_CONFIG_DIR` must refer to the deployed config directory if set, and a
+`MISE_GLOBAL_CONFIG_FILE` override can suppress workstation profile discovery. These
+settings are read before `[env]`, so correct or unset conflicting overrides in the shell.
 
-Bootstrap downloads the installer completely before executing it and removes the
-temporary script on success or failure. Preview/help with missing local mise does
-not download anything and does not fall back to a Homebrew binary. Use the plain
-installer endpoint, not `/zsh` or `/bash`: shell activation is already managed here.
+The workstation profile sources the existing `.xdg.dirs` and `shell/xdg` through
+`env._.source`; installers receive their XDG and runtime-home variables without shell
+activation. `env._.path` supplies hook/task paths, but on mise 2026.9.1 it does not add
+paths to installers. Keep local mise and Homebrew on the initial shell PATH as shown
+above. Do not replace `[env] PATH`: that would discard mise's installer dependency paths.
 
-Missing, unknown or unreadable `local.class` stops bootstrap before mutations.
-Set it with `yadm config local.class home` (or `work`), then run `yadm alt`.
-Direct helper phases and targeted workstation defaults/tools phases also validate
-the class. For applying a subset, use the guarded entry, for example
-`"$HOME/.config/yadm/bootstrap" --only macos-defaults`.
+The existing pre-packages, pre-defaults and pre-tools hooks validate macOS and
+`local.class` before their effects. Missing, unknown or unreadable class stops real
+bootstrap; set it with `yadm config local.class home` (or `work`), then `yadm alt`.
+Native `--dry-run` prints and skips hooks, including preflight; it is a preview, not
+class validation. For guarded partial application use:
+`MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E workstation bootstrap --only macos-defaults`.
 
 Class reads use Git directly against `$XDG_DATA_HOME/yadm/repo.git/config`, the
 standard yadm repository location used here, with includes disabled. They do not
@@ -100,15 +110,17 @@ application `defaults` scripts still run after the native preferences.
 
 Deploy the rename, including removal of the old `conf.d/macos.toml`; leaving that
 file in `$HOME` would keep its preferences globally active.
+Also remove the obsolete `.config/yadm/bootstrap` during deployment so it cannot remain
+as a second entry point. Follow the initial setup above if mise is not installed.
 
 After the configs are deployed to `$HOME`:
 
 ```sh
 # Preview the whole machine bootstrap without installing or applying anything.
-"$HOME/.config/yadm/bootstrap" --dry-run
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E workstation bootstrap --dry-run
 
 # Inspect only the declarative macOS preferences; this excludes the shell extras.
-mise -C "$HOME" -E workstation bootstrap macos defaults status
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E workstation bootstrap macos defaults status
 
 # List tasks, then run one explicit maintenance operation.
 mise tasks

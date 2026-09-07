@@ -1,6 +1,16 @@
 # Workstation setup is opt-in: mise -E workstation bootstrap.
 # Keep this out of conf.d so project bootstrap never inherits machine operations.
 
+[env]
+_.source = ["{{env.HOME}}/.xdg.dirs", "{{env.HOME}}/.config/shell/xdg"]
+HOMEBREW_PREFIX = { default = "/opt/homebrew" }
+# Hook/task PATH additions; installer PATH comes from the initial shell setup.
+_.path = [
+  "{{env.HOME}}/.local/bin",
+  "{{env.HOMEBREW_PREFIX | default(value='/opt/homebrew')}}/bin",
+  "{{env.HOMEBREW_PREFIX | default(value='/opt/homebrew')}}/sbin",
+]
+
 # Homebrew remains the package owner; do not duplicate Brewfiles in bootstrap.packages.
 [bootstrap.hooks.pre-packages]
 run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" packages'

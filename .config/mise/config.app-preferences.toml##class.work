@@ -2,4 +2,7 @@
 [bootstrap.hooks.pre-dotfiles]
 run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight'
 
+[bootstrap.hooks.pre-defaults]
+run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight'
+
 [dotfiles]

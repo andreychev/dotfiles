@@ -166,7 +166,7 @@ class MiseBootstrapTests(unittest.TestCase):
             shutil.copy2(ROOT / source, destination)
         self.manifest = self.config.parent / "config.app-preferences.toml##class.home"
         entries = tomllib.loads(self.manifest.read_text())["dotfiles"]
-        self.assertEqual(len(entries), 13)
+        self.assertEqual(len(entries), 2)
         self.snapshots = {}
         for target, entry in entries.items():
             self.assertTrue(target.startswith("~/"))
@@ -294,10 +294,13 @@ class MiseBootstrapTests(unittest.TestCase):
     def test_app_preferences_preserve_unmanaged_and_archive_targets(self):
         self.set_machine_class("home")
         unmanaged = [self.home / "Library/Preferences/unmanaged-neighbor.plist"]
-        archive = ROOT / ".config/app-preferences/archive"
-        unmanaged += [self.home / path.relative_to(archive)
-                      for path in archive.rglob("*") if path.is_file()]
-        self.assertEqual(len(unmanaged), 3)
+        unmanaged += [self.home / "Library/Preferences" / (domain + ".plist") for domain in (
+            "com.apple.mail", "com.raycast.macos", "com.surteesstudios.Bartender",
+            "com.spotify.client", "org.videolan.vlc", "ZoomChat", "us.zoom.ZoomAutoUpdater",
+            "us.zoom.xos", "pl.maketheweb.cleanshotx", "com.marcoarment.quitter",
+            "net.freemacsoft.AppCleaner", "net.freemacsoft.AppCleaner-SmartDelete",
+        )]
+        unmanaged.append(self.home / "Library/Application Support/org.videolan.vlc/ml.xspf")
         for path in unmanaged:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b"isolated unmanaged preference")
@@ -448,10 +451,13 @@ class MiseBootstrapTests(unittest.TestCase):
         rows = self.records()
         self.assertFalse(any(row["command"] == "brew" and "install" in row["args"] for row in rows))
         writes = [row["args"] for row in rows if row["command"] == "defaults" and "write" in row["args"]]
-        self.assertEqual(len(writes), 79)
+        selected = tomllib.loads((self.config.parent / "config.app-preferences.toml").read_text())
+        app_defaults = selected.get("bootstrap", {}).get("macos", {}).get("defaults", {})
+        expected_writes = 79 + sum(len(settings) for settings in app_defaults.values())
+        self.assertEqual(len(writes), expected_writes)
         identities = [(tuple(args[:args.index("write")]), *args[args.index("write") + 1:args.index("write") + 3])
                       for args in writes]
-        self.assertEqual(len(set(identities)), 79, "Each domain/key/scope must be written once")
+        self.assertEqual(len(set(identities)), expected_writes, "Each domain/key/scope must be written once")
         applications = sum(args[args.index("write") + 1] in
                            ("org.m0k.transmission", "com.googlecode.iterm2.plist") for args in writes)
         self.assertEqual(applications, 12)
@@ -497,6 +503,26 @@ class MiseBootstrapTests(unittest.TestCase):
 
     def test_home_pipeline(self):
         self.exercise_profile("home")
+
+    def test_defaults_runs_only_explicit_scripts(self):
+        unselected = self.home / ".config/scratch/defaults"
+        unselected.parent.mkdir()
+        marker = self.home / "unexpected-defaults"
+        unselected.write_text(f'#!/bin/bash\ntouch {json.dumps(str(marker))}\nexit 37\n')
+        unselected.chmod(0o755)
+        self.assert_success(self.bootstrap("--only", "macos-defaults"))
+        self.assertFalse(marker.exists(), "Unselected executable defaults script ran")
+        writes = [row["args"] for row in self.records()
+                  if row["command"] == "defaults" and "write" in row["args"]]
+        self.assertTrue(any("org.m0k.transmission" in args for args in writes))
+        self.assertTrue(any("com.googlecode.iterm2.plist" in args for args in writes))
+
+    def test_explicit_defaults_failure_stops_following_scripts(self):
+        (self.home / ".config/iterm2/defaults").write_text("#!/bin/bash\nexit 37\n")
+        result = self.bootstrap("--only", "macos-defaults")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(any("org.m0k.transmission" in row["args"] for row in self.records()))
+        self.assertFalse((self.home / ".config/docker").exists())
 
     def test_project_bootstrap_does_not_inherit_workstation(self):
         captured = self.base / "project-env.json"
@@ -655,7 +681,7 @@ class MiseBootstrapTests(unittest.TestCase):
         (self.home / ".config").chmod(0o755)
         helper = str(self.home / ".config/mise/bootstrap")
         commands = [("/bin/bash", helper, phase)
-                    for phase in ("preflight", "packages", "defaults", "finish")]
+                    for phase in ("preflight", "packages", "finish")]
         commands += [(MISE, "-C", str(self.home), "-E", "workstation", "bootstrap",
                       "--only", phase, "--yes") for phase in ("macos-defaults", "tools")]
         for state in ("", "unknown", "missing-file", "missing-key", "malformed", "unreadable"):

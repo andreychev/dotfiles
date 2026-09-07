@@ -9,6 +9,9 @@ setopt CDABLE_VARS       # Change directory to a path stored in a variable.
 setopt MULTIOS           # Write to multiple descriptors.
 setopt EXTENDED_GLOB     # Use extended globbing syntax.
 
+export HISTFILE="$XDG_STATE_HOME/zsh/history"
+mkdir -p "$XDG_STATE_HOME/zsh"
+
 HISTSIZE=10000          # Max number of history entries in memory.
 SAVEHIST=10000          # Max number of history entries saved to disk.
 

@@ -4,13 +4,13 @@ source "$HOME"/.xdg.dirs
 
 # Check if XDG_CONFIG_HOME is set before sourcing the shell environment
 if [ -n "$XDG_CONFIG_HOME" ]; then
+    source "$XDG_CONFIG_HOME"/shell/xdg
     source "$XDG_CONFIG_HOME"/shell/environment
     source "$XDG_CONFIG_HOME"/shell/aliases
-    _yadm_class=$(yadm config local.class 2>/dev/null)
+    _yadm_class=$(git config --no-includes --file "$XDG_DATA_HOME/yadm/repo.git/config" --get local.class 2>/dev/null)
     [[ -n "$_yadm_class" && -f "$XDG_CONFIG_HOME/shell/aliases.$_yadm_class" ]] && \
         source "$XDG_CONFIG_HOME/shell/aliases.$_yadm_class"
     unset _yadm_class
-    source "$XDG_CONFIG_HOME"/shell/xdg
 else
     echo "Warning: XDG_CONFIG_HOME is not set. Skipping shell config."
 fi

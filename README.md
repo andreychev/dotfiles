@@ -1,60 +1,90 @@
-This scripts installs and configures most of the software I use on my Mac for web and software development.
+# Dotfiles
 
-## Intro
+Personal macOS configuration: **yadm** deploys files and selects `home` / `work`;
+**mise** manages runtimes and machine setup; **Homebrew** installs system packages.
+Configs live under `~/.config/`.
 
-1. Setup uses [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) and is heavily inspired by [this blog post](https://gist.github.com/sharadhr/39b804236c1941e9c30d90af828ad41e).
-2. [`yadm`](https://yadm.io/) is used for managing dotfiles, and [`mackup`](https://github.com/lra/mackup) is used for managing some desktop application preferences.
-3. [`zsh`](https://en.wikipedia.org/wiki/Z_shell), [`powerlevel10k`](https://github.com/romkatv/powerlevel10k), and [`antidote`](https://github.com/mattmc3/antidote) work together with [`Ghostty`](https://ghostty.org/) to provide high-performance, beautiful, and handy terminal defaults.
-4. Some things in macOS are slightly difficult to automate, so there are a few manual installation steps, but at least it's all documented here.
+## New Mac
 
-## Installation
+Install Xcode Command Line Tools, [Homebrew](https://brew.sh/) and the
+[official mise binary](https://mise.jdx.dev/getting-started.html) at
+`~/.local/bin/mise` (2026.9.1 or newer, not the Homebrew formula).
+Sign in to the Mac App Store first.
 
 ```sh
-# Take Me Home, Country Roads.
-cd $HOME
-
-# Ensure macOS is updated.
-sudo softwareupdate -i -a
-
-# Ensure Apple's command line tools are installed.
-xcode-select --install
-
-# **Ensure you are authorized in the Mac App Store**.
-
-# Enable TouchID for sudo (uncomment corresponding line).
-# Note: at least in the US, you cannot be compelled to give up a password by a court (it's considered a violation of the 5th amendment), but your biometrics are not secret, so you can absolutely be forced by a court to biometric auth.
-sudo cp /etc/pam.d/sudo_local.template /etc/pam.d/sudo_local
-sudo vi /etc/pam.d/sudo_local
-
-# Install Homebrew.
-if [[ $(command -v brew) == "" ]]; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-
-# Install mas, yadm, mackup.
-/opt/homebrew/bin/brew install mas
-/opt/homebrew/bin/brew install yadm
-/opt/homebrew/bin/brew install mackup
-
-# Clone this repository and set the machine class before running bootstrap.
-# yadm clone --bootstrap doesn't support passing a class, so do it in steps:
+brew install yadm mas
+export HOMEBREW_PREFIX="$(brew --prefix)"
+export PATH="$HOME/.local/bin:$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
 yadm clone git@github.com:andreychev/dotfiles.git
-yadm config local.class home   # or: work
+yadm config local.class home  # or work
 yadm alt
-yadm bootstrap
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E workstation bootstrap --dry-run
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E workstation bootstrap
 ```
 
-### Things that need to be done manually
+Bootstrap installs packages/tools, applies macOS preferences and selected app
+settings, and completes machine setup. Preview skips hooks, including class checks.
+App logins, licenses and cloud synchronization remain manual.
+On work machines, create local `~/.config/git/config.work` and
+`~/.config/shell/environment.work`; keep them out of Git.
 
-1. [Remap Caps Lock to Ctrl](https://support.apple.com/zh-sg/guide/mac-help/mchlp1011/mac), [Launchpad to F13](https://github.com/the-via/releases/issues/92#issuecomment-826337718).
-3. Install [Paragon NTFS](https://uc.paragon-software.com/cabinet).
-4. Install M1-compatible apps: Streisand, Xiaomi Home, SailTies.
-5. Install Adobe Lightroom from Adobe Creative Cloud.
-8. Authorize Yandex.Disk and wait for sync.
-9. Authorize iCloud Drive and Photos.
-10. Configure extra Mail, Calendar.
-11. Apply all licenses.
+## Existing Mac: migrate
 
-## Thanks to…
+Run from a **separate checkout of the committed new version**, before updating the
+old yadm checkout. Close affected apps and resolve tracked local changes first.
+The legacy baseline is `main` at `c454ecb` (the repository has no `master` branch).
 
-- [Github dotfiles repos](https://dotfiles.github.io/)
+```sh
+python3 scripts/migrate-from-legacy.py          # preview; no changes
+python3 scripts/migrate-from-legacy.py --apply  # back up and migrate
+```
+
+The script preserves current app data and machine class, detaches old Mackup
+symlinks, updates yadm by fast-forward and selects the new alternates. It ensures
+`~/.local/bin/mise` is available without running workstation bootstrap, overwriting
+live preferences with repository snapshots, upgrading runtimes or uninstalling
+packages. Keep the private backup it reports until you have checked your apps.
+See `--help` for prerequisites and failure handling.
+
+## Maintenance
+
+```sh
+mise tasks
+mise -C "$HOME" run --skip-tools update:tools
+```
+
+Other tasks: `update:mise`, `update:brew`, `update:zsh`, `update:nvim`, `update:macos`.
+Use `--skip-tools` to avoid implicit runtime installation; add `--dry-run` to preview.
+Machine setup stays opt-in: do not export `MISE_ENV=workstation` globally.
+
+## App settings
+
+Home keeps two VLC/VLSub config files and explicit scalar preferences in the mise
+profile; work has no app snapshots. Full plists, accounts, licenses and media history
+are excluded. Complex layouts/rules stay in private backups, not automatic transfer.
+After changing machine class, run `yadm alt`. Edit scalar settings in the profile;
+`add --changed` captures files only. Workstation bootstrap applies both parts.
+
+```sh
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap dotfiles status
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap dotfiles apply --dry-run
+# Close affected apps and back up before applying: selected files are overwritten.
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap dotfiles apply
+# Apply only the explicitly managed scalar preferences, preserving other plist keys.
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap --only macos-defaults
+# After changing settings and quitting the apps, capture selected files only.
+MISE_CEILING_PATHS="$HOME" mise -C "$HOME" -E app-preferences bootstrap dotfiles add --changed --no-apply
+```
+
+Review captured changes before committing. Keep hooks enabled on apply.
+Old Git history still contains the original snapshots; this migration does not rewrite it.
+
+## Checks
+
+On macOS with Python 3.11+, mise and yadm installed:
+
+```sh
+python3 -m unittest discover -s tests -p 'test_*.py' -v
+```
+
+Tests use temporary homes; they do not verify application GUI behavior.

@@ -1,0 +1,8 @@
+# Work selects no app snapshots; Mail preferences are applied by workstation defaults.
+[bootstrap.hooks.pre-dotfiles]
+run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight'
+
+[bootstrap.hooks.pre-defaults]
+run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight'
+
+[dotfiles]

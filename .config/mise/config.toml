@@ -1,3 +1,6 @@
+# Native bootstrap and macOS defaults require this mise version.
+min_version = "2026.9.1"
+
 [env]
 NODE_OPTIONS="--max_old_space_size=1536"
 
@@ -14,3 +17,36 @@ rust = "stable"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
+
+[tasks."update:mise"]
+description = "Update the mise.run binary without updating plugins"
+dir = "{{env.HOME}}"
+raw = true
+run = '"$HOME/.local/bin/mise" self-update --no-plugins'
+
+[tasks."update:tools"]
+description = "Update mise tools within configured version constraints"
+dir = "{{env.HOME}}"
+run = '"$HOME/.local/bin/mise" upgrade'
+
+[tasks."update:brew"]
+description = "Update Homebrew packages and clean downloads"
+dir = "{{env.HOME}}"
+run = "brew update && brew upgrade && brew cleanup"
+
+[tasks."update:zsh"]
+description = "Update antidote shell plugins"
+dir = "{{env.HOME}}"
+run = '. "$HOME/.xdg.dirs"; zsh "${ANTIDOTE_HOME:-$XDG_CACHE_HOME/repos}/mattmc3/antidote/antidote" update'
+
+[tasks."update:nvim"]
+description = "Synchronize Neovim plugins"
+dir = "{{env.HOME}}"
+run = 'nvim --headless "+Lazy! sync" +qa'
+
+# Keep OS updates explicit, separate from other maintenance tasks.
+[tasks."update:macos"]
+description = "Install macOS software updates (may require a restart)"
+dir = "{{env.HOME}}"
+raw = true
+run = "sudo softwareupdate -i -a"

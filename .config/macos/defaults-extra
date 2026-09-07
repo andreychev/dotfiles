@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+# Preferences unsupported by native mise defaults: arrays, dictionaries, currentHost,
+# and dynamic paths (mise 2026.9.1 does not render templates in defaults values).
+# Other scalar preferences live in mise/config.workstation.toml.
+defaults write NSGlobalDomain AppleLanguages -array "en" "ru"
+defaults write com.apple.terminal StringEncodings -array 4
+defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
+defaults write com.apple.mail NSUserKeyEquivalents -dict-add "Send" -string "@↩"
+defaults write com.apple.screencapture location -string "${HOME}/Desktop"

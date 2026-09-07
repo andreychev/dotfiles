@@ -1,0 +1,64 @@
+# Selected by yadm; loaded only with mise -E app-preferences.
+# Mixed application plists are deliberately not copied or recaptured.
+[bootstrap.hooks.pre-dotfiles]
+run = [
+  '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight',
+  'chmod -R go-rwx "${XDG_CONFIG_HOME:-$HOME/.config}/app-preferences/home"',
+]
+
+[bootstrap.hooks.pre-defaults]
+run = '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/mise/bootstrap" preflight'
+
+[dotfiles]
+"~/Library/Preferences/org.videolan.vlc/vlcrc" = { source = "../app-preferences/home/Library/Preferences/org.videolan.vlc/vlcrc", mode = "copy" }
+"~/Library/Application Support/org.videolan.vlc/lua/extensions/userdata/vlsub/vlsub_conf.xml" = { source = "../app-preferences/home/Library/Application Support/org.videolan.vlc/lua/extensions/userdata/vlsub/vlsub_conf.xml", mode = "copy" }
+
+# Portable scalar settings only; edit here instead of capturing complete plists.
+[bootstrap.macos.defaults."net.freemacsoft.AppCleaner"]
+SUEnableAutomaticChecks = true
+SUAutomaticallyUpdate = true
+SUSendProfileInfo = false
+
+[bootstrap.macos.defaults."com.surteesstudios.Bartender"]
+UseBartenderBar = false
+ClickingMenuBarTogglesBartender = true
+MouseOverMenuBarTogglesBartender = true
+HideItemsWhenShowingOthers = false
+HideSecondaryMenuBarItems = false
+ShowAllItemsWhenDragging = true
+SUEnableAutomaticChecks = true
+SUAutomaticallyUpdate = false
+SUSendProfileInfo = false
+
+[bootstrap.macos.defaults."pl.maketheweb.cleanshotx"]
+popupSize = 2
+analyticsAllowed = false
+annotateTextStyle = 0
+annotatePixelateIntensity = 10
+popupAskForDestinationWhenSaving = false
+confirmVideoDelete = false
+captureWithoutDesktopIcons = true
+deletePopupAfterDragging = true
+doNotDisturbWhileRecording = false
+SUEnableAutomaticChecks = false
+SUAutomaticallyUpdate = false
+
+[bootstrap.macos.defaults."com.marcoarment.quitter"]
+active = false
+SUEnableAutomaticChecks = true
+SUAutomaticallyUpdate = true
+SUSendProfileInfo = false
+
+[bootstrap.macos.defaults."org.videolan.vlc"]
+language = "auto"
+SUEnableAutomaticChecks = false
+SUAutomaticallyUpdate = true
+SUSendProfileInfo = false
+
+[bootstrap.macos.defaults."us.zoom.xos"]
+kZMShowNotificationCenter = true
+WebContinuousSpellCheckingEnabled = true
+ZMInputTextViewAutomaticSpellingCorrectionEnabled = false
+ZMInputTextViewContinuousSpellCheckingEnabled = false
+ZMInputTextViewGrammarCheckingEnabled = false
+NSAllowContinuousSpellChecking = true

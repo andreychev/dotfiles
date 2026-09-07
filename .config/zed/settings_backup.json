@@ -18,7 +18,6 @@
   "format_on_save": "off",
   "use_system_path_prompts": true,
   "edit_predictions": {
-    "disabled_globs": [],
     "mode": "eager"
   },
   "features": {

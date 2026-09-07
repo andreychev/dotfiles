@@ -34,7 +34,6 @@
   "use_system_path_prompts": true,
   "edit_predictions": {
     "provider": "zed",
-    "disabled_globs": [],
     "mode": "eager"
   },
   /* Duplicated key auto-commented: "agent": {

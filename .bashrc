@@ -3,9 +3,25 @@
 # Source the XDG directories configuration
 source "$HOME"/.xdg.dirs
 
+if [[ "$OSTYPE" == darwin* ]] && [ -x "${HOMEBREW_PREFIX:-/opt/homebrew}/bin/brew" ]; then
+    eval "$("${HOMEBREW_PREFIX:-/opt/homebrew}/bin/brew" shellenv)"
+fi
+
+# mise.run and other user-local tools take precedence over package-manager binaries.
+export PATH="$HOME/.local/bin:$PATH"
+
 # Check if XDG_CONFIG_HOME is set before sourcing the shell config
 if [ -n "$XDG_CONFIG_HOME" ]; then
     source "$XDG_CONFIG_HOME"/shell/config
 else
     echo "Warning: XDG_CONFIG_HOME is not set. Skipping shell config."
+fi
+
+export HISTFILE="$XDG_STATE_HOME/bash/history"
+
+if [[ "$-" == *i* ]]; then
+    mkdir -p "$XDG_STATE_HOME/bash"
+    if [ -x "$HOME/.local/bin/mise" ]; then
+        eval "$("$HOME/.local/bin/mise" activate bash)"
+    fi
 fi

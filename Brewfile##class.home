@@ -11,6 +11,7 @@ cask "chatgpt"
 
 # Essential apps
 cask "1password@7"
+cask "yandex-disk"
 
 # Personal hardware and media tools
 cask "adobe-creative-cloud"
@@ -27,6 +28,7 @@ cask "handy"
 # Communication tools
 cask "zoom"
 cask "telegram"
+cask "amneziavpn"
 
 # Media
 cask "vlc"

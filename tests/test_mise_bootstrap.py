@@ -16,6 +16,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 MISE = shutil.which("mise")
 YADM = shutil.which("yadm")
+RUBY = shutil.which("ruby")
 SOURCES = (
     ".xdg.dirs", ".config/shell/xdg",
     ".config/mise/bootstrap", ".config/mise/config.toml",
@@ -55,39 +56,6 @@ elif name == "brew":
 elif name == "yadm":
     if args != ["sparse-checkout", "init"] and args[:3] != ["sparse-checkout", "set", "--no-cone"]:
         sys.exit("Unexpected yadm operation")
-elif name == "curl":
-    for flag, expected in (("--connect-timeout", "15"), ("--max-time", "300")):
-        if args.count(flag) != 1 or args[args.index(flag) + 1] != expected:
-            sys.exit("Missing bounded curl timeout: " + flag)
-    options = args.copy()
-    for flag in ("--connect-timeout", "--max-time"):
-        index = options.index(flag)
-        del options[index:index + 2]
-    if options == ["-fsSL", "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest"]:
-        print(os.environ.get("RELEASE_JSON", '{"tag_name": "v1.2.3"}'))
-    elif len(options) == 4 and options[:2] == ["-fL", "-o"]:
-        destination = Path(options[2]).resolve()
-        if destination.parent != Path(os.environ["HOME"], "Downloads").resolve():
-            sys.exit("Refusing download outside temporary Downloads")
-        if not destination.name.rsplit(".part.", 1)[-1] or ".part." not in destination.name:
-            sys.exit("App downloads must use temporary part files")
-        if os.environ.get("FAIL_APP_DOWNLOAD"):
-            destination.write_bytes(b"partial")
-            sys.exit(18)
-        destination.write_bytes(b"complete application download")
-    else:
-        sys.exit("Unexpected curl operation")
-elif name == "jq":
-    if len(args) != 2 or args[0] != "-er":
-        sys.exit("Release lookup must reject missing values")
-    try:
-        payload = json.load(sys.stdin)
-    except (ValueError, TypeError):
-        sys.exit(4)
-    tag = payload.get("tag_name") if isinstance(payload, dict) else None
-    if not isinstance(tag, str) or not tag:
-        sys.exit(4)
-    print(tag)
 elif name == "mise":
     if Path(sys.argv[0]).parent != Path(os.environ["HOME"], ".local/bin"):
         sys.exit("Homebrew mise must never be selected")
@@ -99,6 +67,148 @@ elif name == "sudo":
 elif name not in ("osascript", "zsh", "nvim"):
     sys.exit("Unexpected external command")
 '''
+
+
+@unittest.skipUnless(sys.platform == "darwin", "Requires macOS shell bootstrap")
+class BootstrapShellPhaseTests(unittest.TestCase):
+    """Test shell/package boundaries without invoking native preference operations."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix="bootstrap shell tests ")
+        self.addCleanup(temporary.cleanup)
+        self.base = Path(temporary.name).resolve()
+        self.home = self.base / "isolated home"
+        self.prefix = self.base / "homebrew"
+        self.log = self.base / "commands.jsonl"
+        self.env = {
+            "HOME": str(self.home), "HOMEBREW_PREFIX": str(self.prefix),
+            "PATH": f"{self.prefix}/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+            "COMMAND_LOG": str(self.log), "MISE_AUTO_UPDATE": "false",
+            "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1",
+        }
+        for source in (".xdg.dirs", ".config/shell/xdg", ".config/mise/bootstrap",
+                       "Brewfile.base", "Brewfile##class.home", "Brewfile##class.work"):
+            destination = self.home / source
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / source, destination)
+        self.class_config = self.home / ".local/share/yadm/repo.git/config"
+        self.class_config.parent.mkdir(parents=True)
+        self.buildx = self.home / ".config/docker/cli-plugins/docker-buildx"
+        self.downloads = self.home / "Downloads"
+        self.downloads.mkdir()
+        self.set_profile("work")
+        for name in ("brew", "yadm"):
+            path = self.prefix / "bin" / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(f"#!{sys.executable}\n" + STUB + (
+                '\nassert Path(os.environ["DOCKER_CONFIG"], "cli-plugins/docker-buildx").is_symlink()\n'
+                if name == "yadm" else ""))
+            path.chmod(0o755)
+        mise = self.home / ".local/bin/mise"
+        mise.parent.mkdir(parents=True)
+        mise.write_text(f"#!{sys.executable}\n" + r'''
+import json, os, sys
+with open(os.environ["COMMAND_LOG"], "a") as log:
+    log.write(json.dumps({"command": "mise", "args": sys.argv[1:], "cwd": os.getcwd()}) + "\n")
+sys.exit(23 if sys.argv[-1] == os.environ.get("FAIL_PREFERENCES") else 0)
+''')
+        mise.chmod(0o755)
+
+    def set_profile(self, profile):
+        self.class_config.write_text(f'[local]\nclass = {json.dumps(profile)}\n')
+        shutil.copy2(ROOT / f".config/mise/config.app-preferences.toml##class.{profile}",
+                     self.home / ".config/mise/config.app-preferences.toml")
+        active = self.home / "Brewfile"
+        active.unlink(missing_ok=True)
+        active.symlink_to(f"Brewfile##class.{profile}")
+
+    def run_phase(self, phase):
+        return subprocess.run(
+            ["/bin/bash", str(self.home / ".config/mise/bootstrap"), phase],
+            cwd=self.base, env=self.env, text=True,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30,
+        )
+
+    def operations(self):
+        rows = [json.loads(line) for line in self.log.read_text().splitlines()] if self.log.exists() else []
+        self.assertTrue(all(Path(row["cwd"]).resolve() == self.home for row in rows))
+        return [(row["command"], row["args"]) for row in rows]
+
+    def test_preflight_and_packages_do_not_run_finish(self):
+        config = self.home / ".config"
+        config.chmod(0o755)
+        result = self.run_phase("preflight")
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertEqual(self.operations(), [])
+        self.assertEqual(config.stat().st_mode & 0o777, 0o755)
+        result = self.run_phase("packages")
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertEqual(self.operations(), [("brew", ["bundle"])])
+        self.assertFalse((self.home / ".config/docker").exists())
+        self.assertEqual(list(self.downloads.iterdir()), [])
+
+    @unittest.skipUnless(RUBY, "Requires Ruby to evaluate Brewfiles")
+    def test_home_and_work_bundles_select_applications(self):
+        evaluator = r'''
+require "json"
+packages = []
+dsl = Object.new
+%w[brew cask mas].each do |kind|
+  dsl.define_singleton_method(kind) { |name, **options| packages << [kind, name] }
+end
+dsl.instance_eval(File.read(ARGV.fetch(0)), ARGV.fetch(0))
+puts JSON.generate(packages)
+'''
+        for profile in ("home", "work"):
+            with self.subTest(profile=profile):
+                self.set_profile(profile)
+                result = subprocess.run(
+                    [RUBY, "-e", evaluator, str(self.home / "Brewfile")],
+                    cwd=self.base, env=self.env, text=True,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                casks = [name for kind, name in json.loads(result.stdout) if kind == "cask"]
+                self.assertEqual(casks.count("ilya-birman-typography-layout"), 1)
+                for application in ("amneziavpn", "yandex-disk"):
+                    self.assertEqual(casks.count(application), int(profile == "home"))
+                self.assertEqual(self.operations(), [])
+
+    def test_finish_orders_preferences_buildx_and_yadm_without_installers(self):
+        sentinel = self.downloads / "unmanaged-file"
+        sentinel.write_bytes(b"leave existing downloads alone")
+        prefix = ["-C", str(self.home), "-E", "app-preferences", "bootstrap"]
+        for profile in ("home", "work"):
+            self.set_profile(profile)
+            self.buildx.unlink(missing_ok=True)
+            for repeat in range(2):
+                with self.subTest(profile=profile, repeat=repeat):
+                    self.log.write_text("")
+                    result = self.run_phase("finish")
+                    self.assertEqual(result.returncode, 0, result.stdout)
+                    self.assertEqual(self.operations(), [
+                        ("mise", prefix + ["dotfiles", "apply"]),
+                        ("mise", prefix + ["--only", "macos-defaults"]),
+                        ("yadm", ["sparse-checkout", "init"]),
+                        ("yadm", ["sparse-checkout", "set", "--no-cone", "/*", "!README.md",
+                                  "!LICENSE", "!.editorconfig", "!MISE-ASSESSMENT.md",
+                                  "!MACKUP-REMOVAL-PLAN.md", "!/tests/"]),
+                    ])
+                    self.assertEqual(os.readlink(self.buildx),
+                                     str(self.prefix / "opt/docker-buildx/bin/docker-buildx"))
+                    self.assertEqual(list(self.downloads.iterdir()), [sentinel])
+                    self.assertEqual(sentinel.read_bytes(), b"leave existing downloads alone")
+
+    def test_preference_failures_stop_before_buildx_and_yadm(self):
+        for operation, count in (("apply", 1), ("macos-defaults", 2)):
+            with self.subTest(operation=operation):
+                self.log.write_text("")
+                self.env["FAIL_PREFERENCES"] = operation
+                result = self.run_phase("finish")
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertEqual([name for name, args in self.operations()], ["mise"] * count)
+                self.assertFalse((self.home / ".config/docker").exists())
+                self.assertEqual(list(self.downloads.iterdir()), [])
 
 
 @unittest.skipUnless(sys.platform == "darwin" and MISE, "Requires macOS and installed mise")
@@ -146,7 +256,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.class_config = self.home / ".local/share/yadm/repo.git/config"
         self.class_config.parent.mkdir(parents=True)
         self.set_machine_class("work")
-        for name in ("defaults", "brew", "yadm", "curl", "jq", "osascript", "zsh", "nvim", "sudo"):
+        for name in ("defaults", "brew", "yadm", "osascript", "zsh", "nvim", "sudo"):
             self.make_stub(name)
         self.make_stub("mise")
         self.local_mise.symlink_to(MISE)
@@ -372,7 +482,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
         self.assertFalse(missing.exists())
 
-    def test_missing_snapshot_stops_finish_before_buildx_and_downloads(self):
+    def test_missing_snapshot_stops_finish_before_buildx_and_yadm(self):
         self.set_machine_class("home")
         next(iter(self.snapshots.values())).unlink()
         result = self.run_command("/bin/bash", str(self.home / ".config/mise/bootstrap"), "finish")
@@ -483,20 +593,12 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assert_success(self.bootstrap())
         self.assert_pipeline()
         self.assert_snapshots(restored=profile == "home")
-        expected = {"ilya-birman-typolayout-3.9-mac.dmg"}
-        if profile == "home":
-            expected |= {"AmneziaVPN_1.2.3.dmg", "Yandex.Disk.dmg"}
-        self.assertEqual({path.name for path in (self.home / "Downloads").iterdir()}, expected)
-        if profile == "work":
-            self.assertFalse(any("amnezia" in " ".join(row["args"]).lower() or
-                                 "yandex" in " ".join(row["args"]).lower()
-                                 for row in self.records() if row["command"] == "curl"))
+        self.assertEqual(list((self.home / "Downloads").iterdir()), [])
         self.clear_records()
         self.assert_success(self.bootstrap())
         self.assert_pipeline()
         self.assert_snapshots(restored=profile == "home")
-        self.assertFalse(any(row["command"] == "curl" and "-fL" in row["args"] for row in self.records()))
-        self.assertEqual({path.name for path in (self.home / "Downloads").iterdir()}, expected)
+        self.assertEqual(list((self.home / "Downloads").iterdir()), [])
 
     def test_work_pipeline(self):
         self.exercise_profile("work")
@@ -695,43 +797,6 @@ class MiseBootstrapTests(unittest.TestCase):
                     self.assert_class_failure(result)
                     self.assertIn("Invalid" if state in ("", "unknown") else "Cannot read", result.stdout)
 
-    def test_interrupted_app_download_is_cleaned_and_retry_is_complete(self):
-        self.env["FAIL_APP_DOWNLOAD"] = "1"
-        result = self.bootstrap()
-        self.assertNotEqual(result.returncode, 0, result.stdout)
-        downloads = self.home / "Downloads"
-        self.assertEqual(list(downloads.iterdir()), [])
-        self.assertTrue(any(row["command"] == "curl" and "-fL" in row["args"]
-                            for row in self.records()))
-        self.env.pop("FAIL_APP_DOWNLOAD")
-        self.clear_records()
-        self.assert_success(self.bootstrap())
-        destination = downloads / "ilya-birman-typolayout-3.9-mac.dmg"
-        self.assertEqual(list(downloads.iterdir()), [destination])
-        self.assertEqual(destination.read_bytes(), b"complete application download")
-        self.assertTrue(any(row["command"] == "curl" and "-fL" in row["args"]
-                            for row in self.records()))
-        self.clear_records()
-        self.assert_success(self.bootstrap())
-        self.assertFalse(any(row["command"] == "curl" for row in self.records()))
-        self.assertEqual(destination.read_bytes(), b"complete application download")
-        self.assertEqual(list(downloads.iterdir()), [destination])
-
-    def test_invalid_release_response_stops_before_release_download(self):
-        self.set_machine_class("home")
-        for payload in ("not json", "{}", '{"tag_name": null}', '{"tag_name": 12}',
-                        '{"tag_name": ""}'):
-            with self.subTest(payload=payload):
-                self.env["RELEASE_JSON"] = payload
-                self.clear_records()
-                result = self.run_command("/bin/bash", str(self.home / ".config/mise/bootstrap"), "finish")
-                self.assertNotEqual(result.returncode, 0, result.stdout)
-                self.assertTrue(any(row["command"] == "jq" for row in self.records()))
-                self.assertFalse(any("/releases/download/" in arg or "disk.yandex.ru" in arg
-                                     for row in self.records() for arg in row["args"]))
-                self.assertEqual({path.name for path in (self.home / "Downloads").iterdir()},
-                                 {"ilya-birman-typolayout-3.9-mac.dmg"})
-
     def test_preview_has_no_external_mutations(self):
         # Runtimes remain omitted to keep this test offline; production tools
         # are covered by the separate native dry-run during migration.
@@ -850,7 +915,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, result.stdout)
         rows = self.records()
         self.assertTrue(any(row["command"] == "brew" and row["args"] == ["bundle"] for row in rows))
-        self.assertFalse(any(row["command"] in ("defaults", "osascript", "curl") for row in rows))
+        self.assertFalse(any(row["command"] in ("defaults", "osascript", "yadm") for row in rows))
         self.assertFalse((self.home / ".config/docker/cli-plugins/docker-buildx").is_symlink())
 
     def test_maintenance_runs_exact_operations_from_home(self):

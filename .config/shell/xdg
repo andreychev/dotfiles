@@ -21,3 +21,6 @@ export WGETRC="$XDG_CONFIG_HOME"/wget/wgetrc
 alias wget="wget --hsts-file=\$XDG_CACHE_HOME/wget/wget-hsts"
 
 export PYTHONSTARTUP="$HOME"/python/pythonrc
+
+# Oh My Pi: dedicated configuration directory.
+export PI_CODING_AGENT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omp"

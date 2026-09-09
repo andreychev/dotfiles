@@ -60,13 +60,6 @@
     },
     "Lua": {
       "format_on_save": "off"
-    },
-    "SQL": {
-      "formatter": {
-        "external": {
-          "command": "sql-formatter"
-        }
-      }
     }
   },
   "lsp": {

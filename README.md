@@ -28,6 +28,12 @@ App logins, licenses and cloud synchronization remain manual.
 On work machines, create local `~/.config/git/config.work` and
 `~/.config/shell/environment.work`; keep them out of Git.
 
+Homebrew installs [Ilya Birman's keyboard layout](https://formulae.brew.sh/cask/ilya-birman-typography-layout)
+for both classes; reboot after installation. The home class also installs
+[Amnezia VPN](https://formulae.brew.sh/cask/amneziavpn) and
+[Yandex Disk](https://formulae.brew.sh/cask/yandex-disk), which require Rosetta on
+Apple Silicon. Bootstrap no longer saves these installers in `~/Downloads`.
+
 ## Existing Mac: migrate
 
 Run from a **separate checkout of the committed new version**, before updating the
@@ -56,6 +62,9 @@ mise -C "$HOME" run --skip-tools update:tools
 Other tasks: `update:mise`, `update:brew`, `update:zsh`, `update:nvim`, `update:macos`.
 Use `--skip-tools` to avoid implicit runtime installation; add `--dry-run` to preview.
 Machine setup stays opt-in: do not export `MISE_ENV=workstation` globally.
+
+Global tools are Go, Node, Python, uv and Rust. npm is bundled with Node rather
+than managed separately; Yarn, pnpm and sql-formatter are not installed globally.
 
 ## App settings
 

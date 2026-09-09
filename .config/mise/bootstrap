@@ -3,11 +3,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Constants
-readonly TYPOGRAPHY_VERSION="3.9"
-readonly DOWNLOADS_TIMEOUT=300
-readonly CONNECT_TIMEOUT=15
-
 # Logger function
 log() {
     local level=$1
@@ -74,63 +69,6 @@ setup_docker_buildx() {
     log "SUCCESS" "Docker-buildx configured"
 }
 
-# Download application
-download_app() (
-    local url=$1
-    local filename=$2
-    local timeout=$3
-
-    if [ -f "$filename" ]; then
-        log "INFO" "File $filename already exists, skipping download"
-        return 0
-    fi
-
-    local temporary
-    temporary=$(mktemp "${filename}.part.XXXXXX")
-    trap 'rm -f "$temporary"' EXIT
-    log "INFO" "Downloading $filename..."
-    curl -fL -o "$temporary" --connect-timeout "$CONNECT_TIMEOUT" \
-        --max-time "$timeout" "$url"
-    mv -f "$temporary" "$filename"
-    trap - EXIT
-    log "SUCCESS" "Downloaded $filename"
-)
-
-# Download all applications
-download_apps() {
-    local class=$1
-    cd "$XDG_DOWNLOAD_DIR"
-
-    # Typography Layout (all machines)
-    download_app \
-        "https://ilyabirman.ru/typography-layout/download/ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
-        "ilya-birman-typolayout-$TYPOGRAPHY_VERSION-mac.dmg" \
-        "$DOWNLOADS_TIMEOUT"
-
-    # Home-only downloads
-    if [[ "$class" == "home" ]]; then
-        # Amnezia VPN
-        local AMNEZIA
-        AMNEZIA=$(curl -fsSL --connect-timeout "$CONNECT_TIMEOUT" \
-            --max-time "$DOWNLOADS_TIMEOUT" \
-            "https://api.github.com/repos/amnezia-vpn/amnezia-client/releases/latest" \
-            | jq -er '.tag_name | select(type == "string" and length > 0)')
-        local AMNEZIA_VERSION="${AMNEZIA#v}"
-        download_app \
-            "https://github.com/amnezia-vpn/amnezia-client/releases/download/$AMNEZIA/AmneziaVPN_$AMNEZIA_VERSION.dmg" \
-            "AmneziaVPN_$AMNEZIA_VERSION.dmg" \
-            "$DOWNLOADS_TIMEOUT"
-
-        # Yandex.Disk
-        download_app \
-            "https://disk.yandex.ru/download/Yandex.Disk.dmg/?instant=1" \
-            "Yandex.Disk.dmg" \
-            "$DOWNLOADS_TIMEOUT"
-    fi
-
-    cd "$HOME"
-}
-
 # Configure yadm
 setup_yadm() {
     log "INFO" "Configuring yadm sparse-checkout..."
@@ -176,7 +114,6 @@ main() {
             MISE_CEILING_PATHS="$HOME" "$HOME/.local/bin/mise" -C "$HOME" -E app-preferences \
                 bootstrap --only macos-defaults
             setup_docker_buildx
-            download_apps "$class"
             setup_yadm
             log "SUCCESS" "Setup completed successfully"
             ;;

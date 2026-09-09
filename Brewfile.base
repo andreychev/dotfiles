@@ -55,6 +55,9 @@ brew "mole"
 # Fonts
 cask "font-fira-code-nerd-font"
 
+# Keyboard layout
+cask "ilya-birman-typography-layout"
+
 # QuickLook plugins
 cask "qlmarkdown"
 cask "quicklook-csv"

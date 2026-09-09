@@ -90,10 +90,14 @@ Old Git history still contains the original snapshots; this migration does not r
 
 ## Checks
 
-On macOS with Python 3.11+, standalone mise and yadm installed:
+On macOS with Python 3.11+, standalone mise 2026.9.3+ and yadm installed:
 
 ```sh
 PATH="$HOME/.local/bin:$PATH" python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
 Tests use temporary homes; they do not verify application GUI behavior.
+Native macOS preferences are redirected to absolute temporary plist domains:
+changing HOME alone does not isolate CFPreferences. The fixture rejects native
+domains outside its temporary directory before execution and separately checks
+interception of shell `defaults` commands.

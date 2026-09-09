@@ -4,7 +4,9 @@
 import json
 import os
 from pathlib import Path
+import plistlib
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -230,6 +232,8 @@ class MiseBootstrapTests(unittest.TestCase):
         self.log = self.base / "commands.jsonl"
         self.config = self.home / ".config/mise/config.toml"
         self.config.parent.mkdir(parents=True)
+        self.native_dir = self.base / "native-preferences"
+        self.native_dir.mkdir()
         # Deliberately inherit no MISE/XDG configuration or executable search path.
         self.env = {
             "HOME": str(self.home), "USER": os.environ.get("USER", "test"),
@@ -261,20 +265,30 @@ class MiseBootstrapTests(unittest.TestCase):
         self.make_stub("mise")
         self.local_mise.symlink_to(MISE)
 
-        # Before exposing actual domains, prove native mise uses our fake defaults.
-        # A failed interception can only affect an absolute temporary plist domain.
-        domain = str(self.base / "harmless-probe")
-        self.config.write_text(f'[bootstrap.macos.defaults.{json.dumps(domain)}]\nprobe = "intercepted"\n')
+        # Native mise uses CFPreferences, not the PATH-resolved defaults command.
+        # Prove absolute-domain isolation and shell-hook interception separately.
+        domain = str(self.native_dir / "probe")
+        shell_domain = str(self.base / "shell-probe")
+        shell_args = ["write", shell_domain, "probe", "-string", "intercepted"]
+        shell_command = shlex.join(["defaults", *shell_args])
+        self.config.write_text(
+            f'[bootstrap.macos.defaults.{json.dumps(domain)}]\nprobe = "intercepted"\n'
+            f'[bootstrap.hooks.post-defaults]\nrun = {json.dumps(shell_command)}\n')
         self.assert_success(self.run_mise("bootstrap", "--only", "macos-defaults", "--yes"))
-        self.assertTrue(any(row["command"] == "defaults" and row["args"] ==
-                            ["write", domain, "probe", "-string", "intercepted"]
+        self.assertEqual(self.native_preferences(), {"probe": {"probe": "intercepted"}},
+                         "Safety probe failed: native preferences escaped temporary storage")
+        self.assertTrue(any(row["command"] == "defaults" and row["args"] == shell_args
                             for row in self.records()),
-                        "Safety probe failed; refusing to expose actual preference domains")
+                        "Safety probe failed: shell defaults interception is unavailable")
+        self.assertFalse(Path(shell_domain + ".plist").exists())
+        (self.native_dir / "probe.plist").unlink()
         self.clear_records()
         for source in SOURCES:
             destination = self.home / source
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / source, destination)
+            if ".toml" in destination.name:
+                self.isolate_native_config(destination)
         self.manifest = self.config.parent / "config.app-preferences.toml##class.home"
         entries = tomllib.loads(self.manifest.read_text())["dotfiles"]
         self.assertEqual(len(entries), 2)
@@ -290,6 +304,76 @@ class MiseBootstrapTests(unittest.TestCase):
         # Only runtimes are omitted; all production hooks/tasks/preferences remain.
         self.config.write_text(re.sub(r"(?ms)^\[tools\]\n.*?(?=^\[settings\])", "",
                                       self.production_config, count=1))
+
+    def isolate_native_config(self, path):
+        text = path.read_text()
+        expected = tomllib.loads(text)
+        macos = expected.get("bootstrap", {}).get("macos", {})
+        self.assertLessEqual(set(macos), {"defaults"}, "Unisolated native preference section")
+        if "defaults" in macos:
+            isolated = {}
+            for domain, settings in macos["defaults"].items():
+                target = str(self.native_dir / domain)
+                header = f"[bootstrap.macos.defaults.{json.dumps(domain)}]"
+                replacement = f"[bootstrap.macos.defaults.{json.dumps(target)}]"
+                text, count = re.subn("(?m)^" + re.escape(header) + "$",
+                                      lambda match: replacement, text)
+                self.assertEqual(count, 1, "Cannot isolate native preference domain")
+                isolated[target] = settings
+            macos["defaults"] = isolated
+        self.assertEqual(tomllib.loads(text), expected, "Isolation changed non-domain configuration")
+        path.write_text(text)
+
+    def assert_safe_native_configs(self):
+        self.assertEqual(self.native_dir.resolve(), self.native_dir)
+        for directory in (self.config.parent, self.home, self.other,
+                          Path(self.env["MISE_SYSTEM_CONFIG_DIR"])):
+            for path in directory.glob("*.toml*"):
+                if not path.is_file():
+                    continue
+                macos = tomllib.loads(path.read_text()).get("bootstrap", {}).get("macos", {})
+                self.assertLessEqual(set(macos), {"defaults"}, "Unisolated native preference section")
+                for domain in macos.get("defaults", {}):
+                    target = Path(domain)
+                    self.assertTrue(target.is_absolute() and target.resolve().parent == self.native_dir,
+                                    "Unsafe native preference domain: " + domain)
+                    plist = Path(domain + ".plist")
+                    self.assertFalse(plist.is_symlink(), "Native preference plist must not be a symlink")
+                    self.assertEqual(plist.resolve().parent, self.native_dir,
+                                     "Native preference plist escapes temporary storage")
+
+    def native_preferences(self):
+        return {path.name.removesuffix(".plist"): plistlib.loads(path.read_bytes())
+                for path in self.native_dir.glob("*.plist")}
+
+    def test_native_domain_guard_blocks_unsafe_launches(self):
+        marker = self.base / "unexpected-process"
+        command = (sys.executable, "-c", f"from pathlib import Path; Path({str(marker)!r}).touch()")
+        (self.native_dir / "escaped").symlink_to(self.base / "outside")
+        (self.native_dir / "linked.plist").symlink_to(self.base / "outside.plist")
+        domains = ("NSGlobalDomain", "-g", "-globalDomain", "com.example.unsafe",
+                   str(self.base / "outside"), str(self.native_dir / "escaped"),
+                   str(self.native_dir / "linked"))
+        cases = [f'[bootstrap.macos.defaults.{json.dumps(domain)}]\nprobe = true\n'
+                 for domain in domains]
+        cases.append('[bootstrap.macos.dock]\nautohide = true\n')
+        for path in (self.config, self.home / "mise.toml", self.other / "mise.toml",
+                     self.config.parent / "config.hostile.toml"):
+            original = path.read_text() if path.exists() else None
+            try:
+                for content in cases:
+                    with self.subTest(config=path.name, content=content):
+                        path.write_text(content)
+                        with self.assertRaisesRegex(AssertionError,
+                                                    "Unsafe native|Unisolated native|Native preference plist"):
+                            self.run_command(*command)
+                        self.assertFalse(marker.exists(), "Unsafe config reached subprocess execution")
+            finally:
+                if original is None:
+                    path.unlink()
+                else:
+                    path.write_text(original)
+
 
     def set_machine_class(self, profile):
         self.class_config.write_text(f'[local]\nclass = {json.dumps(profile)}\n')
@@ -325,6 +409,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.log.write_text("")
 
     def run_command(self, *args, env=None):
+        self.assert_safe_native_configs()
         return subprocess.run(args, cwd=self.other, env=self.env if env is None else env, text=True,
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=90)
 
@@ -339,6 +424,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout)
 
     def snapshot_command(self, *args):
+        self.assert_safe_native_configs()
         return subprocess.run(
             (MISE, "-C", str(self.home), "-E", "app-preferences", "bootstrap", "dotfiles", *args),
             cwd=self.other, env={**self.env, "MISE_CEILING_PATHS": str(self.home)}, text=True,
@@ -365,6 +451,7 @@ class MiseBootstrapTests(unittest.TestCase):
                 for path in (self.manifest, *self.snapshots.values()) if path.exists()}
 
     def assert_snapshot_idle(self, before, config_mode):
+        self.assertEqual(self.native_preferences(), {})
         self.assertTrue(self.snapshot_state() == before, "Snapshot sources or modes changed")
         self.assertEqual((self.home / ".config").stat().st_mode, config_mode)
         self.assert_snapshots(restored=False)
@@ -562,9 +649,20 @@ class MiseBootstrapTests(unittest.TestCase):
         rows = self.records()
         self.assertFalse(any(row["command"] == "brew" and "install" in row["args"] for row in rows))
         writes = [row["args"] for row in rows if row["command"] == "defaults" and "write" in row["args"]]
-        selected = tomllib.loads((self.config.parent / "config.app-preferences.toml").read_text())
-        app_defaults = selected.get("bootstrap", {}).get("macos", {}).get("defaults", {})
-        expected_writes = 77 + sum(len(settings) for settings in app_defaults.values())
+        expected_native = {}
+        for name in ("config.workstation.toml", "config.app-preferences.toml"):
+            selected = tomllib.loads((self.config.parent / name).read_text())
+            if name == "config.workstation.toml":
+                self.assertEqual(sum(len(values) for values in selected["bootstrap"]["macos"]["defaults"].values()), 61)
+            for domain, settings in selected.get("bootstrap", {}).get("macos", {}).get("defaults", {}).items():
+                expected_native[Path(domain).name] = settings
+        actual_native = self.native_preferences()
+        self.assertEqual(actual_native, expected_native)
+        self.assertEqual(actual_native["kCFPreferencesAnyApplication"]["TSMLanguageIndicatorEnabled"], "0")
+        for domain, settings in expected_native.items():
+            for key, value in settings.items():
+                self.assertIs(type(actual_native[domain][key]), type(value))
+        expected_writes = 16  # Complex defaults-extra and Transmission shell operations.
         self.assertEqual(len(writes), expected_writes)
         identities = [(tuple(args[:args.index("write")]), *args[args.index("write") + 1:args.index("write") + 3])
                       for args in writes]
@@ -577,7 +675,7 @@ class MiseBootstrapTests(unittest.TestCase):
             ["-currentHost", "write", "com.apple.ImageCapture", "disableHotPlug", "-bool", "true"],
             ["write", "com.apple.messageshelper.MessageController", "SOInputLineSettings", "-dict-add",
              "automaticEmojiSubstitutionEnablediMessage", "-bool", "false"],
-            ["write", "kCFPreferencesAnyApplication", "TSMLanguageIndicatorEnabled", "-string", "0"],
+            ["write", "com.apple.mail", "NSUserKeyEquivalents", "-dict-add", "Send", "-string", "@↩"],
             ["write", "com.apple.screencapture", "location", "-string", str(self.home / "Desktop")],
         ):
             self.assertIn(expected, writes)
@@ -595,8 +693,10 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assert_snapshots(restored=profile == "home")
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
         self.clear_records()
+        native_before = {path: path.read_bytes() for path in self.native_dir.glob("*.plist")}
         self.assert_success(self.bootstrap())
         self.assert_pipeline()
+        self.assertEqual({path: path.read_bytes() for path in self.native_dir.glob("*.plist")}, native_before)
         self.assert_snapshots(restored=profile == "home")
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
 
@@ -642,6 +742,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertFalse(any(key.startswith("XDG_") for key in received))
         self.assertTrue({"CARGO_HOME", "RUSTUP_HOME", "GOPATH", "DOCKER_CONFIG"}.isdisjoint(received))
         self.assertEqual(self.records(), [], "Even global defaults reads must be opt-in")
+        self.assertEqual(self.native_preferences(), {})
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
         self.assertFalse((self.home / ".config/docker").exists())
 
@@ -707,6 +808,7 @@ class MiseBootstrapTests(unittest.TestCase):
             "-E", "workstation", "exec", "--", "bootstrap-probe"))
         self.assertIn("native-probe-ran", result.stdout)
         self.assertEqual(self.records(), [])
+        self.assertEqual(self.native_preferences(), {})
         self.assertFalse((self.home / ".config/docker").exists())
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
 
@@ -729,6 +831,7 @@ class MiseBootstrapTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, result.stdout)
         self.assertIn("local.class", result.stdout)
         self.assertEqual(self.records(), [], "Class validation must not invoke external mutations")
+        self.assertEqual(self.native_preferences(), {})
         self.assertEqual((self.home / ".config").stat().st_mode & 0o777, 0o755)
         self.assertFalse((self.home / ".config/docker").exists())
         self.assertEqual(list((self.home / "Downloads").iterdir()), [])
@@ -801,6 +904,7 @@ class MiseBootstrapTests(unittest.TestCase):
         # Runtimes remain omitted to keep this test offline; production tools
         # are covered by the separate native dry-run during migration.
         self.assert_success(self.bootstrap("--dry-run"))
+        self.assertEqual(self.native_preferences(), {})
         self.assertTrue(all(row["command"] == "defaults" and
                             row["args"][0] in ("read", "read-type")
                             for row in self.records()))
@@ -843,8 +947,8 @@ class MiseBootstrapTests(unittest.TestCase):
 
     @unittest.skipUnless(YADM, "Requires installed yadm")
     def test_real_yadm_preview_and_preflight_preserve_files_and_permissions(self):
-        # Real yadm setup is confined to the fixture HOME/XDG paths. The fixture
-        # preference interception probe still guards every real mise invocation.
+        # Real yadm setup is confined to fixture HOME/XDG paths. Native domains
+        # are checked before execution; shell defaults stay intercepted.
         self.class_config.unlink()
         self.class_config.parent.rmdir()
         (self.bin / "yadm").unlink()
@@ -889,6 +993,7 @@ class MiseBootstrapTests(unittest.TestCase):
                 result = self.run_command(*command,
                                           env={**self.env, "MISE_CEILING_PATHS": str(self.home)})
                 self.assert_success(result)
+                self.assertEqual(self.native_preferences(), {})
                 self.assertFalse(os.path.lexists(generated), result.stdout)
                 self.assertEqual({path: path.stat().st_mode for path in modes}, modes)
                 self.assertFalse((self.home / "yadm-hook-executed").exists())
@@ -916,6 +1021,7 @@ class MiseBootstrapTests(unittest.TestCase):
         rows = self.records()
         self.assertTrue(any(row["command"] == "brew" and row["args"] == ["bundle"] for row in rows))
         self.assertFalse(any(row["command"] in ("defaults", "osascript", "yadm") for row in rows))
+        self.assertEqual(self.native_preferences(), {})
         self.assertFalse((self.home / ".config/docker/cli-plugins/docker-buildx").is_symlink())
 
     def test_maintenance_runs_exact_operations_from_home(self):

@@ -81,10 +81,10 @@ Old Git history still contains the original snapshots; this migration does not r
 
 ## Checks
 
-On macOS with Python 3.11+, mise and yadm installed:
+On macOS with Python 3.11+, standalone mise and yadm installed:
 
 ```sh
-python3 -m unittest discover -s tests -p 'test_*.py' -v
+PATH="$HOME/.local/bin:$PATH" python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
 Tests use temporary homes; they do not verify application GUI behavior.

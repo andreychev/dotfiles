@@ -22,7 +22,7 @@ SOURCES = (
     ".config/mise/config.app-preferences.toml##class.home",
     ".config/mise/config.app-preferences.toml##class.work",
     ".config/mise/config.workstation.toml", ".config/macos/defaults-extra",
-    ".config/iterm2/defaults", ".config/transmission/defaults",
+    ".config/transmission/defaults",
 )
 STUB = r'''
 import json
@@ -135,6 +135,7 @@ class MiseBootstrapTests(unittest.TestCase):
             "MISE_CEILING_PATHS": str(self.base),
             "MISE_TRUSTED_CONFIG_PATHS": str(self.base),
             "MISE_TASK_RUN_AUTO_INSTALL": "false", "MISE_AUTO_INSTALL": "false",
+            "MISE_AUTO_UPDATE": "false",
             "TMPDIR": str(self.base / "tmp"),
             "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1",
         }
@@ -453,14 +454,13 @@ class MiseBootstrapTests(unittest.TestCase):
         writes = [row["args"] for row in rows if row["command"] == "defaults" and "write" in row["args"]]
         selected = tomllib.loads((self.config.parent / "config.app-preferences.toml").read_text())
         app_defaults = selected.get("bootstrap", {}).get("macos", {}).get("defaults", {})
-        expected_writes = 79 + sum(len(settings) for settings in app_defaults.values())
+        expected_writes = 77 + sum(len(settings) for settings in app_defaults.values())
         self.assertEqual(len(writes), expected_writes)
         identities = [(tuple(args[:args.index("write")]), *args[args.index("write") + 1:args.index("write") + 3])
                       for args in writes]
         self.assertEqual(len(set(identities)), expected_writes, "Each domain/key/scope must be written once")
-        applications = sum(args[args.index("write") + 1] in
-                           ("org.m0k.transmission", "com.googlecode.iterm2.plist") for args in writes)
-        self.assertEqual(applications, 12)
+        applications = sum(args[args.index("write") + 1] == "org.m0k.transmission" for args in writes)
+        self.assertEqual(applications, 10)
         for expected in (
             ["write", "NSGlobalDomain", "AppleLanguages", "-array", "en", "ru"],
             ["write", "com.apple.terminal", "StringEncodings", "-array", "4"],
@@ -515,10 +515,10 @@ class MiseBootstrapTests(unittest.TestCase):
         writes = [row["args"] for row in self.records()
                   if row["command"] == "defaults" and "write" in row["args"]]
         self.assertTrue(any("org.m0k.transmission" in args for args in writes))
-        self.assertTrue(any("com.googlecode.iterm2.plist" in args for args in writes))
+        self.assertFalse(any("com.googlecode.iterm2.plist" in args for args in writes))
 
     def test_explicit_defaults_failure_stops_following_scripts(self):
-        (self.home / ".config/iterm2/defaults").write_text("#!/bin/bash\nexit 37\n")
+        (self.home / ".config/macos/defaults-extra").write_text("#!/bin/bash\nexit 37\n")
         result = self.bootstrap("--only", "macos-defaults")
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse(any("org.m0k.transmission" in row["args"] for row in self.records()))

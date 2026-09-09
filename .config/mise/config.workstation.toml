@@ -25,7 +25,6 @@ run = [
 [bootstrap.hooks.post-defaults]
 run = [
   '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/macos/defaults-extra"',
-  '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/iterm2/defaults" --no-restart',
   '/bin/bash "${XDG_CONFIG_HOME:-$HOME/.config}/transmission/defaults" --no-restart',
 ]
 

@@ -35,5 +35,5 @@ split-inherit-working-directory = true
 # macOS
 macos-titlebar-style = tabs
 
-# Match iTerm2 close behavior
+# Close without confirmation
 confirm-close-surface = false

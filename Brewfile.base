@@ -68,8 +68,6 @@ cask "obsidian"
 
 # Development apps
 cask "ghostty"
-cask "iterm2"
-cask "visual-studio-code"
 cask "zed"
 
 # Productivity and UI enhancements

@@ -69,6 +69,7 @@ class MiseMaintenanceTests(unittest.TestCase):
             "MISE_TRUSTED_CONFIG_PATHS": str(self.base),
             # Unlike the bootstrap fixture, both auto-install switches stay enabled.
             "MISE_TASK_RUN_AUTO_INSTALL": "true", "MISE_AUTO_INSTALL": "true",
+            "MISE_AUTO_UPDATE": "false",
             "XDG_CONFIG_HOME": str(self.home / ".config"),
             "XDG_DATA_HOME": str(self.home / ".local/share"),
             "XDG_STATE_HOME": str(self.home / ".local/state"),

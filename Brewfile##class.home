@@ -4,10 +4,11 @@ instance_eval(File.read(File.expand_path("~/Brewfile.base")))
 # AI
 cask "claude"
 cask "claude-code"
+cask "chatgpt"
+cask "codex"
 
 # Personal apps
 cask "spotify"
-cask "chatgpt"
 
 # Essential apps
 cask "1password@7"
@@ -34,6 +35,7 @@ cask "amneziavpn"
 cask "vlc"
 
 # Personal Mac App Store apps
+mas "The Unarchiver", id: 425424353
 mas "1Blocker", id: 1365531024
 mas "Outline", id: 1356178125
 mas "DjVu Reader Pro", id: 895264364

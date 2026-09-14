@@ -11,26 +11,32 @@ cursor-style = bar
 cursor-style-blink = false
 shell-integration-features = no-cursor
 
-# Initial terminal dimensions
-window-width = 80
-window-height = 25
+# Window
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+window-width = 100
+window-height = 200
+
+# Splits
+unfocused-split-opacity = 0.85
+split-preserve-zoom = navigation
 
 # Appearance
 macos-icon = retro
-window-padding-x = 5
-window-padding-y = 2
 background-opacity = 1
 background-blur-radius = 0
 unfocused-split-opacity = 0.95
 
 # History
-scrollback-limit = 10000
+scrollback-limit = 100000000
 
 # Working directory behavior
 working-directory = home
 window-inherit-working-directory = false
 tab-inherit-working-directory = false
 split-inherit-working-directory = true
+copy-on-select = clipboard
 
 # macOS
 macos-titlebar-style = tabs

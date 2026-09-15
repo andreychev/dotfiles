@@ -74,7 +74,7 @@ cask "ghostty"
 cask "zed"
 
 # Productivity and UI enhancements
-cask "raycast"
+cask "abue-ammar/tinycast/tinycast"
 cask "quitter"
 cask "bartender"
 cask "cleanshot"

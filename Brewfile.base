@@ -87,7 +87,6 @@ cask "logitech-g-hub"
 cask "latest"
 
 # Utility Apps from Mac App Store
-mas "Paste", id: 967805235
 mas "Velja", id: 1607635845
 mas "Dato", id: 1470584107
 mas "Lungo", id: 1263070803

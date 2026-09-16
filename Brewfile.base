@@ -60,7 +60,6 @@ cask "ilya-birman-typography-layout"
 
 # QuickLook plugins
 cask "qlmarkdown"
-cask "quicklook-csv"
 
 # Browsers
 cask "google-chrome"
@@ -93,7 +92,6 @@ mas "Velja", id: 1607635845
 mas "Dato", id: 1470584107
 mas "Lungo", id: 1263070803
 mas "Shareful", id: 1522267256
-mas "Flighty", id: 1358823008
 mas "Obsidian Web Clipper", id: 6720708363
 
 # Productivity Suite from Mac App Store

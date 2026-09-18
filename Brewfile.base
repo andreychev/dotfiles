@@ -75,7 +75,6 @@ cask "zed"
 # Productivity and UI enhancements
 cask "abue-ammar/tinycast/tinycast"
 cask "quitter"
-cask "bartender"
 cask "cleanshot"
 
 # Hardware tools

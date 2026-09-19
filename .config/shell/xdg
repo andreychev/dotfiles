@@ -22,5 +22,6 @@ alias wget="wget --hsts-file=\$XDG_CACHE_HOME/wget/wget-hsts"
 
 export PYTHONSTARTUP="$HOME"/python/pythonrc
 
-# Oh My Pi: dedicated configuration directory.
+# Oh My Pi: PI_CONFIG_DIR is relative to HOME; the agent directory is absolute.
+export PI_CONFIG_DIR="${XDG_CONFIG_HOME#"$HOME"/}/omp"
 export PI_CODING_AGENT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omp"

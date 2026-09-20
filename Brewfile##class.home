@@ -16,7 +16,6 @@ cask "yandex-disk"
 
 # Personal hardware and media tools
 cask "adobe-creative-cloud"
-cask "airbuddy"
 cask "imazing"
 cask "transmission"
 cask "qflipper"

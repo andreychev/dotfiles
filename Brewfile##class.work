@@ -4,6 +4,7 @@ instance_eval(File.read(File.expand_path("~/Brewfile.base")))
 # Work-specific tools — add as needed
 
 cask "bartender"
+cask "bruno"
 
 # AI
 brew "can1357/tap/omp"

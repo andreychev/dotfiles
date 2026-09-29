@@ -38,6 +38,7 @@ brew "bat"
 brew "tealdeer"
 brew "ripgrep"
 brew "fd"
+brew "pstree"
 
 # Development tools
 brew "scmpuff"

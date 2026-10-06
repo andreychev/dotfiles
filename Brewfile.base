@@ -59,9 +59,6 @@ cask "font-fira-code-nerd-font"
 # Keyboard layout
 cask "ilya-birman-typography-layout"
 
-# QuickLook plugins
-cask "qlmarkdown"
-
 # Browsers
 cask "google-chrome"
 cask "firefox"

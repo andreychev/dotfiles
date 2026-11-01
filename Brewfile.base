@@ -48,6 +48,7 @@ brew "docker-compose"
 brew "colima"
 brew "qemu"
 brew "umputun/apps/revdiff"
+brew "mokevnin/tap/heavy"
 
 # System utilities
 brew "xdg-ninja"
